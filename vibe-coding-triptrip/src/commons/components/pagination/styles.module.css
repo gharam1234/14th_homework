@@ -1,0 +1,80 @@
+.root {
+  /* 피그마 기준: 전체 높이 32, 아이템 32, 간격 8, 둥근모서리 8 */
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 좌/우 아이콘 버튼: 24x24 아이콘 박스 기준 주변 터치 영역 보정 */
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #5f6368; /* chevron 아이콘 컬러 */
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, opacity 120ms ease;
+}
+.iconButton:disabled { opacity: 0.4; cursor: not-allowed; }
+.iconButton:hover { background-color: rgba(0,0,0,0.04); }
+.iconButton:active { background-color: rgba(0,0,0,0.06); }
+
+.items {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 페이지 아이템: 32x32, Pretendard 16/24, Medium(활성)/Regular(비활성) */
+.item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: #777777;
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, opacity 120ms ease;
+}
+
+.item:hover { background-color: rgba(0,0,0,0.04); }
+.item:active { background-color: rgba(0,0,0,0.06); }
+
+/* 활성 아이템: 배경 #f2f2f2, 라벨 #000000, 폰트 500 */
+.itemActive {
+  background-color: #f2f2f2;
+  color: #000000;
+  font-weight: 500;
+}
+
+/* variant: primary | secondary | tertiary */
+.variantPrimary {}
+.variantSecondary {}
+.variantTertiary {}
+
+/* size: small | medium | large -> 32 기준으로 스케일 */
+.sizeSmall .iconButton, .sizeSmall .item { width: 28px; height: 28px; border-radius: 6px; }
+.sizeSmall .item { font-size: 14px; line-height: 20px; }
+
+.sizeMedium .iconButton, .sizeMedium .item { width: 32px; height: 32px; border-radius: 8px; }
+.sizeMedium .item { font-size: 16px; line-height: 24px; }
+
+.sizeLarge .iconButton, .sizeLarge .item { width: 40px; height: 40px; border-radius: 10px; }
+.sizeLarge .item { font-size: 18px; line-height: 26px; }
+
+/* 전체 비활성 */
+.isDisabled { opacity: 0.6; pointer-events: none; }
+
+
