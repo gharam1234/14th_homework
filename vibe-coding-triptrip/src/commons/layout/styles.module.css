@@ -1,0 +1,117 @@
+.container {
+  /* 와이어프레임 전체 컨테이너: 가운데 정렬, 고정 폭 1920px */
+  width: 1920px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.navigation {
+  /* 1920x80 */
+  width: 1920px; 
+  height: 80px;
+  display: flex;
+  flex-shrink: 0;
+  background: var(--color-surface-default);
+}
+
+.navigationInner {
+  /* 내부 컨테이너: 1280x80, 가운데 정렬 */
+  width: 1280px;
+  height: 80px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navLeftGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoArea {
+  /* 로고 placeholder: 56x32 */
+  width: 56px;
+  height: 32px;
+  background: transparent;
+}
+
+.tapGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tapItem {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.tapLabel {
+  /* Pretendard 16 / 24 / 500 */
+  font-size: var(--typo-desktop-bodyMd-fontSize);
+  line-height: var(--typo-desktop-bodyMd-lineHeight);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.tapLabelPrimary {
+  /* 활성 탭 라벨: Pretendard Bold 16/24, 주 텍스트 컬러 */
+  font-size: var(--typo-desktop-bodyMd-fontSize);
+  line-height: var(--typo-desktop-bodyMd-lineHeight);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.tapActive {
+  /* 활성 탭 배경 강조 */
+  background: var(--color-surface-subtle);
+}
+
+.navRightGroup {
+  display: flex;
+  align-items: center;
+}
+
+.loginButton {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 100px;
+  background: var(--color-action-neutral);
+  color: var(--color-on-action-neutral);
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600; /* SemiBold */
+}
+
+.banner {
+  /* 1920x516 */
+  width: 1920px;
+  height: 516px;
+  flex-shrink: 0;
+}
+
+.gap {
+  /* 1920x40 */
+  width: 1920px;
+  height: 40px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.content {
+  /* 1920 x auto */
+  width: 1920px;
+  min-height: 1px;
+  display: block;
+}
+
+

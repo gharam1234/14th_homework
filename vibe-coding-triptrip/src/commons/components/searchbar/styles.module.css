@@ -1,0 +1,81 @@
+
+.root {
+  /* 피그마 기준: 높이 48, 좌우 패딩 16, 라운드 8 */
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px; /* 라벨-필드 간격 */
+}
+
+.label {
+  /* 피그마 텍스트: Regular 12/20, #333333 */
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #333333;
+}
+
+.field {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 240px;
+  height: 48px; /* 기본 높이 */
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #f2f2f2; /* 피그마 채움: #f2f2f2 */
+  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.input {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 16px; /* 피그마 16 */
+  line-height: 24px; /* 피그마 24 */
+  color: #111111;
+  padding: 0 12px;
+}
+
+.leftIcon,
+.rightIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+/* 포커스 가시성 */
+.field:focus-within {
+  border-color: #2974e5;
+  box-shadow: 0 0 0 3px rgba(41, 116, 229, 0.15);
+}
+
+/* 비활성 */
+.isDisabled .field {
+  background-color: #f3f4f6;
+  border-color: #e5e7eb;
+}
+.isDisabled .input { color: #9ca3af; }
+
+/* variant */
+.variantPrimary .field { background-color: #f2f2f2; }
+.variantSecondary .field { background-color: #ffffff; }
+.variantTertiary .field { background-color: transparent; border-color: #e5e7eb; }
+
+/* size */
+.sizeSmall .field { height: 36px; padding: 0 10px; border-radius: 8px; }
+.sizeSmall .input { font-size: 14px; line-height: 20px; padding: 0 8px; }
+
+.sizeMedium .field { height: 40px; padding: 0 12px; border-radius: 8px; }
+.sizeMedium .input { font-size: 14px; line-height: 20px; padding: 0 10px; }
+
+.sizeLarge .field { height: 52px; padding: 0 16px; border-radius: 10px; }
+.sizeLarge .input { font-size: 18px; line-height: 26px; padding: 0 12px; }
+
+

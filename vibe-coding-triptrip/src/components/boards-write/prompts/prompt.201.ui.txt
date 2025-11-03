@@ -1,0 +1,75 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+==============================================
+
+조건-피그마) 활용할MCP: CursorTalkToFigmaMCP(채널명: 8ovh29mt)
+조건-피그마) 구현될 컴포넌트 노드ID(write-header 영역): 285:32386
+조건-피그마) 구현될 컴포넌트 노드ID(write-title 영역): 285:32394
+조건-피그마) 구현될 컴포넌트 노드ID(write-contents 영역): 285:32396
+조건-피그마) 구현될 컴포넌트 노드ID(write-address 영역): 285:32401
+조건-피그마) 구현될 컴포넌트 노드ID(write-utube 영역): 285:32406
+조건-피그마) 구현될 컴포넌트 노드ID(write-images 영역): 285:32408
+조건-피그마) 구현될 컴포넌트 노드ID(write-footer 영역): 285:32416
+
+조건-파일경로) 구현될 TSX 파일경로: src/components/boards-write/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/boards-write/styles.module.css
+
+==============================================
+
+조건-공통목록) 사용할 공통컴포넌트 목록
+            - <Input />, <Button />
+
+조건-공통목록) 사용할 색상 목록(global.css에 명시된 변수 토큰 활용)
+            - 비슷한 토큰 선택하여 사용(하드코딩 금지)
+
+조건-공통목록) 사용할 타이포그래피 목록(global.css에 명시된 변수 토큰 활용)
+            - 비슷한 토큰 선택하여 사용(하드코딩 금지)
+
+==============================================
+
+핵심요구사항) MCP를 연동하여 피그마의 디자인을 이미 만들어져있는 와이어프레임의 
+            - write-header
+            - write-title
+            - write-contents
+            - write-address
+            - write-utube
+            - write-images
+            - write-footer 영역에 그대로 구현할 것.
+                    
+                    
+
+기존히스토리 참고만 할것 - 핵심요구사항) 공통컴포넌트는 다음의 규칙을 지켜 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1. 공통컴포넌트 원본을 수정하지 말고, 아래의 props만 활용할 것.
+                - variant: primary, secondary를 확인하여 구현할 것.
+                - size: 피그마와 일치할 것.
+                - className 전달: width만 허용할 것.
+
+            2. 적용될 공통컴포넌트 목록을 구현할 것.
+
+             write-header : 공통컴포넌트없음
+             write-title : 제목입력: <Input />
+             write-contents : 내용입력: <Input />
+             write-address : 우편번호검색: <Input /> (disabled) , 주소 : <Input /> (readonly) , 상세주소 : <Input /> 
+             write-utube : 유튜브 링크 : <Input />
+             write-images : images/add-image.png 이미지 3개를 구현할것 (간격 16px)
+             write-footer : - 닫기버튼: <Button />
+                            - 등록하기버튼: <Button />
+
+핵심요구사항) 다음문제를 해결할 것
+-현재상황 : CursorTalkToFigmaMCP를 활용하지 않음
+-해결방향 : CursorTalkToFigmaMCP를 활용하여 미세한 css 조정
+
+핵심요구사항) 
+1. index.tsx에 제목과 내용 주소 유튜브링크 사진첨부 소제목을 <h2>태그로 만들어주고
+2. 인풋과 간격은 8px 타이포그래피는 피그마mcp를 활용해서 피그마와 같게 할것
+3. 우편번호검색 text는 <input />이 아니라 button에 달려있을것 ,
+4. 내용 input은 피그마 원안대로 높이 336px로 할것
+5. {gap : 1280 * 40} 짜리 갭이 2개 연달아 있는 곳에는 두 갭사이에 피그마 원안대로 수평선을 그려줄것

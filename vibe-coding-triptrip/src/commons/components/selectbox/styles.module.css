@@ -1,0 +1,132 @@
+.root {
+  /* 피그마 기준: 라벨-트리거-헬퍼 세로 스택 */
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px; /* 라벨/필드/헬퍼 간 간격 */
+}
+
+.label {
+  /* 피그마 토큰: Regular 12/20, #333333 */
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #333333;
+}
+
+.trigger {
+  /* 트리거 버튼: 좌측 라벨, 우측 아이콘 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 240px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #cfd4dc;
+  background-color: #ffffff;
+  color: #111111;
+  cursor: pointer;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease, opacity 120ms ease;
+}
+
+.selectedValue {
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: #111111;
+}
+
+.placeholder { color: #9ca3af; }
+
+.rightIcon {
+  margin-left: 8px;
+  color: #6b7280;
+}
+
+/* 포커스 스타일 */
+.trigger:focus-visible {
+  outline: none;
+  border-color: #2974e5;
+  box-shadow: 0 0 0 3px rgba(41, 116, 229, 0.15);
+}
+
+/* 패널 및 리스트박스 */
+.panel {
+  position: relative;
+}
+
+.listbox {
+  position: absolute;
+  z-index: 20;
+  margin-top: 6px;
+  min-width: 100%;
+  max-height: 280px;
+  overflow: auto;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #111111;
+}
+
+.option:hover { background-color: #f3f4f6; }
+
+.isHighlighted { background-color: #eef2ff; }
+.isSelected { font-weight: 600; }
+.optionDisabled { color: #9ca3af; cursor: not-allowed; }
+
+.optionLabel {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.checkIcon { color: #2974e5; }
+
+/* 에러/헬퍼 텍스트 */
+.errorText {
+  font-size: 12px;
+  line-height: 16px;
+  color: #b91c1c;
+}
+
+.helperText {
+  font-size: 12px;
+  line-height: 16px;
+  color: #6b7280;
+}
+
+/* 상태: 오픈/비활성/에러 */
+.isOpen .trigger { border-color: #2974e5; box-shadow: 0 0 0 3px rgba(41, 116, 229, 0.12); }
+.isDisabled .trigger { background-color: #f3f4f6; border-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+.isDisabled .rightIcon { color: #c4c4c4; }
+.isError .trigger { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12); }
+
+/* variant: primary | secondary | tertiary */
+.variantPrimary .trigger { background-color: #ffffff; }
+.variantSecondary .trigger { background-color: #f9fafb; }
+.variantTertiary .trigger { background-color: transparent; border-color: #e5e7eb; }
+
+/* size: small | medium | large */
+.sizeSmall .trigger { height: 36px; padding: 0 10px; border-radius: 8px; }
+.sizeSmall .selectedValue { font-size: 14px; line-height: 20px; }
+
+.sizeMedium .trigger { height: 40px; padding: 0 12px; border-radius: 8px; }
+.sizeMedium .selectedValue { font-size: 14px; line-height: 20px; }
+
+.sizeLarge .trigger { height: 52px; padding: 0 14px; border-radius: 10px; }
+.sizeLarge .selectedValue { font-size: 18px; line-height: 26px; }
+
+

@@ -1,0 +1,448 @@
+/* 마이페이지 컴포넌트 스타일 */
+
+/* 메인 컨테이너 */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 40px 20px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* 제목 */
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 36px;
+  color: #000000;
+  margin: 0;
+}
+
+/* 메인 레이아웃 */
+.mainLayout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+/* 왼쪽 사이드바 */
+.sidebar {
+  flex: 0 0 auto;
+  width: 280px;
+  min-width: 280px;
+}
+
+/* 오른쪽 콘텐츠 영역 */
+.contentArea {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* 사용자 정보 섹션 */
+.userInfo {
+  background-color: #ffffff;
+  border: 1px solid #e4e4e4;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 사용자 정보 제목 */
+.userInfoTitle {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  color: #000000;
+  margin: 0;
+}
+
+/* 프로필 섹션 */
+.profile {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  width: 100%;
+}
+
+.profileImage {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.profileName {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #333333;
+  margin: 0;
+}
+
+/* 구분선 */
+.divider {
+  height: 1px;
+  background-color: #e4e4e4;
+  margin: 0;
+}
+
+/* 포인트 섹션 */
+.pointsSection {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.pointIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.pointsValue {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #000000;
+}
+
+.pointsValueNumber {
+  margin: 0;
+}
+
+.pointsValueLabel {
+  margin: 0;
+}
+
+/* 메뉴 아이템 */
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menuItem {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background-color: #f2f2f2;
+}
+
+.menuItemActive {
+  background-color: #f2f2f2;
+}
+
+.menuItemText {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: #000000;
+  margin: 0;
+}
+
+.menuItemIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* 탭 섹션 */
+.tabSection {
+  display: flex;
+  gap: 16px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 0;
+  width: 100%;
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #666666;
+  transition: all 0.2s ease;
+}
+
+.tabActive {
+  background-color: #000000;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* 검색 섹션 */
+.searchSection {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+  height: 48px;
+}
+
+.searchBar {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background-color: #f2f2f2;
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 180px;
+  max-width: 640px;
+  font-size: 16px;
+  line-height: 24px;
+  color: #919191;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 16px;
+  color: #333333;
+}
+
+.searchInput::placeholder {
+  color: #919191;
+}
+
+.searchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  height: 48px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  min-width: 64px;
+}
+
+.searchButton:hover {
+  background-color: #333333;
+}
+
+/* 테이블 섹션 */
+.tableContainer {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px 48px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+}
+
+.tableHeader {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  margin-bottom: 12px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.tableHeaderCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #1c1c1c;
+  margin: 0;
+}
+
+.tableHeaderNumber {
+  width: 64px;
+  flex-shrink: 0;
+}
+
+.tableHeaderName {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.tableHeaderPrice {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.tableHeaderDate {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+/* 테이블 행 */
+.tableRow {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  margin-bottom: 12px;
+  border: 1px solid #f2f2f2;
+  border-radius: 8px;
+  width: 100%;
+  background-color: #ffffff;
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: #f9f9f9;
+}
+
+.tableCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 20px;
+  color: #333333;
+  margin: 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tableCellNumber {
+  width: 64px;
+  flex-shrink: 0;
+  color: #919191;
+}
+
+.tableCellName {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+  text-align: left;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tableCellNameText {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tableCellStatus {
+  font-weight: 700;
+  color: #2974e5;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.tableCellPrice {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.tableCellDate {
+  width: 100px;
+  flex-shrink: 0;
+  color: #919191;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .mainLayout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  .tableContainer {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    gap: 24px;
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .searchSection {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .searchBar {
+    width: 100%;
+  }
+
+  .tableContainer {
+    overflow-x: auto;
+    padding: 16px;
+  }
+
+  .tableHeader,
+  .tableRow {
+    padding: 12px 16px;
+  }
+
+  .tableHeaderNumber,
+  .tableCellNumber {
+    width: 50px;
+  }
+
+  .tableHeaderPrice,
+  .tableCellPrice {
+    width: 80px;
+  }
+
+  .tableHeaderDate,
+  .tableCellDate {
+    width: 80px;
+  }
+}
