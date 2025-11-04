@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 // import ApolloUploadSetting from "@/commons/setttings/apollo-setting";
+import dynamic from "next/dynamic";
 import Layout from "@/commons/layout";
-import ApiHeaderProvider from "@/commons/setttings/apollo-setting";
+
+const ApiHeaderProvider = dynamic(
+  () => import("@/commons/setttings/apollo-setting"),
+  { ssr: false }
+);
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
