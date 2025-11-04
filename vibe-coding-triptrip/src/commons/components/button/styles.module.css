@@ -1,0 +1,77 @@
+.root {
+  /* 피그마 기준 높이 48, 좌우 16 패딩, 라운드 8 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* 아이콘-라벨 간격 */
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, opacity 120ms ease;
+}
+
+/* 공통 라벨 스타일: Pretendard 18/24, 세미볼드 */
+.label {
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.leftIcon,
+.rightIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* variant: primary */
+.variantPrimary {
+  background-color: #2974e5; /* Figma fill */
+  color: #ffffff; /* onPrimary */
+  border-color: transparent;
+}
+
+/* variant: secondary (stroke 검정, 배경 흰색) */
+.variantSecondary {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #000000;
+}
+
+/* state: active (기본 상호작용 허용) */
+.stateActive {
+  opacity: 1;
+}
+
+/* state: inactive (Figma 색상 반영) */
+.stateInactive.variantPrimary {
+  background-color: #c7c7c7; /* 비활성 배경 */
+  color: #e4e4e4; /* 비활성 라벨 */
+}
+
+.stateInactive.variantSecondary {
+  background-color: #ffffff; /* secondary 비활성도 배경 동일 */
+  color: #000000; /* 라벨은 검정 유지 (디자인 기준) */
+  border-color: #000000;
+  opacity: 0.5; /* 상호작용 불가 시 시각적 구분 */
+}
+
+/* 호버/프레스 상태: 접근성 고려하여 미세 변화 */
+.variantPrimary.stateActive:hover { background-color: #2468cf; }
+.variantPrimary.stateActive:active { background-color: #1f5cb8; }
+
+.variantSecondary.stateActive:hover { opacity: 0.9; }
+.variantSecondary.stateActive:active { opacity: 0.8; }
+
+/* 비활성 상호작용 차단 */
+.stateInactive { cursor: not-allowed; }
+
+

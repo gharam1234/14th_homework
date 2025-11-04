@@ -1,0 +1,148 @@
+.writeContainer {
+  /* 작성 컨테이너: 가로 1280px 고정, 수직 스택 */
+  width: 1280px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.gap {
+  /* {gap}: 1280 * 40 */
+  width: 1280px;
+  height: 40px;
+}
+
+.writeHeader {
+  /* write-header: 1280 * 68 */
+  width: 1280px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-primary);
+}
+.headerTitle {
+  /* 제목 타이포 토큰 적용 */
+  font-size: var(--typo-desktop-headingLg-fontSize);
+  line-height: var(--typo-desktop-headingLg-lineHeight);
+  font-weight: var(--typo-desktop-headingLg-fontWeight);
+}
+
+.writeTitle {
+  /* write-title: 1280 * 80 */
+  width: 1280px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: center;
+  background: var(--color-surface-default);
+}
+
+.writeContents {
+  /* write-contents: 1280 * 368 */
+  width: 1280px;
+  height: 368px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-subtle);
+}
+
+.writeAddress {
+  /* write-address: 1280 * 192 */
+  width: 1280px;
+  height: 192px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  background: var(--color-surface-default);
+}
+.addressRow {
+  /* 주소 입력 행: 좌우 정렬/간격 */
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-start;
+}
+.zipInput {
+  /* 우편번호 입력 사이즈 고정 */
+  width: 82px; /* 피그마 우편번호 예시 5자리 폭 근사 */
+}
+.zipButton {
+  /* 우편번호 검색 버튼 너비 */
+  width: 130px; /* 피그마 버튼 폭 */
+}
+
+.writeUtube {
+  /* write-utube: 1280 * 80 */
+  width: 1280px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-default);
+}
+
+.writeImages {
+  /* write-images: 1280 * 192 */
+  width: 1280px;
+  height: 192px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-subtle);
+}
+.imageGrid {
+  /* 3열 고정, 간격 16px */
+  display: grid;
+  grid-template-columns: repeat(3, 160px);
+  gap: 16px;
+  width: auto;
+}
+.imageItem {
+  /* placeholder 이미지 크기 맞춤 */
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  background: var(--color-surface-default);
+  border: 1px dashed var(--color-outline);
+  border-radius: 8px;
+}
+
+.writeFooter {
+  /* write-footer: 1280 * 48 */
+  width: 1280px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-default);
+}
+.footerButtons {
+  /* 좌우 버튼 간 간격 고정 */
+  width: 1280px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 0 0; /* 피그마 기준 우측 정렬 */
+}
+.footerButtonLeft {
+  /* secondary 버튼 너비만 className으로 제어 */
+  width: 64px; /* 피그마 취소 버튼 폭 */
+}
+.footerButtonRight {
+  /* primary 버튼 너비만 className으로 제어 */
+  width: 95px; /* 피그마 등록하기 버튼 폭 */
+}
+
+/* 공통 유틸: 폭 100% 지정 */
+.fullWidth {
+  width: 1280px; /* 피그마 폭과 정확히 일치 */
+}
+
+
