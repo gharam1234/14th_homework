@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
 test.describe("TokenMarketplace Component", () => {
   test.beforeEach(async ({ page }) => {
     // 테스트 페이지 이동
-    await page.goto("http://localhost:3000/test/token-marketplace");
+    await page.goto("http://localhost:3000/tokens");
   });
 
   test("컴포넌트가 렌더링되어야 함", async ({ page }) => {
