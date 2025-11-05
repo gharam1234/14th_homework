@@ -1,0 +1,171 @@
+## 토큰 상세 페이지 (Token Detail) - UI 디자인
+
+### 📐 레이아웃 & 구조
+- **최대 너비**: 1280px (고정)
+- **배경색**: #ffffff (흰색)
+- **주요 간격**: 40px (섹션 간), 24px (서브섹션), 16px (요소), 8px (미세 조정)
+
+---
+
+### 🎨 섹션별 디자인
+
+#### 1. 헤더 섹션 (Header Section)
+**구성요소:**
+- 제목 행 (Title Row)
+  - 제목: "Claude Code Token - Cursor Edition"
+  - 폰트: Pretendard Bold 28px, 높이 36px
+  - 색상: #000000
+
+- 액션 버튼 (Action Buttons) - 우측 정렬
+  - 삭제 아이콘 (24x24)
+  - 공유 아이콘 (24x24)
+  - 위치 아이콘 (24x24)
+  - 북마크 배지
+    - 배경: rgba(0, 0, 0, 0.4) (반투명 검정)
+    - 패딩: 4px 8px
+    - 모서리: 8px 라운드
+    - 그림자: 0px 0px 8px rgba(0, 0, 0, 0.25)
+    - 아이콘 + 숫자 (24px + 텍스트)
+
+**부제목:**
+- 텍스트: "신뢰할 수 있는 거래"
+- 폰트: Pretendard Variable Medium 16px, 높이 24px
+- 색상: #777777
+
+**해시태그:**
+- 텍스트: "#인기토큰 #클로드코드 #신뢰"
+- 폰트: Pretendard Variable Medium 16px
+- 색상: #2974e5 (파랑)
+
+---
+
+#### 2. 이미지 갤러리 (Image Gallery)
+**레이아웃:** Flexbox 가로 배치
+
+**메인 이미지:**
+- 크기: 640px x 480px
+- 모서리: 8px 라운드
+- 객체 적용: cover
+- 반응형: 모바일에서 100% 너비
+
+**썸네일:**
+- 컨테이너: 180px 너비, 480px 높이
+- 갭: 16px (수직)
+- 썸네일 개별: 180px x 136px
+- 모서리: 8px 라운드
+
+**비활성 썸네일:**
+- 투명도: 50% (opacity: 0.5)
+
+**그라데이션 오버레이:**
+- 위치: 썸네일 상단에 절대 위치
+- 방향: 아래로 (linear-gradient)
+- 시작: rgba(255, 255, 255, 0) @ 85.521%
+- 종료: #ffffff @ 102.19%
+
+---
+
+#### 3. 구분선 (Divider)
+- 높이: 1px
+- 색상: #d4d3d3
+- 여백: 40px (상하)
+
+---
+
+#### 4. 상세 설명 섹션 (Description Section)
+**제목:**
+- 텍스트: "상세 설명"
+- 폰트: Pretendard Bold 20px, 높이 28px
+- 색상: #333333
+
+**컨텐츠:**
+- 폰트: Pretendard Variable Regular 16px, 높이 24px
+- 색상: #333333
+- 줄바꿈: pre-wrap (형식 유지)
+- 최대 너비: 844px
+
+---
+
+#### 5. 위치 섹션 (Location Section)
+**제목:**
+- 동일한 스타일 (상세 설명과 동일)
+
+**지도 컨테이너:**
+- 크기: 844px x 280px
+- 모서리: 16px 라운드
+- 테두리: 1px solid #e4e4e4
+- 객체 적용: cover
+- 오버플로우: hidden
+
+---
+
+#### 6. 문의 섹션 (Inquiry Section)
+**헤더:**
+- 아이콘 (24x24) + "이 판매자에게 문의하기"
+- 폰트: Pretendard Variable SemiBold 16px
+- 색상: #000000
+
+**메시지 입력:**
+- 최소 높이: 96px
+- 패딩: 12px 16px
+- 테두리: 1px solid #d4d3d3
+- 배경: #ffffff
+- 모서리: 8px 라운드
+- 폰트: Pretendard Variable Regular 16px
+- 색상: #333333
+- 플레이스홀더: #ababab
+- 리사이즈: vertical
+
+**문자수 카운터:**
+- 위치: 입력창 우측 하단
+- 폰트: Pretendard Variable Medium 14px
+- 색상: #ababab
+- 형식: "0/100"
+
+**버튼 (구매하기):**
+- 높이: 48px
+- 패딩: 12px 16px
+- 배경: #000000
+- 텍스트: "구매하기"
+- 폰트: Pretendard Variable SemiBold 18px
+- 색상: #ffffff
+- 모서리: 8px 라운드
+- 상태:
+  - Hover: #333333
+  - Active: #000000
+
+**빈 상태 메시지:**
+- 텍스트: "아직 문의가 없습니다."
+- 폰트: Pretendard Variable Regular 14px, 높이 20px
+- 색상: #777777
+- 정렬: center
+
+---
+
+### 🎯 포인트 디테일
+
+1. **폰트 패밀리:**
+   - 제목/헤더: Pretendard (Bold)
+   - 일반 텍스트: Pretendard Variable (Regular, Medium, SemiBold)
+
+2. **색상 팔레트:**
+   - 검정: #000000 (제목, 버튼, 아이콘)
+   - 회색: #333333, #777777, #ababab, #d4d3d3 (텍스트 계층)
+   - 강조색: #2974e5 (해시태그)
+   - 배경: #ffffff
+
+3. **그림자 & 효과:**
+   - 북마크 배지: 0px 0px 8px rgba(0, 0, 0, 0.25)
+   - 텍스트 그림자: 0px 0px 4px rgba(0, 0, 0, 0.25) (북마크 숫자)
+
+4. **반응형 조정:**
+   - 모바일: 이미지 갤러리 세로 배치
+   - 모바일: 썸네일 가로 스크롤
+
+---
+
+### 🔧 Figma 정보
+- **Figma 파일**: 메인캠프 - 복사
+- **Node ID**: 285-32188
+- **디자인 컨셉**: 당근마켓 스타일 토큰 거래 플랫폼
+- **생성 도구**: Figma to React (Claude Code)
