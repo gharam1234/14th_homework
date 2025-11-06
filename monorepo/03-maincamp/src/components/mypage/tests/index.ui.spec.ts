@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test";
  */
 test.describe("TokenWallet Component", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("http://localhost:3000/test/mypage");
+    await page.goto("http://localhost:3000/mypage");
   });
 
   test("컴포넌트가 렌더링되어야 함", async ({ page }) => {
