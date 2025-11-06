@@ -1,0 +1,78 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-detail/hooks/index.bookmark.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/phone-detail/tests/index.bookmark.hook.spec.ts
+
+==============================================
+
+핵심요구사항) phone-detail 컴포넌트의 북마크 기능을 관리하는 커스텀 훅을 구현할 것.
+
+1) 훅 상태 관리
+   1-1) 다음의 상태를 관리할 것
+        - isBookmarked: boolean (현재 북마크 상태)
+        - bookmarkCount: number (현재 북마크 수)
+        - isLoading: boolean (로딩 상태)
+        - error: string | null (에러 메시지)
+
+2) 초기 데이터 조회
+   2-1) useEffect를 사용하여 컴포넌트 마운트 시 초기 데이터를 조회할 것
+        - GET /api/phones/{phoneId}/bookmark/status 호출
+        - GET /api/phones/{phoneId}/bookmark/count 호출
+        - 두 API를 병렬로 처리할 것
+
+   2-2) 조회 성공 시
+        - isBookmarked 상태 업데이트
+        - bookmarkCount 상태 업데이트
+
+   2-3) 조회 실패 시
+        - error에 에러 메시지 저장
+
+3) 북마크 추가 함수
+   3-1) addBookmark() 함수를 구현할 것
+        - isBookmarked를 true로 변경할 것 (낙관적 업데이트)
+        - POST /api/phones/{phoneId}/bookmark 호출
+        - 요청 본문: { userId: string }
+        - 성공 시 bookmarkCount를 응답값으로 업데이트
+        - 실패 시 isBookmarked를 false로 롤백
+
+4) 북마크 제거 함수
+   4-1) removeBookmark() 함수를 구현할 것
+        - isBookmarked를 false로 변경할 것 (낙관적 업데이트)
+        - DELETE /api/phones/{phoneId}/bookmark 호출
+        - 성공 시 bookmarkCount를 응답값으로 업데이트
+        - 실패 시 isBookmarked를 true로 롤백
+
+5) 토글 함수
+   5-1) toggleBookmark() 함수를 구현할 것
+        - isBookmarked 상태에 따라 add/remove 함수 호출
+        - isLoading 중에는 호출 방지
+
+6) 훅 반환값
+   훅은 다음 객체를 반환할 것:
+   {
+     isBookmarked: boolean,
+     bookmarkCount: number,
+     isLoading: boolean,
+     addBookmark: () => Promise<void>,
+     removeBookmark: () => Promise<void>,
+     toggleBookmark: () => Promise<void>
+   }
+
+핵심요구사항) 테스트 시나리오
+            1) 초기 상태 조회 테스트
+               - API 호출 확인
+               - 상태 업데이트 확인
+
+            2) 북마크 추가/제거 테스트
+               - 낙관적 업데이트 확인
+               - 롤백 처리 확인
+
+            3) 에러 처리 테스트
+               - API 실패 시 error 상태 업데이트 확인
