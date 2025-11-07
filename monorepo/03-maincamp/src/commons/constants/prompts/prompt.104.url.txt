@@ -1,0 +1,244 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+
+==============================================
+
+조건-파일경로) 구현될 TS 파일경로: src/commons/constants/url.ts
+
+==============================================
+
+핵심요구사항)
+애플리케이션의 모든 URL 라우트를 중앙집중식으로 관리하는 설정 파일을 작성할 것.
+다음 16개의 라우트를 포함하고, 각 라우트별로 접근 권한(PUBLIC/MEMBER_ONLY), 배너/네비게이션 표시 여부, 네비게이션 메뉴 정보를 정의할 것.
+라우트 설정에 기반한 유틸 함수들을 제공할 것:
+- getPath(): 동적 세그먼트를 포함한 경로 생성
+- isAccessible(): 접근 권한 검사
+- isBannerVisible(): 배너 표시 여부 확인
+- isNavigationVisible(): 네비게이션 표시 여부 확인
+- findRouteKeyByPath(): 경로로부터 라우트 키 찾기
+- getNavigationMenuItems(): 네비게이션 메뉴 자동 생성 (order로 정렬)
+- getRouteMeta(): 라우트 메타정보 조회
+
+==============================================
+
+[1] 홈 (HOME)
+    - 경로명: /
+    - 접근가능상태: 누구나
+    - 노출가능목록
+       - banner: X (배너 미표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: "홈" (order: 1)
+
+[2] 회원가입 (SIGNUP)
+    - 경로명: /signup
+    - 접근가능상태: 누구나
+    - 노출가능목록
+       - banner: X (배너 미표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: 없음
+
+[3] 게시글 목록 (BOARDS_LIST)
+    - 경로명: /boards
+    - 접근가능상태: 회원전용
+    - 노출가능목록
+       - banner: O (배너 표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: "게시글" (order: 2)
+
+[4] 게시글 상세 (BOARD_DETAIL)
+    - 경로명: /boards/[boardId]
+    - 접근가능상태: 회원전용
+    - 노출가능목록
+       - banner: O (배너 표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: 없음
+
+[5] 게시글 수정 (BOARD_EDIT)
+    - 경로명: /boards/[boardId]/edit
+    - 접근가능상태: 회원전용
+    - 노출가능목록
+       - banner: X (배너 미표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: 없음
+
+[6] 게시글 작성 (BOARD_CREATE)
+    - 경로명: /boards/new
+    - 접근가능상태: 회원전용
+    - 노출가능목록
+       - banner: X (배너 미표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: 없음
+
+[7] 중고폰 목록 (PHONES_LIST)
+    - 경로명: /phones
+    - 접근가능상태: 회원전용
+    - 노출가능목록
+       - banner: O (배너 표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: "중고폰" (order: 3)
+
+[8] 중고폰 상세 (PHONE_DETAIL)
+    - 경로명: /phones/[id]
+    - 접근가능상태: 회원전용
+    - 노출가능목록
+       - banner: O (배너 표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: 없음
+
+[9] 중고폰 수정 (PHONE_EDIT)
+    - 경로명: /phones/[id]/edit
+    - 접근가능상태: 회원전용
+    - 노출가능목록
+       - banner: X (배너 미표시)
+       - navigation: O (네비게이션 표시)
+    - 네비게이션 메뉴: 없음
+
+[10] 중고폰 등록 (PHONE_CREATE)
+     - 경로명: /phones/new
+     - 접근가능상태: 회원전용
+     - 노출가능목록
+        - banner: X (배너 미표시)
+        - navigation: O (네비게이션 표시)
+     - 네비게이션 메뉴: 없음
+
+[11] 내 API 목록 (MY_APIS_LIST)
+     - 경로명: /myapis
+     - 접근가능상태: 회원전용
+     - 노출가능목록
+        - banner: O (배너 표시)
+        - navigation: O (네비게이션 표시)
+     - 네비게이션 메뉴: "내 API" (order: 4)
+
+[12] 내 API 상세 (MY_API_DETAIL)
+     - 경로명: /myapis/[id]
+     - 접근가능상태: 회원전용
+     - 노출가능목록
+        - banner: O (배너 표시)
+        - navigation: O (네비게이션 표시)
+     - 네비게이션 메뉴: 없음
+
+[13] 내 API 수정 (MY_API_EDIT)
+     - 경로명: /myapis/[id]/edit
+     - 접근가능상태: 회원전용
+     - 노출가능목록
+        - banner: O (배너 표시)
+        - navigation: O (네비게이션 표시)
+     - 네비게이션 메뉴: 없음
+
+[14] 내 API 생성 (MY_API_CREATE)
+     - 경로명: /myapis/new
+     - 접근가능상태: 회원전용
+     - 노출가능목록
+        - banner: O (배너 표시)
+        - navigation: O (네비게이션 표시)
+     - 네비게이션 메뉴: 없음
+
+[15] 공개 API 목록 (OPEN_APIS_LIST)
+     - 경로명: /openapis
+     - 접근가능상태: 누구나
+     - 노출가능목록
+        - banner: O (배너 표시)
+        - navigation: O (네비게이션 표시)
+     - 네비게이션 메뉴: "공개 API" (order: 5)
+
+[16] 마이페이지 (MY_PAGE)
+     - 경로명: /mypage
+     - 접근가능상태: 회원전용
+     - 노출가능목록
+        - banner: O (배너 표시)
+        - navigation: O (네비게이션 표시)
+     - 네비게이션 메뉴: "마이페이지" (order: 6)
+
+==============================================
+
+타입 및 인터페이스 요구사항)
+
+1. AccessState 타입: 'PUBLIC' | 'MEMBER_ONLY'
+
+2. NavigationMenuItem 인터페이스:
+   - menuId: string (네비게이션 메뉴 고유 ID, kebab-case)
+   - label: string (메뉴에 표시될 텍스트, 한국어)
+   - path: string (메뉴 클릭 시 이동할 경로)
+   - order: number (메뉴 표시 순서)
+
+3. RouteConfig 인터페이스:
+   - name: string (라우트 이름, 한국어)
+   - pathTemplate: string (경로 템플릿, 동적 세그먼트 포함 가능)
+   - access: AccessState (접근 권한)
+   - showBanner: boolean (배너 표시 여부)
+   - showNavigation: boolean (네비게이션 표시 여부)
+   - navigationMenu?: { menuId, label, order } (선택사항)
+
+4. RouteKey 타입: 위 16개 라우트의 키를 모두 포함하는 유니온 타입
+
+5. URLS 상수: Record<RouteKey, RouteConfig>로 모든 라우트 설정 정의
+
+==============================================
+
+유틸 함수 요구사항)
+
+1. getPath(key: RouteKey, params?: Record<string, string | number>): string
+   - 동적 세그먼트를 포함한 경로를 생성
+   - 예: getPath('BOARD_DETAIL', { boardId: 123 }) → '/boards/123'
+   - 동적 세그먼트 [segmentName]을 params의 해당 값으로 치환
+
+2. isAccessible(key: RouteKey, isAuthenticated: boolean): boolean
+   - 사용자가 해당 라우트에 접근 가능한지 확인
+   - PUBLIC인 경우 항상 true
+   - MEMBER_ONLY인 경우 isAuthenticated가 true일 때만 true
+
+3. isBannerVisible(key: RouteKey): boolean
+   - 해당 라우트에서 배너를 표시할지 확인
+   - showBanner 값 반환
+
+4. isNavigationVisible(key: RouteKey): boolean
+   - 해당 라우트에서 네비게이션을 표시할지 확인
+   - showNavigation 값 반환
+
+5. findRouteKeyByPath(pathname: string): RouteKey | undefined
+   - 현재 경로로부터 라우트 키를 찾기 (동적 세그먼트 매칭)
+   - 예: findRouteKeyByPath('/boards/123') → 'BOARD_DETAIL'
+   - 정확한 매칭 또는 동적 세그먼트 패턴 매칭 수행
+   - 일치하는 라우트가 없으면 undefined 반환
+
+6. getNavigationMenuItems(): NavigationMenuItem[]
+   - 네비게이션 메뉴 항목을 order 순서대로 정렬하여 반환
+   - navigationMenu가 정의된 라우트만 포함
+   - NavigationMenuItem 배열 반환 (order로 정렬됨)
+   - 컴포넌트에서 네비게이션 메뉴를 렌더링할 때 사용
+
+7. getRouteMeta(key: RouteKey): RouteConfig
+   - 특정 라우트의 메타정보(RouteConfig) 조회
+   - URLS[key]의 값 반환
+
+==============================================
+
+코드 스타일 및 주석 요구사항)
+
+1. 모든 주석은 한국어로 작성
+2. JSDoc 형식으로 함수 문서화 (한국어)
+3. 섹션 구분: "타입 정의", "라우트 설정 객체", "유틸 함수" 섹션으로 명확히 구분
+4. 라우트 설정값에 대한 인라인 주석 추가
+5. 동적 세그먼트 패턴이 명확하도록 예시 제공
+
+==============================================
+
+검증 항목)
+
+- [ ] 16개의 모든 라우트가 URLS 객체에 포함됨
+- [ ] 각 라우트의 접근 제어(access)가 설계대로 적용됨
+- [ ] 배너/네비게이션 설정이 설계대로 적용됨
+- [ ] 동적 세그먼트 패턴이 올바름 ([boardId], [id])
+- [ ] 네비게이션 메뉴 order가 1~6 충돌 없음
+- [ ] 7개의 유틸 함수가 모두 export됨
+- [ ] TypeScript 타입이 완전하고 정확함
+- [ ] 모든 주석이 한국어로 작성됨
+- [ ] getPath() 함수가 동적 세그먼트를 올바르게 처리함
+- [ ] getNavigationMenuItems()가 order순으로 정렬된 배열 반환함
+- [ ] findRouteKeyByPath()가 정규식 기반 경로 매칭 수행함
+- [ ] url.ts 파일이 src/commons/constants/ 경로에 생성됨

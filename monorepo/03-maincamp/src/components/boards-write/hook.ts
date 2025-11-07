@@ -1,15 +1,18 @@
 "use client";
 
 
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation } from "@apollo/client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import {ChangeEvent} from 'react';
-import { CREATE_BOARD, FETCH_BOARD, UPDATE_BOARD } from "./queres";
+import { CREATE_BOARD, UPDATE_BOARD } from "./queres";
 import { IMyvariables,Idata } from "./types";
-import { on } from "events";
-import { FetchBoardQuery } from "@/gql/graphql";
-import { ApolloError } from "@apollo/client";
+import {
+  CreateBoardMutation,
+  CreateBoardMutationVariables,
+  UpdateBoardMutation,
+  UpdateBoardMutationVariables,
+} from "@/gql/graphql";
 import { Modal } from "antd";
 import { IBoardWriteProps } from "@/components/boards-write/types";
 import { checkFileValidation } from "@/commons/libraries/image-validation";
@@ -83,7 +86,7 @@ export default function useBoardsWrite(props:IBoardWriteProps) {
       const [isActive, setIsActive] = useState<boolean>(false)
       
       const router = useRouter();
-      const [createBoard] = useMutation(CREATE_BOARD,{
+      const [createBoard] = useMutation<CreateBoardMutation, CreateBoardMutationVariables>(CREATE_BOARD,{
         refetchQueries:[{query:FETCH_BOARDS,
           variables:{
             page:1,
@@ -91,12 +94,10 @@ export default function useBoardsWrite(props:IBoardWriteProps) {
           }
         }]
       });
-      const [updateBoard] = useMutation(UPDATE_BOARD);
+      const [updateBoard] = useMutation<UpdateBoardMutation, UpdateBoardMutationVariables>(UPDATE_BOARD);
       const { boardId } = useParams()
       const [imageUrls, setImageUrls] = useState<string[]>(["", "", ""]);
       
-      const fileRef = useRef(null);
-
       const fileRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
       const onClickGrayBox = (index: number, event: React.MouseEvent<HTMLDivElement>) => {
           event.stopPropagation();

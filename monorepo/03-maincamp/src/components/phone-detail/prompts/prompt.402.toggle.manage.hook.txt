@@ -1,0 +1,132 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-detail/hooks/index.toggle.manage.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/phone-detail/tests/index.toggle.manage.hook.spec.ts
+
+==============================================
+
+핵심요구사항) phone-detail 컴포넌트 내 문의별 답변 입력창 노출 제어를 관리하는 커스텀 훅을 구현할 것.
+
+1) 훅 상태 관리
+   1-1) 다음의 상태를 관리할 것
+        - openFormMap: Map<inquiryId, boolean> (문의별 답변 폼 노출 상태)
+
+   1-2) Map을 사용하여 여러 문의의 폼 상태를 동시에 관리할 것
+
+2) 폼 토글 메서드 구현
+   2-1) openReplyForm(inquiryId: string) 메서드
+        - openFormMap.set(inquiryId, true)
+        - 해당 문의의 답변 입력창 노출
+        - 입력 필드에 자동 포커스 처리
+
+   2-2) closeReplyForm(inquiryId: string) 메서드
+        - openFormMap.set(inquiryId, false)
+        - 해당 문의의 답변 입력창 숨김
+        - 입력 내용은 초기화하지 않음
+
+   2-3) toggleReplyForm(inquiryId: string) 메서드
+        - 현재 상태를 토글 (true ↔ false)
+        - 개방 → openReplyForm() 호출
+        - 폐쇄 → closeReplyForm() 호출
+
+   2-4) closeAllReplyForms() 메서드
+        - 모든 열린 폼을 닫을 것
+        - openFormMap의 모든 값을 false로 설정
+
+   2-5) closeOtherReplyForms(inquiryId: string) 메서드
+        - 지정된 inquiryId의 폼만 열고 나머지는 닫을 것
+        - closeAllReplyForms() 호출
+        - openReplyForm(inquiryId) 호출
+
+3) 상태 조회 메서드
+   3-1) isReplyFormVisible(inquiryId: string): boolean 메서드
+        - 지정된 문의의 답변 폼 노출 여부 반환
+        - 해당 inquiryId가 없으면 false 반환
+
+   3-2) getVisibleForms(): string[] 메서드
+        - 현재 열려있는 모든 문의 ID 배열 반환
+
+   3-3) isAnyFormOpen(): boolean 메서드
+        - 열려있는 폼이 하나라도 있는지 여부 반환
+
+4) 부작용 관리 메서드
+   4-1) 폼 제출 성공 후 자동 닫기
+        - 시나리오: POST /api/inquiries/{id}/replies 성공
+        - closeReplyForm(inquiryId) 자동 호출
+        - 폼 내용은 리셋 (FormManageHook에서 처리)
+
+   4-2) 다른 문의 폼 열기 시 기존 폼 자동 닫기
+        - openReplyForm(newInquiryId) 호출 시
+        - closeOtherReplyForms(newInquiryId) 권장
+        - 또는 명시적으로 closeReplyForm(previousId) 호출
+
+5) 초기화 및 리셋
+   5-1) clearAllStates() 메서드
+        - openFormMap을 완전히 초기화 (빈 Map으로)
+        - 페이지 언마운트 시 호출
+
+6) 훅 반환값
+   훅은 다음 객체를 반환할 것:
+   {
+     openFormMap: Map<string, boolean>,
+     openReplyForm: (inquiryId: string) => void,
+     closeReplyForm: (inquiryId: string) => void,
+     toggleReplyForm: (inquiryId: string) => void,
+     closeAllReplyForms: () => void,
+     closeOtherReplyForms: (inquiryId: string) => void,
+     isReplyFormVisible: (inquiryId: string) => boolean,
+     getVisibleForms: () => string[],
+     isAnyFormOpen: () => boolean,
+     clearAllStates: () => void
+   }
+
+핵심요구사항) 훅 사용 예시
+            const toggleManager = useToggleManageHook();
+
+            // 답변 폼 열기
+            <button onClick={() => toggleManager.openReplyForm(inquiryId)}>
+              {toggleManager.isReplyFormVisible(inquiryId) ? '닫기' : '답변하기'}
+            </button>
+
+            // 조건부 렌더링
+            {toggleManager.isReplyFormVisible(inquiryId) && (
+              <ReplyForm inquiryId={inquiryId} />
+            )}
+
+            // 다른 폼 자동 닫기
+            const handleOpenForm = (newId) => {
+              toggleManager.closeOtherReplyForms(newId);
+            }
+
+            // 전체 폼 닫기
+            <button onClick={() => toggleManager.closeAllReplyForms()}>
+              모두 닫기
+            </button>
+
+핵심요구사항) 테스트 시나리오
+            1) 폼 토글 테스트
+               - openReplyForm() 호출 후 isReplyFormVisible() true 확인
+               - closeReplyForm() 호출 후 isReplyFormVisible() false 확인
+               - toggleReplyForm() 호출 시 상태 반전 확인
+
+            2) 복수 폼 관리 테스트
+               - 여러 문의 ID로 폼 열기
+               - closeOtherReplyForms()로 특정 폼만 열려있는지 확인
+
+            3) 전체 닫기 테스트
+               - 여러 폼 열기 후 closeAllReplyForms() 호출
+               - 모두 닫혔는지 확인
+
+            4) 상태 조회 테스트
+               - getVisibleForms() 결과 확인
+               - isAnyFormOpen() 반환값 확인
+
+            5) 초기화 테스트
+               - clearAllStates() 호출 후 모든 상태 초기화 확인

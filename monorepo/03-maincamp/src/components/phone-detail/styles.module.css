@@ -1,0 +1,281 @@
+/* 중고폰 상세 페이지 스타일 */
+
+/* 전역 스타일 (CSS 변수 정의) */
+.body {
+  width: 100%;
+  background-color: var(--color-white);
+
+  /* 색상 토큰 */
+  --color-black: #000000;
+  --color-dark-gray: #333333;
+  --color-medium-gray: #777777;
+  --color-light-gray: #ababab;
+  --color-very-light-gray: #d4d3d3;
+  --color-border-light: #e4e4e4;
+  --color-primary-blue: #2974e5;
+  --color-white: #ffffff;
+  --color-overlay-dark: rgba(0, 0, 0, 0.4);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* === 헤더 섹션 === */
+.headerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.titleHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.title {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 36px;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.iconButton {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.bookmarkBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-overlay-dark);
+  padding: 4px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+}
+
+.bookmarkCount {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--color-white);
+  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--color-medium-gray);
+  margin: 0;
+}
+
+.hashtags {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--color-primary-blue);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* === 이미지 갤러리 === */
+.imageGallery {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.mainImageWrapper {
+  width: 640px;
+  height: 480px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbnailWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 480px;
+  width: 180px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.thumbnail {
+  width: 100%;
+  height: 136px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbnailInactive {
+  opacity: 0.5;
+}
+
+.thumbnailGradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 85.521%, var(--color-white) 102.19%);
+  pointer-events: none;
+}
+
+/* === 구분선 === */
+.divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--color-very-light-gray);
+  margin: 40px 0;
+}
+
+/* === 상세 설명 섹션 === */
+.descriptionSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 844px;
+}
+
+.sectionTitle {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--color-dark-gray);
+  margin: 0;
+}
+
+.descriptionContent {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--color-dark-gray);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.descriptionContent p {
+  margin: 0;
+  margin-bottom: 0;
+}
+
+/* === 위치 섹션 === */
+.locationSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.mapContainer {
+  width: 844px;
+  height: 280px;
+  border-radius: 16px;
+  border: 1px solid var(--color-border-light);
+  overflow: hidden;
+  position: relative;
+}
+
+.mapImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* === 반응형 미디어 쿼리 === */
+@media (max-width: 1280px) {
+  .imageGallery {
+    flex-direction: column;
+  }
+
+  .mainImageWrapper {
+    width: 100%;
+  }
+
+  .thumbnailWrapper {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    gap: 16px;
+    overflow-x: auto;
+  }
+
+  .thumbnail {
+    width: 136px;
+    height: 136px;
+    flex-shrink: 0;
+  }
+
+  .mapContainer {
+    width: 100%;
+  }
+
+  .descriptionSection {
+    max-width: 100%;
+  }
+}
