@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px; /* 아이콘-라벨 간격 */
-  height: 48px;
+  height: 48px; /* 기본은 medium 사이즈에 해당 */
   padding: 0 16px;
   border-radius: 8px;
   border: 1px solid transparent;
@@ -21,6 +21,7 @@
   line-height: 24px;
   font-weight: 600;
   letter-spacing: 0;
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
 }
 
 .leftIcon,
@@ -46,6 +47,13 @@
   border-color: #000000;
 }
 
+/* variant: tertiary (텍스트 버튼) */
+.variantTertiary {
+  background-color: transparent;
+  color: #2974e5;
+  border-color: transparent;
+}
+
 /* state: active (기본 상호작용 허용) */
 .stateActive {
   opacity: 1;
@@ -64,6 +72,11 @@
   opacity: 0.5; /* 상호작용 불가 시 시각적 구분 */
 }
 
+.stateInactive.variantTertiary {
+  color: #9bbdf3; /* tertiary 비활성 색상 약화 */
+  opacity: 0.6;
+}
+
 /* 호버/프레스 상태: 접근성 고려하여 미세 변화 */
 .variantPrimary.stateActive:hover { background-color: #2468cf; }
 .variantPrimary.stateActive:active { background-color: #1f5cb8; }
@@ -71,7 +84,31 @@
 .variantSecondary.stateActive:hover { opacity: 0.9; }
 .variantSecondary.stateActive:active { opacity: 0.8; }
 
+.variantTertiary.stateActive:hover { color: #2468cf; }
+.variantTertiary.stateActive:active { color: #1f5cb8; }
+
 /* 비활성 상호작용 차단 */
 .stateInactive { cursor: not-allowed; }
 
+/* size variants */
+.sizeSmall {
+  height: 40px;
+  padding: 0 12px;
+}
+.sizeSmall .label {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.sizeMedium { /* 기본값과 동일 (48 / 16) */ }
+.sizeMedium .label { /* 유지 */ }
+
+.sizeLarge {
+  height: 56px;
+  padding: 0 20px;
+}
+.sizeLarge .label {
+  font-size: 20px;
+  line-height: 28px;
+}
 

@@ -9,11 +9,17 @@ const meta: Meta<typeof Button> = {
   component: Button,
   tags: ['autodocs'],
   argTypes: {
-    // 한국어 주석: variant 선택 - primary/secondary
+    // 한국어 주석: variant 선택 - primary/secondary/tertiary
     variant: {
       control: { type: 'radio' },
-      options: ['primary', 'secondary'],
+      options: ['primary', 'secondary', 'tertiary'],
       description: '버튼 시각 변형',
+    },
+    // 한국어 주석: size 선택 - small/medium/large
+    size: {
+      control: { type: 'radio' },
+      options: ['small', 'medium', 'large'],
+      description: '버튼 사이즈',
     },
     // 한국어 주석: active 상태 - active/inactive
     active: {
@@ -34,6 +40,7 @@ const meta: Meta<typeof Button> = {
   args: {
     // 한국어 주석: 기본 args - 프라이머리/활성/기본 라벨
     variant: 'primary',
+    size: 'medium',
     active: 'active',
     children: 'Button',
   },
@@ -75,6 +82,27 @@ export const SecondaryInactive: Story = {
   } as Partial<ButtonProps>,
 };
 
+// 한국어 주석: 터셔리(텍스트) 버튼
+export const TertiaryActive: Story = {
+  name: 'Tertiary / Active',
+  args: {
+    variant: 'tertiary',
+    children: 'Tertiary',
+  } as Partial<ButtonProps>,
+};
+
+// 한국어 주석: 사이즈 예시
+export const Sizes: Story = {
+  name: 'Sizes',
+  render: (args) => (
+    <div style={{ display: 'flex', gap: 12 }}>
+      <Button {...args} size="small">Small</Button>
+      <Button {...args} size="medium">Medium</Button>
+      <Button {...args} size="large">Large</Button>
+    </div>
+  ),
+};
+
 // 한국어 주석: 아이콘 슬롯 예시 (좌/우 아이콘)
 export const WithIcons: Story = {
   name: 'With Left/Right Icons',
@@ -84,5 +112,4 @@ export const WithIcons: Story = {
     children: 'With Icons',
   } as Partial<ButtonProps>,
 };
-
 
