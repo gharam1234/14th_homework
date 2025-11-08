@@ -3,6 +3,20 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+
+  /* 기본 토큰 (variant로 override) */
+  --pg-accent: #1a73e8; /* 기본 포커스/강조 컬러 */
+  --pg-item-bg: transparent;
+  --pg-item-color: #777777;
+  --pg-item-border: transparent;
+  --pg-item-hover-bg: rgba(0, 0, 0, 0.04);
+  --pg-item-active-bg: #f2f2f2;
+  --pg-item-active-color: #000000;
+  --pg-icon-color: #5f6368;
+  --pg-icon-hover-bg: rgba(0, 0, 0, 0.04);
+  --pg-icon-active-bg: rgba(0, 0, 0, 0.06);
+  --pg-focus-outline: 2px solid rgba(26, 115, 232, 0.35);
+  --pg-focus-outline-offset: 2px;
 }
 
 /* 좌/우 아이콘 버튼: 24x24 아이콘 박스 기준 주변 터치 영역 보정 */
@@ -15,13 +29,14 @@
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
-  color: #5f6368; /* chevron 아이콘 컬러 */
+  color: var(--pg-icon-color); /* chevron 아이콘 컬러 */
   cursor: pointer;
   transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, opacity 120ms ease;
 }
 .iconButton:disabled { opacity: 0.4; cursor: not-allowed; }
-.iconButton:hover { background-color: rgba(0,0,0,0.04); }
-.iconButton:active { background-color: rgba(0,0,0,0.06); }
+.iconButton:hover { background-color: var(--pg-icon-hover-bg); }
+.iconButton:active { background-color: var(--pg-icon-active-bg); }
+.iconButton:focus-visible { outline: var(--pg-focus-outline); outline-offset: var(--pg-focus-outline-offset); }
 
 .items {
   display: inline-flex;
@@ -37,9 +52,9 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  border: 1px solid transparent;
-  background-color: transparent;
-  color: #777777;
+  border: 1px solid var(--pg-item-border);
+  background-color: var(--pg-item-bg);
+  color: var(--pg-item-color);
   font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
   font-size: 16px;
   line-height: 24px;
@@ -48,21 +63,41 @@
   cursor: pointer;
   transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, opacity 120ms ease;
 }
-
-.item:hover { background-color: rgba(0,0,0,0.04); }
+.item:hover { background-color: var(--pg-item-hover-bg); }
 .item:active { background-color: rgba(0,0,0,0.06); }
+.item:focus-visible { outline: var(--pg-focus-outline); outline-offset: var(--pg-focus-outline-offset); }
 
 /* 활성 아이템: 배경 #f2f2f2, 라벨 #000000, 폰트 500 */
 .itemActive {
-  background-color: #f2f2f2;
-  color: #000000;
+  background-color: var(--pg-item-active-bg);
+  color: var(--pg-item-active-color);
   font-weight: 500;
 }
 
 /* variant: primary | secondary | tertiary */
-.variantPrimary {}
-.variantSecondary {}
-.variantTertiary {}
+.variantPrimary {
+  /* 기본 토큰 유지 (중립 스타일) */
+}
+.variantSecondary {
+  /* 아웃라인 느낌 + 약한 브랜드 톤 */
+  --pg-item-color: #3c4043;
+  --pg-item-border: #e0e0e0;
+  --pg-item-hover-bg: rgba(0, 0, 0, 0.04);
+  --pg-item-active-bg: #e8f0fe; /* 밝은 블루 틴트 */
+  --pg-item-active-color: #1a73e8;
+  --pg-icon-color: #3c4043;
+  --pg-focus-outline: 2px solid rgba(26, 115, 232, 0.45);
+}
+.variantTertiary {
+  /* 고스트/텍스트형 - 강조 컬러 중심 */
+  --pg-item-color: #1a73e8;
+  --pg-item-border: transparent;
+  --pg-item-hover-bg: rgba(26, 115, 232, 0.06);
+  --pg-item-active-bg: rgba(26, 115, 232, 0.12);
+  --pg-item-active-color: #0b57d0;
+  --pg-icon-color: #1a73e8;
+  --pg-focus-outline: 2px solid rgba(26, 115, 232, 0.45);
+}
 
 /* size: small | medium | large -> 32 기준으로 스케일 */
 .sizeSmall .iconButton, .sizeSmall .item { width: 28px; height: 28px; border-radius: 6px; }
@@ -76,5 +111,4 @@
 
 /* 전체 비활성 */
 .isDisabled { opacity: 0.6; pointer-events: none; }
-
 
