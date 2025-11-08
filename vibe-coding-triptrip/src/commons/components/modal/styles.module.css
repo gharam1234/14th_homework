@@ -1,0 +1,68 @@
+.root {
+  /* MCP-Figma 노드(285:30884, 99:15030) 기준 토큰 적용 가이드
+     - 배경: #FFFFFF
+     - 라운드: 12px (카드형)
+     - 그림자: 살짝 부드러운 레이어 쉐도우
+     - 내부 패딩: 24px (콘텐츠 여백)
+  */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  padding: 24px;
+  width: 100%;
+  max-width: 420px; /* 일반 정보 모달 기준 폭 */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* variant: info | danger (리드 아이콘 및 타이틀 강조 색) */
+.info .leadIcon { background-color: #2974e5; }
+.danger .leadIcon { background-color: #e54848; }
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.leadIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.title {
+  margin: 0;
+  color: #111111;
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0;
+  color: #444444;
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.actions {
+  margin-top: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+/* actions: single | dual */
+.single { grid-template-columns: 1fr; }
+.dual { grid-template-columns: 1fr 1fr; }
+
+/* 버튼 width만 제어 (색/타이포/높이 등은 버튼 컴포넌트 자체 규칙 준수) */
+.buttonFullWidth {
+  width: 100%;
+}
+
