@@ -1,0 +1,122 @@
+/* 루트 컨테이너: 라벨/필드/헬퍼 수직 스택 */
+.root {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  /* Regular 12/20, #333 */
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #333333;
+}
+
+.requiredMark {
+  margin-left: 4px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  color: #f66a6a;
+}
+
+/* 입력 필드 래퍼: 좌우 아이콘 + 텍스트영역 */
+.field {
+  display: inline-flex;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 240px;
+  border-radius: 8px;
+  border: 1px solid #cfd4dc;
+  background-color: #ffffff;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.leftIcon,
+.rightIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  margin-top: 10px; /* 텍스트 첫 줄과 수직 정렬 가늠치 */
+}
+
+.textarea {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: vertical; /* 사용자가 높이 조정 가능 */
+  width: 100%;
+  box-sizing: border-box;
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  color: #111111;
+  padding: 10px 12px; /* 아이콘 공간을 고려하여 좌우 패딩 */
+}
+
+/* 포커스 스타일 */
+.field:focus-within {
+  border-color: #2974e5;
+  box-shadow: 0 0 0 3px rgba(41, 116, 229, 0.15);
+}
+
+/* 비활성 상태 */
+.isDisabled .field {
+  background-color: #f3f4f6;
+  border-color: #e5e7eb;
+}
+.isDisabled .textarea {
+  color: #9ca3af;
+}
+
+/* 에러 상태 */
+.isError .field {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+.errorText {
+  font-size: 12px;
+  line-height: 16px;
+  color: #b91c1c;
+}
+
+.helperText {
+  font-size: 12px;
+  line-height: 16px;
+  color: #6b7280;
+}
+
+/* 카운터: 오른쪽 정렬 0/100 */
+.counter {
+  display: flex;
+  justify-content: flex-end;
+}
+.counterText {
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  color: #ababab;
+}
+
+/* variant: primary | secondary | tertiary */
+.variantPrimary .field { background-color: #ffffff; }
+.variantSecondary .field { background-color: #f9fafb; }
+.variantTertiary .field { background-color: transparent; border-color: #e5e7eb; }
+
+/* size: small | medium | large  - 높이/패딩/타이포 차등 */
+.sizeSmall .field { border-radius: 8px; }
+.sizeSmall .textarea { font-size: 14px; line-height: 20px; padding: 8px 10px; min-height: 80px; }
+
+.sizeMedium .field { border-radius: 8px; }
+.sizeMedium .textarea { font-size: 14px; line-height: 20px; padding: 10px 12px; min-height: 120px; }
+
+.sizeLarge .field { border-radius: 10px; }
+.sizeLarge .textarea { font-size: 18px; line-height: 26px; padding: 12px 14px; min-height: 160px; }
+
