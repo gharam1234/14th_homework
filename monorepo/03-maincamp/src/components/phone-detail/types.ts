@@ -60,4 +60,5 @@ export interface PhoneDetailProps {
   phoneId?: string;
   data?: PhoneDetail;
   onShare?: () => void;
+  userEmail?: string;
 }

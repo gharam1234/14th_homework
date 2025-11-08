@@ -1,0 +1,56 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+조건-파일경로) 구현될 TSX 파일경로: src/commons/components/modal/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/commons/components/modal/styles.module.css
+조건-파일경로) 구현될 TYPE 파일경로: src/commons/components/modal/types.ts
+
+==============================================
+
+핵심요구사항) Modal 공통컴포넌트의 완전한 variant 시스템을 구현할 것.
+                - variant: 'info' | 'danger'
+                - actions: 'single' | 'dual'
+
+핵심요구사항) 다음 구조를 만족하는 Modal UI를 구현할 것.
+                1) Modal 구조
+                    - ModalProvider를 통해 제공되므로, 자체 backdrop 스타일을 생성하지 말 것.
+                    - 내부 콘텐츠 영역만 구현할 것: header(제목), body(메시지), footer(액션버튼)
+
+                2) 각 variant별 스타일
+                    - info: 파란색 계열 테마, 정보 제공 목적
+                    - danger: 빨간색 계열 테마, 경고/확인 목적
+
+                3) actions 속성별 버튼 구성
+                    - single: [닫기] 버튼 1개만 표시
+                    - dual: [취소] [확인] 버튼 2개 표시
+
+핵심요구사항) <Button /> 공통컴포넌트를 사용할 때 다음의 규칙을 지켜 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+                1) <Button />의 원본을 수정하지 말고, 아래의 props만 활용할 것.
+                    - variant: primary, secondary를 확인하여 구현할 것.
+                    - size: 적절한 크기를 선택할 것.
+                    - onClick: 콜백 함수를 받을 것.
+                    - className 전달: width만 허용할 것.
+
+                2) 적용될 공통컴포넌트 목록을 구현할 것.
+                    - 닫기/취소 버튼: <Button variant="secondary" />
+                    - 확인 버튼: <Button variant="primary" />
+
+핵심요구사항) Modal Props 인터페이스를 정의할 것.
+                1) 필수 props
+                    - variant: 'info' | 'danger'
+                    - actions: 'single' | 'dual'
+                    - title: string (모달 제목)
+                    - message: string (모달 본문 메시지)
+                    - onConfirm: () => void (확인 버튼 클릭 핸들러)
+                    - onCancel?: () => void (취소/닫기 버튼 클릭 핸들러, dual일 때 필수)
+
+                2) 선택 props
+                    - confirmText?: string (확인 버튼 텍스트, 기본값: "확인")
+                    - cancelText?: string (취소 버튼 텍스트, 기본값: "취소")
