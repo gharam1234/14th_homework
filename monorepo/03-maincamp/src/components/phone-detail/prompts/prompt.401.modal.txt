@@ -1,0 +1,68 @@
+아래 조건을 모두 준수하여 요구사항을 완수하고, 구현 결과는 체크리스트로 정리할 것.
+
+==============================================
+
+조건-커서룰) 작업 전 과정에 아래 커서룰을 적용하고, 룰 적용 여부를 체크리스트에 명시할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현 HOOK: src/components/phone-detail/hooks/index.modal.hook.ts  
+조건-파일경로) 구현 TEST: src/components/phone-detail/tests/index.modal.hook.spec.ts
+
+==============================================
+
+핵심 요구사항)
+    1) 스토어·채널 설정
+        - 스토어 ID: store-abc39db7-8ee1-4898-919e-0af603a68317  
+        - 채널키(카카오페이): channel-key-1dc10cea-ec89-471d-aedf-f4bd68993f33  
+        - 위 정보를 사용해 포트원 SDK를 초기화하고 결제 요청에 동일 값을 전달할 것.
+
+    2) 모달 퍼블리싱
+        - 구매 안내 모달, 포인트 부족 안내 모달, 포인트 충전 모달 총 3종을 구현한다.
+        - 모든 모달은 `src/commons/providers/modal/modal.provider.tsx`에 구현된 ModalProvider만을 이용한다. (provider 수정 금지)
+        - 이미 셋팅되어있는 modal.provider를 사용할 것.
+        - 이미 셋팅되어있는 modal.provider를 수정하지 말 것.
+        - 모달은 동일 조건에서 1회만 노출되고 닫힌 후에는 조건이 다시 충족되기 전까지 재등장하지 않도록 상태를 관리한다.
+        2.1- 구매 안내 모달은
+        `<Modal variant="info" actions="dual" />` 형태를 고정으로 사용한다.
+        2.2- 포인트 부족 안내 모달은 `<Modal variant="info" actions="dual" />` 형태를 고정으로 사용한다.
+        2.3- 포인트 충전 모달은 `<Modal variant="info" actions="dual" />` 형태를 고정으로 사용한다.
+           - <input
+        
+
+        
+
+    3) 숙박권 상세 페이지 시나리오
+        - `[구매하기]` 버튼 클릭 시 구매 안내 모달을 연다.
+        - 구매 안내 모달 [취소] 클릭: 모든 모달 닫기 → `/phones`로 이동(경로는 commons/constants/url.ts 참고하여 하드코딩되지 않도록 한다).
+        - 구매 안내 모달 [구매] 클릭:
+            1. `FetchUserLoggedIn` 쿼리 호출(파라미터 없음)로 현재 로그인한 사용자의 `amount` 데이터를 조회한다.
+            2.FetchUserLoggedIn 구조 : 
+             query FetchUserLoggedIn {
+    fetchUserLoggedIn {
+      _id
+      name
+      picture
+      userPoint {
+        amount
+      }
+    }
+  }
+            3. amount가 구매 금액 이상이면 "구현 예정입니다" 모달을 1회 노출한다.
+            4. amount가 부족하면 포인트 부족 안내 모달을 노출한다.
+        - 포인트 부족 안내 모달 [충전] 클릭: 포인트 충전 모달을 연다.
+        - 모든 모달의 [취소]/[닫기] 액션은 열린 모달을 닫고, 필요한 경우 지정된 이동 조건을 이행하도록 통일한다.
+
+    4) 포인트 충전
+        - 포인트 충전 모달 [충전] 클릭 시 포트원 SDK를 통해 카카오페이 결제를 시작한다.
+        - 결제가 성공적으로 완료되면 `createPointTransactionOfLoading` 뮤테이션을 호출해 포인트를 적립한다.
+        - 충전 성공/실패 여부를 모달 또는 알림으로 명확히 안내하고, 성공 시 필요한 refetch 또는 상태 갱신을 수행한다.
+
+    5) 테스트 작성
+        - 전체 흐름을 검증하는 단위/통합 테스트를 `src/components/phone-detail/tests/index.modal.hook.spec.ts`에 작성한다.
+        - 주요 검증: 구매 안내 모달 노출, 포인트 부족 분기, 충전 모달 전환, 포트원 SDK 및 `createPointTransactionOfLoading` 호출 여부.
+
+모든 구현이 끝나면 적용한 커서룰, 완료된 기능, 작성한 테스트를 포함한 체크리스트를 반환할 것.
+
+
+=======

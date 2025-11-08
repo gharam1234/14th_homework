@@ -1,7 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import styles from './styles.module.css';
 import { PhoneDetail as PhoneDetailType, PhoneDetailProps } from './types';
+import PhonesInquiry from '@/components/phones-inquiry';
+import { usePhoneDetailModalHook } from './hooks/index.modal.hook';
 
 /**
  * PhoneDetail - Figma 디자인 기반 프레젠테이션 컴포넌트
@@ -66,8 +69,49 @@ const DUMMY_PHONE_DATA: PhoneDetailType = {
 /**
  * 중고폰 상세 페이지 컴포넌트
  */
-export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneDetailProps) {
+export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, userEmail }: PhoneDetailProps) {
   const phoneData = data || DUMMY_PHONE_DATA;
+
+  // 문의하기 상태 관리
+  const [inquiryText, setInquiryText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inquiryError, setInquiryError] = useState('');
+
+  // 구매 모달 Hook
+  const { openPurchaseGuideModal } = usePhoneDetailModalHook({
+    phoneId: phoneData.id,
+    phonePrice: phoneData.price,
+    userEmail: userEmail || '',
+  });
+
+  /**
+   * 문의 제출 핸들러
+   */
+  const handleInquirySubmit = async () => {
+    if (!inquiryText.trim()) {
+      setInquiryError('문의사항을 입력해주세요.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setInquiryError('');
+
+      // TODO: API 호출 (문의 등록)
+      // const response = await submitInquiry(phoneData.id, inquiryText);
+
+      // 임시: 1초 후 완료
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // 성공 후 입력 필드 초기화
+      setInquiryText('');
+      alert('문의가 등록되었습니다.');
+    } catch {
+      setInquiryError('문의 등록에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className={styles.body} data-testid="phone-detail-body">
@@ -77,6 +121,61 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
           {/* 제목 및 액션 버튼 */}
           <div className={styles.titleArea} data-testid="title-area">
             <div className={styles.titleHeader}>
+              {/* 가격 및 구매 버튼 */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}
+                data-testid="price-purchase-section"
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: '24px',
+                      fontWeight: 'bold',
+                      color: '#333',
+                    }}
+                    data-testid="phone-price"
+                  >
+                    {phoneData.price.toLocaleString()}원
+                  </div>
+                  {phoneData.originalPrice && (
+                    <div
+                      style={{
+                        fontSize: '14px',
+                        color: '#999',
+                        textDecoration: 'line-through',
+                      }}
+                    >
+                      {phoneData.originalPrice.toLocaleString()}원
+                    </div>
+                  )}
+                </div>
+                
+                  <button
+                    onClick={openPurchaseGuideModal}
+                    data-testid="purchase-button"
+                    style={{
+                      padding: '12px 24px',
+                      backgroundColor: '#333',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    구매하기
+                  </button>
+                
+              </div>
               <div className={styles.titleRow}>
                 <h1 className={styles.title}>{phoneData.title}</h1>
                 <div className={styles.actionButtons} data-testid="action-buttons">
@@ -197,6 +296,22 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
               className={styles.mapImage}
             />
           </div>
+        </section>
+
+        {/* === 구분선 === */}
+        <div className={styles.divider} />
+
+        {/* === 문의하기 섹션 === */}
+        <section className={styles.inquirySection} data-testid="inquiry-section">
+          <PhonesInquiry
+            text={inquiryText}
+            onChangeText={setInquiryText}
+            onSubmit={handleInquirySubmit}
+            maxLength={100}
+            isLoading={isSubmitting}
+            error={inquiryError}
+            placeholder="문의사항을 입력해 주세요"
+          />
         </section>
       </div>
     </div>

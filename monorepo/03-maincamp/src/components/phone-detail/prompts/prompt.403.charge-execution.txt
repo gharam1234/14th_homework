@@ -1,0 +1,102 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 HOOK 파일경로: src/commons/hooks/usePointCharging.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/commons/hooks/tests/usePointCharging.spec.ts
+
+==============================================
+
+핵심요구사항) 충전 모달 [충전] 버튼 클릭 시 포트원 SDK로 카카오페이 결제를 실행하는 hook을 구현할 것.
+
+                1) 결제 요청 함수 구현
+                    - 함수명: requestPayment(amount: number)
+                    - 포트원 SDK 사용: PortOne.requestPayment()
+                    - 결제 수단: 카카오페이
+                    - 결제 데이터 구조
+                        - storeId: usePortOneInit에서 받아온 storeId
+                        - channelKey: usePortOneInit에서 받아온 channelKey
+                        - orderId: UUID 형식으로 자동 생성
+                        - amount: 충전 금액 (원 단위)
+                        - payMethod: "CARD" (카카오페이)
+                        - currency: "KRW"
+                        - buyerName: 로그인된 사용자명
+                        - buyerEmail: 로그인된 사용자 이메일
+
+                2) 결제 성공/실패 처리
+                    - 성공: response.code === "Success"
+                        - 결제 결과값 반환
+                        - createPointTransactionOfLoading mutation 호출 대기
+                    - 실패: response.code !== "Success"
+                        - 에러 메시지 표시
+                        - 결제 재시도 로직 구성
+
+핵심요구사항) 결제 성공 후 포인트 적립 로직을 구현할 것.
+
+                1) createPointTransactionOfLoading mutation 호출
+                    - 뮤테이션 입력값
+                        - amount: 충전 금액
+                        - paymentId: 포트원에서 반환받은 paymentId
+                        - paymentMethod: "PORTONE_KAKAOPAY"
+                    - 뮤테이션 응답값 처리
+                        - transactionId 수신
+                        - 포인트 적립 결과 확인
+
+                2) 포인트 적립 후 상태 갱신
+                    - 사용자 포인트 정보 리패치 (FetchUserLoggedIn 다시 호출)
+                    - 전역 상태에 최신 포인트 반영
+
+                3) 결과 안내 및 모달 닫기
+                    - 성공 알림메시지: "[충전금액]P 충전에 성공했습니다. [충전 후 포인트]P 보유 중입니다."
+                    - 충전 모달 닫기
+                    - 구매 안내 모달 자동으로 다시 표시 (선택사항)
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+                1) 테스트 제외 라이브러리
+                    - jest
+                    - @testing-library/react
+
+                2) 테스트 조건
+                    - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+                    - 페이지가 완전히 로드된 후 테스트할 것.
+                        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+                        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+                3) 테스트 API 조건
+                    3-1) 데이터
+                        - 실제 API 데이터를 사용할 것.
+                        - Mock 데이터를 사용하지 말 것.
+                    3-2) 성공 시나리오
+                        - 포트원 결제 성공 및 mutation 호출 확인
+                    3-3) 실패 시나리오
+                        - 결제 실패 또는 mutation 실패 처리
+
+                4) 테스트 시나리오
+                    4-1) 충전 모달 [충전] 버튼 클릭
+                        - requestPayment(amount) 함수가 호출되는지 확인
+                        - 포트원 SDK PortOne.requestPayment()가 실행되는지 확인
+
+                    4-2) 결제 성공
+                        - 포트원 response.code === "Success" 확인
+                        - createPointTransactionOfLoading mutation 호출 확인
+                        - 뮤테이션 입력값 (amount, paymentId, paymentMethod) 검증
+
+                    4-3) 포인트 적립 후 상태 갱신
+                        - FetchUserLoggedIn 리쿼리 확인
+                        - 사용자 포인트 업데이트 확인
+                        - 전역 상태 반영 확인
+
+                    4-4) 결과 안내
+                        - 성공 알림메시지 표시 확인
+                        - 충전 모달 닫기 확인
+                        - (선택) 구매 안내 모달 자동 재표시 확인
+
+                    4-5) 결제 실패
+                        - 에러 메시지 표시 확인
+                        - 충전 모달이 유지되는지 확인

@@ -247,6 +247,15 @@
   display: block;
 }
 
+/* === 문의하기 섹션 === */
+.inquirySection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  padding: 40px 0;
+}
+
 /* === 반응형 미디어 쿼리 === */
 @media (max-width: 1280px) {
   .imageGallery {
