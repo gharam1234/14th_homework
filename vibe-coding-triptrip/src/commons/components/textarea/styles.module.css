@@ -1,0 +1,174 @@
+/* 텍스트 영역 컴포넌트 스타일 (CSS Module 사용) */
+
+/* 루트 컨테이너 */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* 라벨 스타일 */
+.label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--typo-desktop-bodyMd-fontSize);
+  line-height: var(--typo-desktop-bodyMd-lineHeight);
+  font-weight: var(--typo-desktop-bodyMd-fontWeight);
+  color: var(--color-text-primary);
+}
+
+/* 필수 표시 마크 */
+.requiredMark {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+/* 입력 필드 컨테이너 */
+.field {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* 텍스트 영역 기본 스타일 */
+.textarea {
+  width: 100%;
+  border: 1px solid var(--color-outline);
+  border-radius: 8px;
+  background-color: var(--color-surface-default);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-ko);
+  font-size: var(--typo-desktop-bodyMd-fontSize);
+  line-height: var(--typo-desktop-bodyMd-lineHeight);
+  font-weight: var(--typo-desktop-bodyMd-fontWeight);
+  padding: 12px 16px;
+  resize: vertical;
+  min-height: 96px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+/* 플레이스홀더 스타일 */
+.textarea::placeholder {
+  color: var(--color-text-placeholder);
+  font-size: var(--typo-desktop-bodyMd-fontSize);
+  line-height: var(--typo-desktop-bodyMd-lineHeight);
+  font-weight: var(--typo-desktop-bodyMd-fontWeight);
+}
+
+/* 포커스 상태 */
+.textarea:focus {
+  border-color: var(--color-action-primary);
+  box-shadow: 0 0 0 3px rgba(41, 116, 229, 0.1);
+}
+
+/* 비활성화 상태 */
+.isDisabled .textarea {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-quaternary);
+  cursor: not-allowed;
+  border-color: var(--color-outline);
+}
+
+.isDisabled .textarea::placeholder {
+  color: var(--color-text-quaternary);
+}
+
+/* 에러 상태 */
+.isError .textarea {
+  border-color: var(--color-danger);
+}
+
+.isError .textarea:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(246, 106, 106, 0.1);
+}
+
+/* Variant 스타일 */
+.variantPrimary .textarea {
+  border-color: var(--color-outline);
+  background-color: var(--color-surface-default);
+}
+
+.variantSecondary .textarea {
+  border-color: var(--color-outline);
+  background-color: var(--color-surface-subtle);
+}
+
+.variantTertiary .textarea {
+  border-color: transparent;
+  background-color: var(--color-surface-soft);
+}
+
+/* Size 스타일 */
+.sizeSmall .textarea {
+  padding: 8px 12px;
+  font-size: var(--typo-desktop-bodySm-fontSize);
+  line-height: var(--typo-desktop-bodySm-lineHeight);
+  min-height: 72px;
+}
+
+.sizeMedium .textarea {
+  padding: 12px 16px;
+  font-size: var(--typo-desktop-bodyMd-fontSize);
+  line-height: var(--typo-desktop-bodyMd-lineHeight);
+  min-height: 144px;
+}
+
+.sizeLarge .textarea {
+  padding: 16px 20px;
+  font-size: var(--typo-desktop-bodyLg-fontSize);
+  line-height: var(--typo-desktop-bodyLg-lineHeight);
+  min-height: 336px;
+}
+
+/* 헬퍼 텍스트 */
+.helperText {
+  font-size: var(--typo-desktop-bodySm-fontSize);
+  line-height: var(--typo-desktop-bodySm-lineHeight);
+  font-weight: var(--typo-desktop-bodySm-fontWeight);
+  color: var(--color-text-tertiary);
+}
+
+/* 에러 텍스트 */
+.errorText {
+  font-size: var(--typo-desktop-bodySm-fontSize);
+  line-height: var(--typo-desktop-bodySm-lineHeight);
+  font-weight: var(--typo-desktop-bodySm-fontWeight);
+  color: var(--color-danger);
+}
+
+/* 글자 수 카운터 */
+.counter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.counterText {
+  font-size: var(--typo-desktop-bodySm-fontSize);
+  line-height: var(--typo-desktop-bodySm-lineHeight);
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+}
+
+/* 반응형: 모바일 대응 */
+@media (max-width: 767px) {
+  .sizeSmall .textarea {
+    padding: 6px 10px;
+    min-height: 64px;
+  }
+
+  .sizeMedium .textarea {
+    padding: 10px 14px;
+    min-height: 80px;
+  }
+
+  .sizeLarge .textarea {
+    padding: 14px 18px;
+    min-height: 100px;
+  }
+}

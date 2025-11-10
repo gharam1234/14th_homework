@@ -1,0 +1,36 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+조건-피그마) figma-to-component 스킬을 사용하여 아래 노드ID의 Figma 디자인을 분석 및 구현할 것.
+            - 참고할 노드ID: 285:31713
+
+조건-파일경로) 구현될 TSX 파일경로: src/commons/components/modal/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/commons/components/modal/styles.module.css
+
+==============================================
+
+핵심요구사항) 다음의 디자인을 그대로 소스코드로 구현할 것.
+                - 스토리북은 생성하지 말 것.
+                - 기존의 공통컴포넌트와 스타일일관성을 통일할 것.
+                - provider 패턴과 함께 사용하므로, 자체 백드롭(backdrop)을 포함할 것.
+
+핵심요구사항) 다음 조건을 모두 만족하는 완전한 variant 시스템을 구현할 것.
+                - type: 'info' | 'danger' | 'warning'
+                - actions: 'single' | 'dual'
+
+핵심요구사항) <Button /> 공통컴포넌트는 다음의 규칙을 지켜 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+                1) <Button />의 원본을 수정하지 말고, 아래의 props만 활용할 것.
+                    - variant: 'primary' | 'secondary' | 'danger' 등 type에 따라 적절히 설정할 것.
+                    - size: 모달 디자인과 일치할 것.
+                    - className 전달: 너비(width) 또는 flex 관련 스타일만 허용할 것.
+
+                2) 적용될 공통컴포넌트 목록을 구현할 것.
+                    - single action: <Button /> (1개)
+                    - dual actions: <Button /> (2개)
