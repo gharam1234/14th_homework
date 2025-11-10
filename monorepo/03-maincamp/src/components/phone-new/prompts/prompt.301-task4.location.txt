@@ -50,11 +50,11 @@
                 - data-testid: "phone-location-status"
 
 핵심요구사항) useLocation Hook을 구현할 것.
-            1) 기능: 위치 관련 필드 상태 관리 및 지도 좌표 변환 (로컬 상태만, Supabase에 저장 안 함)
+            1) 기능: 위치 관련 필드 상태 관리 및 지도 좌표 변환 (Supabase + 로컬 동시 관리)
             2) 상태
-                - tradeAddress: string (로컬스토리지에만 저장)
-                - latitude?: number (로컬스토리지에만 저장)
-                - longitude?: number (로컬스토리지에만 저장)
+                - tradeAddress: string (Supabase phones.trade_address + 로컬스토리지)
+                - latitude?: number (Supabase phones.latitude + 로컬스토리지)
+                - longitude?: number (Supabase phones.longitude + 로컬스토리지)
                 - isLoadingMap: boolean
                 - mapError?: string
             3) 메서드
@@ -64,20 +64,20 @@
                 - reset(): void
 
 핵심요구사항) 저장소 정책
-            1) phones 테이블에는 저장되지 않음 (위치 정보 필드 없음)
-            2) 로컬스토리지에만 저장: key = "phone-new-form-draft"
-            3) 폼 제출 시 해당 데이터는 Supabase에 저장되지 않고 로컬스토리지에만 유지
+            1) Supabase phones 테이블 필드 추가/활용: trade_address (text), latitude (float8), longitude (float8)
+            2) Zustand persist 및 로컬스토리지: key = "phone-new-form-draft"에 동일 데이터 캐싱
+            3) 폼 제출 시 Supabase에 저장 + 제출 성공 후 로컬 드래프트 삭제
 
 핵심요구사항) Kakao Geocoding API 연동
             1) 사용 시점: tradeAddress 입력값 변경 시 (debounce 300ms)
-            2) API 호출
-                - 엔드포인트: https://dapi.kakao.com/v2/local/search/address.json
-                - 파라미터: query=입력된 주소
-                - 헤더: Authorization: KakaoAK {API_KEY}
-            3) 응답 처리
-                - 성공: 첫 번째 결과의 y(위도), x(경도) 추출
+            2) 보안 정책: 클라이언트에서 Kakao REST 키를 노출하지 말 것 → Next.js API Route 또는 Server Action(`/api/maps/geocode`)을 구현하여 서버에서 Kakao API 호출 후 좌표만 반환
+            3) 서버 요청 규격
+                - 클라이언트 → 사내 API: fetch('/api/maps/geocode', { method: 'POST', body: JSON.stringify({ query: address }) })
+                - 서버 → Kakao: https://dapi.kakao.com/v2/local/search/address.json, Header Authorization: KakaoAK {KAKAO_REST_KEY}
+            4) 응답 처리
+                - 성공: 첫 번째 결과의 y(위도), x(경도) 추출 후 Zustand 상태 + Supabase 전송 준비
                 - 실패: mapError 설정
-            4) data-testid: "phone-location-geocoding"
+            5) data-testid: "phone-location-geocoding"
 
 핵심요구사항) 유효성 검증
             1) tradeAddress: 필수, 문자열, 최소 5자 이상

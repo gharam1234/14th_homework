@@ -8,8 +8,12 @@
             - @04-func.mdc
 
 조건-파일경로) 참고할 PAGE 경로: src/app/(protected)/phones/page.tsx
-조건-파일경로) 구현될 HOOK 경로: src/components/phones-list/hooks/index.search.hook.ts
+조건-파일경로) 구현될 HOOK 경로: src/components/phones-list/hooks/index.search.hook.ts (없다면 이번 작업에서 생성)
 조건-파일경로) 구현될 TSX 파일경로: src/components/phones-list/index.tsx
+
+### 상태 관리 가이드
+            - 검색 및 가격 상태는 `src/components/phones-list/stores/use-phone-list.store.ts`에서 관리한다. 파일이 없다면 이번 작업에서 생성하고 `searchKeyword`, `minPrice`, `maxPrice`, `setSearchKeyword`, `setPriceRange` API를 제공한다.
+            - 기존 `samplePhones` 의 `price` 값이 문자열이라면 훅 내부에서 숫자로 변환(`Number(price.replace(/,/g, ""))`)하여 비교하도록 명시한다.
 
 ==============================================
 

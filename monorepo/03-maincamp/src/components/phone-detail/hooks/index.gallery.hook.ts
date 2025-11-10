@@ -1,27 +1,23 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { TouchEvent } from 'react';
 
 interface UseImageGalleryOptions {
   mainImageUrl?: string;
-  imageUrls: string[];
-  placeholderUrl?: string;
+  imageUrls?: string[];
 }
 
 interface UseImageGalleryResult {
-  // 상태
-  currentImageIndex: number;
+  galleryImages: string[];
   currentMainImage: string;
+  mainImageKey: number;
   selectedThumbnailIndex: number;
   isZoomModalOpen: boolean;
   zoomLevel: number;
   isImageLoading: boolean;
   imageError: string | null;
-
-  // 썸네일 슬라이더 상태
   thumbnailScrollPosition: number;
-
-  // 핸들러
   selectThumbnail: (index: number) => void;
   nextThumbnail: () => void;
   prevThumbnail: () => void;
@@ -32,16 +28,17 @@ interface UseImageGalleryResult {
   setZoomLevel: (level: number) => void;
   handleImageLoad: () => void;
   handleImageError: () => void;
-  handleTouchStart: (e: React.TouchEvent) => void;
-  handleTouchEnd: (e: React.TouchEvent) => void;
+  handleTouchStart: (e: TouchEvent<HTMLDivElement>) => void;
+  handleTouchEnd: (e: TouchEvent<HTMLDivElement>) => void;
   resetGallery: () => void;
 }
 
-const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="640" height="480"%3E%3Crect fill="%23e0e0e0" width="640" height="480"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" fill="%23999"%3E이미지 없음%3C/text%3E%3C/svg%3E';
+export const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="640" height="480"%3E%3Crect fill="%23e0e0e0" width="640" height="480"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" fill="%23999"%3E이미지 없음%3C/text%3E%3C/svg%3E';
 const THUMBNAIL_VISIBLE_COUNT = 4;
-const ZOOM_MIN = 1;
-const ZOOM_MAX = 3;
-const ZOOM_STEP = 0.5;
+export const ZOOM_MIN = 1;
+export const ZOOM_MAX = 3;
+export const ZOOM_STEP = 0.5;
+export const SWIPE_THRESHOLD_PX = 40;
 
 /**
  * 이미지 갤러리 상태 관리 훅
@@ -52,84 +49,90 @@ const ZOOM_STEP = 0.5;
  * @param options - 메인 이미지 URL, 이미지 배열, 플레이스홀더
  * @returns 갤러리 상태 및 핸들러
  */
-export function useImageGallery(options: UseImageGalleryOptions): UseImageGalleryResult {
-  const { mainImageUrl, imageUrls, placeholderUrl = PLACEHOLDER_IMAGE } = options;
+export function useImageGallery(options: UseImageGalleryOptions = {}): UseImageGalleryResult {
+  const { mainImageUrl, imageUrls } = options;
 
   // 상태
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedThumbnailIndex, setSelectedThumbnailIndex] = useState(0);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   const [zoomLevel, setZoomLevelState] = useState(ZOOM_MIN);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageError, setImageError] = useState<string | null>(null);
   const [thumbnailScrollPosition, setThumbnailScrollPosition] = useState(0);
-  const [touchStartX, setTouchStartX] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [mainImageKey, setMainImageKey] = useState(0);
 
-  // 전체 이미지 배열 (메인 이미지 + 썸네일들)
-  const allImages = useMemo(() => {
-    const images: string[] = [];
+  const galleryImages = useMemo(() => {
+    const normalizedImages = Array.isArray(imageUrls) ? imageUrls : [];
+    const merged: string[] = [];
+
     if (mainImageUrl) {
-      images.push(mainImageUrl);
+      merged.push(mainImageUrl);
     }
-    if (imageUrls && imageUrls.length > 0) {
-      images.push(...imageUrls);
+
+    if (normalizedImages.length > 0) {
+      merged.push(...normalizedImages);
     }
-    return images.length > 0 ? images : [placeholderUrl];
-  }, [mainImageUrl, imageUrls, placeholderUrl]);
+
+    return merged.length > 0 ? merged : [PLACEHOLDER_IMAGE];
+  }, [mainImageUrl, imageUrls]);
 
   // 현재 메인 이미지
   const currentMainImage = useMemo(() => {
-    return allImages[selectedThumbnailIndex] || placeholderUrl;
-  }, [allImages, selectedThumbnailIndex, placeholderUrl]);
+    return galleryImages[selectedThumbnailIndex] || PLACEHOLDER_IMAGE;
+  }, [galleryImages, selectedThumbnailIndex]);
 
-  // 썸네일 배열 (메인 이미지 제외)
-  const thumbnailImages = useMemo(() => {
-    if (mainImageUrl && imageUrls?.length > 0) {
-      return imageUrls;
-    }
-    return allImages.slice(1);
-  }, [mainImageUrl, imageUrls, allImages]);
+  const resetGallery = useCallback(() => {
+    setIsImageLoading(true);
+    setImageError(null);
+    setMainImageKey((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    setSelectedThumbnailIndex(0);
+    setThumbnailScrollPosition(0);
+    setIsZoomModalOpen(false);
+    setZoomLevelState(ZOOM_MIN);
+    resetGallery();
+  }, [galleryImages, resetGallery]);
+
+  const updateThumbnailScrollPosition = useCallback((index: number) => {
+    const scrollLeft = Math.max(0, index - Math.floor(THUMBNAIL_VISIBLE_COUNT / 2));
+    setThumbnailScrollPosition(scrollLeft * 100);
+  }, []);
 
   /**
    * 특정 썸네일 선택
    */
   const selectThumbnail = useCallback((index: number) => {
-    if (index >= 0 && index < thumbnailImages.length) {
-      setSelectedThumbnailIndex(index);
-      setIsImageLoading(true);
-      setImageError(null);
+    if (galleryImages.length === 0) return;
 
-      // 슬라이더 자동 스크롤
-      const scrollLeft = Math.max(0, index - Math.floor(THUMBNAIL_VISIBLE_COUNT / 2));
-      setThumbnailScrollPosition(scrollLeft * 100); // 대략적인 스크롤 위치 계산
+    const safeIndex = Math.min(Math.max(index, 0), galleryImages.length - 1);
+
+    if (safeIndex === selectedThumbnailIndex) {
+      resetGallery();
+      return;
     }
-  }, [thumbnailImages.length]);
+
+    setSelectedThumbnailIndex(safeIndex);
+    setIsImageLoading(true);
+    setImageError(null);
+    updateThumbnailScrollPosition(safeIndex);
+  }, [galleryImages.length, resetGallery, selectedThumbnailIndex, updateThumbnailScrollPosition]);
 
   /**
    * 다음 썸네일로 이동
    */
   const nextThumbnail = useCallback(() => {
-    setSelectedThumbnailIndex((prev) => {
-      const next = Math.min(prev + 1, thumbnailImages.length - 1);
-      setThumbnailScrollPosition((next - Math.floor(THUMBNAIL_VISIBLE_COUNT / 2)) * 100);
-      return next;
-    });
-    setIsImageLoading(true);
-    setImageError(null);
-  }, [thumbnailImages.length]);
+    selectThumbnail(selectedThumbnailIndex + 1);
+  }, [selectThumbnail, selectedThumbnailIndex]);
 
   /**
    * 이전 썸네일로 이동
    */
   const prevThumbnail = useCallback(() => {
-    setSelectedThumbnailIndex((prev) => {
-      const next = Math.max(prev - 1, 0);
-      setThumbnailScrollPosition(Math.max(0, (next - Math.floor(THUMBNAIL_VISIBLE_COUNT / 2)) * 100));
-      return next;
-    });
-    setIsImageLoading(true);
-    setImageError(null);
-  }, []);
+    selectThumbnail(selectedThumbnailIndex - 1);
+  }, [selectThumbnail, selectedThumbnailIndex]);
 
   /**
    * 줌 모달 열기
@@ -188,45 +191,39 @@ export function useImageGallery(options: UseImageGalleryOptions): UseImageGaller
   /**
    * 터치 시작
    */
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    setTouchStartX(e.touches[0].clientX);
+  const handleTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length > 0) {
+      setTouchStartX(e.touches[0].clientX);
+    }
   }, []);
 
   /**
    * 터치 종료 (스와이프)
    */
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+  const handleTouchEnd = useCallback((e: TouchEvent<HTMLDivElement>) => {
+    if (touchStartX === null || e.changedTouches.length === 0) return;
+
     const touchEndX = e.changedTouches[0].clientX;
     const diffX = touchStartX - touchEndX;
-    const minSwipeDistance = 50;
 
-    if (Math.abs(diffX) > minSwipeDistance) {
+    if (Math.abs(diffX) >= SWIPE_THRESHOLD_PX) {
       if (diffX > 0) {
-        // 왼쪽에서 오른쪽으로 스와이프 = 다음 이미지
         nextThumbnail();
       } else {
-        // 오른쪽에서 왼쪽으로 스와이프 = 이전 이미지
         prevThumbnail();
       }
     }
+
+    setTouchStartX(null);
   }, [touchStartX, nextThumbnail, prevThumbnail]);
 
   /**
    * 갤러리 초기화
    */
-  const resetGallery = useCallback(() => {
-    setCurrentImageIndex(0);
-    setSelectedThumbnailIndex(0);
-    setIsZoomModalOpen(false);
-    setZoomLevelState(ZOOM_MIN);
-    setIsImageLoading(true);
-    setImageError(null);
-    setThumbnailScrollPosition(0);
-  }, []);
-
   return {
-    currentImageIndex,
+    galleryImages,
     currentMainImage,
+    mainImageKey,
     selectedThumbnailIndex,
     isZoomModalOpen,
     zoomLevel,

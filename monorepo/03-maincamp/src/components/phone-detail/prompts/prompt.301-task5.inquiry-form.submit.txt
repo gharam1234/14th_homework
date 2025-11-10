@@ -7,50 +7,33 @@
             - @01-common.mdc
             - @04-func.mdc
 
-조건-파일경로) 구현될 HOOK 파일경로: src/app/components/phone-detail/hooks/index.inquiry.hook.ts
-조건-파일경로) 기존 컴포넌트 파일: src/components/phone-detail/index.tsx (inquiry 영역)
+조건-파일경로) 구현될 HOOK 파일: src/components/phones-inquiry/hooks/index.form.hook.ts (신규 생성)
+조건-파일경로) 수정될 컴포넌트 파일: src/components/phones-inquiry/index.tsx
+조건-파일경로) 타입 정의 파일: src/components/phones-inquiry/types.ts (InquiryItem, PhonesInquiryProps 확장)
+조건-파일경로) 테스트 파일: src/components/phones-inquiry/tests/inquiry-form.spec.ts (Playwright)
 
 ==============================================
 
-핵심요구사항) 구매 문의 폼 기능을 supabase와 연동하여 step-by-step으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+핵심요구사항) PhonesInquiry 컴포넌트를 Supabase phone_inquiries 테이블과 연동하여 폼 제출이 가능하도록 만들 것.
 
-            1. 문의 제출 시나리오
-                1-1) 다음의 데이터를 Supabase phone_inquiries 테이블에 등록할 것
-                        - 접속키: Supabase Client
-                        - phone_inquiries 테이블
-                        - 데이터
-                            - phone_id: URL 파라미터에서 가져온 폰 ID (필수)
-                            - buyer_id: 현재 로그인한 사용자 ID (필수)
-                            - seller_id: phones 테이블의 seller_id (필수)
-                            - question: 사용자가 입력한 문의 내용 (필수, 최대500자)
-                            - seller_reply: null (초기값)
-                            - created_at: 현재 시간 (자동)
-                            - updated_at: 현재 시간 (자동)
+            1) useInquiryForm 훅
+                - 입력: { phoneId: string; sellerId: string; buyerId?: string }
+                - 상태: value, errorMessage, isSubmitting, charsRemaining
+                - 검증: 최소 5자, 최대 500자, 공백만 입력 불가 → 오류 메시지 한글로 노출
+                - 제출: supabase.from('phone_inquiries').insert({ phone_id, seller_id, buyer_id, question, seller_reply: null })
+                - 성공 시: "문의가 등록되었습니다." 토스트/alert, 입력값 초기화, onSuccess 콜백에서 목록 refetch 트리거
 
-                1-2) 문의 제출 성공 이후 로직을 완성할 것.
-                        - 알림메시지: "문의가 등록되었습니다."
-                        - 폼 초기화: 입력창 비우기
-                        - 문의 목록 갱신: 새 문의가 상단에 추가되도록
+            2) PhonesInquiry 컴포넌트 연동
+                - 기존 더미 데이터/로컬 상태 삭제
+                - props에 { phoneId, sellerId, buyerId, onSubmitted } 추가
+                - data-testid 유지: inquiry-textarea, submit-button 등
+                - 제출 중에는 버튼 disabled + 로딩 스피너 아이콘 교체
+                - 에러 메시지는 data-testid="inquiry-error"로 노출
 
-            2. 유효성 검증 규칙
-                - question: 필수, 최대500자, 최소5자
-                - 빈 값 체크: "문의 내용을 입력해주세요."
-                - 길이 초과: "최대 500자까지 입력 가능합니다."
+            3) 문자 수 표시
+                - "{현재 길이} / {최대 길이}" 형식 유지하되, 최대 길이는 훅 옵션으로 기본 500자
 
-            3. 폼 상태 관리
-                - 제출 중 상태: 버튼 비활성화, 로딩 스피너 표시
-                - 에러 상태: 에러 메시지 표시, 재시도 버튼
-                - 성공 상태: 성공 메시지 표시, 폼 초기화
-
-            4. UI 구성 요소
-                - 문의 입력 텍스트에어 (placeholder: "폰에 대해 궁금한 점을 물어보세요")
-                - 문의 제출 버튼 (disabled 상태 처리)
-                - 문자 수 표시 (예: "50 / 500")
-                - 에러/성공 메시지 표시 영역
-
-            5. 테스트
-                - 폼이 올바르게 렌더링되는지 확인
-                - 문의 제출 시 유효성 검증이 작동하는지 확인
-                - 제출 성공 시 문의가 Supabase에 저장되는지 확인
-                - 제출 후 폼이 초기화되는지 확인
-                - 에러 처리가 올바르게 작동하는지 확인
+            4) 테스트 (Playwright)
+                - page.waitForSelector('[data-testid="inquiry-input-section"]', { timeout: 500 })
+                - 시나리오: 빈 입력 → 오류 메시지, 4자 입력 → 최소 길이 오류, 정상 입력 → Supabase insert spy 확인 또는 API 응답 모킹 없이 실제 키 사용, 성공 후 textarea 비우기, 에러 발생 시 재시도
+                - jest / @testing-library/react 금지, networkidle 금지

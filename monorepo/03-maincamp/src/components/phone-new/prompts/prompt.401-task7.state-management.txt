@@ -30,14 +30,19 @@
                 [Supabase phones 테이블에 저장되는 필드]
                 - basicInfo: { modelName: string; condition: string; color: string; manufacturer?: string; storage?: string; ram?: string; releaseYear?: number; }
                 - pricing: { price: number; originalPrice?: number; }
-                - images: { images: File | null; imagePreview: string | null; }
+                - conditionText: { functionalStatus: string; additionalDescription: string }
                 - conditionData: { batteryHealth: number; } (phones.battery_health로 저장)
-
-                [로컬스토리지에만 저장되는 필드 (Supabase에 저장 안 함)]
-                - pricing: { includesShipping: boolean; } (참고: price, originalPrice는 저장됨)
-                - condition: { conditionDetails: { screenGood: boolean; bodyGood: boolean; batteryGood: boolean; buttonsGood: boolean; cameraGood: boolean; audioGood: boolean; }; functionalStatus: string; additionalDescription: string; }
                 - location: { tradeAddress: string; latitude?: number; longitude?: number; }
                 - tradeMethod: { tradeMethod: "direct" | "delivery" | "parcel" | ""; reservationAvailable: boolean; }
+
+                [로컬스토리지에만 저장되는 필드 (Supabase에 저장 안 함)]
+                - pricing: { includesShipping: boolean; }
+                - conditionDetails: { screenGood: boolean; bodyGood: boolean; batteryGood: boolean; buttonsGood: boolean; cameraGood: boolean; audioGood: boolean; }
+
+                [이미지 상태 관리]
+                - images: { file: File | null; imagePreview: string | null; }
+                - file 속성은 브라우저 메모리에서만 유지하고, Zustand persist `partialize` 또는 `merge` 옵션으로 제외할 것 (localStorage에 File 직렬화 금지)
+                - imagePreview 문자열만 로컬스토리지에 저장하여 새로고침 시 UI 복원
 
                 [전체 폼 관리 필드]
                 - formStatus: "initial" | "editing" | "loading" | "submitted"
@@ -46,7 +51,8 @@
 2) Zustand Store 메서드 구현
                 - setBasicInfo(data: basicInfo)
                 - setPricing(data: pricing)
-                - setCondition(data: condition)
+                - setConditionDetails(data: conditionDetails)
+                - setConditionText(data: conditionText)
                 - setLocation(data: location)
                 - setImages(data: images)
                 - setTradeMethod(data: tradeMethod)
@@ -70,7 +76,8 @@
                 - formData: 현재 폼 전체 데이터
                 - updateBasicInfo(data: basicInfo): void
                 - updatePricing(data: pricing): void
-                - updateCondition(data: condition): void
+                - updateConditionDetails(data: conditionDetails): void
+                - updateConditionText(data: conditionText): void
                 - updateLocation(data: location): void
                 - updateImages(data: images): void
                 - updateTradeMethod(data: tradeMethod): void
@@ -93,7 +100,7 @@
                 - 전화 정보 조회 실패 시: 에러 메시지 표시 및 목록 페이지로 이동
 
 핵심요구사항) 임시 저장 기능
-            1) 자동 저장: 폼 필드 변경 시 자동으로 로컬스토리지에 저장 (debounce 1초)
+            1) 자동 저장: 폼 필드 변경 시 자동으로 로컬스토리지에 저장 (debounce 1초, 이미지 File 제외)
             2) 수동 저장: "임시 저장" 버튼 클릭 시 명시적으로 저장
             3) 복원 기능: 페이지 새로고침 후 이전 작성 내용 자동 복원
             4) 저장소 키: "phone-new-form-draft"
@@ -104,9 +111,12 @@
                   formData: {
                     basicInfo: { modelName, condition, color, manufacturer, storage, ram, releaseYear },
                     pricing: { price, originalPrice, includesShipping },
-                    condition: { conditionDetails, functionalStatus, additionalDescription },
+                    condition: {
+                      details: conditionDetails,
+                      text: { functionalStatus, additionalDescription }
+                    },
                     location: { tradeAddress, latitude, longitude },
-                    images: { images: null (파일 객체는 저장 안 함), imagePreview },
+                    images: { file: null, imagePreview },
                     tradeMethod: { tradeMethod, reservationAvailable },
                     conditionData: { batteryHealth }
                   },

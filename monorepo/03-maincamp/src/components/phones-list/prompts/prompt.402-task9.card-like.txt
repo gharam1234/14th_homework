@@ -16,6 +16,10 @@
 - 훅: `src/components/phones-list/hooks/use-phone-like.hook.ts`
 - TSX: `src/components/phones-list/index.like-button.tsx`
 
+### 상태 관리 가이드
+- 찜 상태(`userLikes`, `likeCount`, `toggleLike`)는 `src/components/phones-list/stores/use-phone-list.store.ts`에서 관리한다. 파일이 없다면 이번 작업에서 생성한다.
+- Supabase 연동 전에는 LocalStorage(`user-likes`)를 임시 저장소로 사용하고, 훅에서 동일한 API를 제공한다.
+
 ### 데이터 구조
 ```typescript
 interface LikeState {
@@ -63,6 +67,7 @@ interface UserLikes {
    - 페이지가 완전히 로드된 후 테스트할 것.
        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+   - Playwright 실행 환경이 없다면 `03-maincamp/playwright.config.ts` 파일과 `@playwright/test` 의존성을 추가 후 테스트를 수행한다.
 
 ---
 

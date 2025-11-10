@@ -16,6 +16,10 @@
 - 훅: `src/components/phones-list/hooks/use-price-filter.hook.ts`
 - TSX: `src/components/phones-list/index.price-filter.tsx`
 
+### 상태 관리 가이드
+- 가격 관련 전역 상태는 `src/components/phones-list/stores/use-phone-list.store.ts`에서 관리한다. 파일이 없다면 이번 작업에서 생성하고 `minPrice`, `maxPrice`, `updatePriceFilter`, `allCards` 등을 노출한다.
+- 기존 카드 데이터의 `price` 값이 문자열이라면 훅 내부에서 숫자로 파싱(`Number(price.replace(/,/g, ""))`) 후 비교한다.
+
 ### 데이터 구조
 ```typescript
 interface PriceFilterState {
@@ -56,6 +60,7 @@ interface PriceFilterConfig {
    - 페이지가 완전히 로드된 후 테스트할 것.
        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대애 방법
+   - Playwright 실행 환경이 없으면 `03-maincamp`에 `playwright.config.ts`를 추가하고 `@playwright/test` + e2e 스크립트를 설치 후 테스트를 진행한다.
 
 ---
 

@@ -13,8 +13,12 @@
 @04-func.mdc
 
 ### 파일 경로
-- 훅: `src/components/phones-list/hooks/use-brand-filter.hook.ts`
+- 훅: `src/components/phones-list/hooks/use-brand-filter.hook.ts` (없다면 생성)
 - TSX: `src/components/phones-list/index.brand-filter.tsx`
+
+### 상태 관리 가이드
+- 브랜드 선택 상태(`selectedBrands`, `toggleBrand`, `resetBrands`, `allCards`)는 `src/components/phones-list/stores/use-phone-list.store.ts`(또는 동일한 Context 스토어)에 보관한다. 파일이 없다면 이번 작업에서 생성한다.
+- Supabase 데이터가 준비되지 않았다면 스토어 초깃값으로 기존 `samplePhones` 데이터를 사용하고, 향후 API 연동 시 동일한 인터페이스를 유지한다.
 
 ### 브랜드 목록
 ```typescript

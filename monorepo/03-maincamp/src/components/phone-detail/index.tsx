@@ -1,26 +1,37 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import styles from './styles.module.css';
-import { PhoneDetail as PhoneDetailType, PhoneDetailProps, PhoneWithSeller } from './types';
-import { useImageGallery } from './hooks/index.gallery.hook';
+import { PhoneCondition, PhoneDetail as PhoneDetailType, PhoneDetailProps, PhoneWithSeller } from './types';
+import { useImageGallery, ZOOM_MAX, ZOOM_MIN } from './hooks/index.gallery.hook';
+import { useBookmarkHook } from './hooks/index.bookmark.hook';
+import { usePhoneDetailModalHook } from './hooks/index.modal.hook';
+import { usePhoneSpecs } from './hooks/index.specs.hook';
 
 /**
  * 할인율 계산
  */
-const calculateDiscountRate = (price: number, originalPrice: number): number => {
-  if (originalPrice === 0) return 0;
+const calculateDiscountRate = (price: number, originalPrice?: number | null): number => {
+  if (typeof originalPrice !== 'number' || originalPrice <= 0 || originalPrice <= price) {
+    return 0;
+  }
   return Math.round(((originalPrice - price) / originalPrice) * 100);
+};
+
+const formatPrice = (value?: number | null): string => {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return '가격 정보 없음';
+  }
+  return `${value.toLocaleString('ko-KR')}원`;
 };
 
 /**
  * 조건별 해시태그 생성
  */
-const generateHashtags = (phone: PhoneWithSeller): string[] => {
+const generateHashtags = (condition?: PhoneCondition, batteryHealth?: number | null): string[] => {
   const hashtags: string[] = [];
 
-  // condition 기반 해시태그
-  switch (phone.condition) {
+  switch (condition) {
     case '미개봉':
       hashtags.push('#미개봉');
       break;
@@ -30,16 +41,88 @@ const generateHashtags = (phone: PhoneWithSeller): string[] => {
     case '중고':
       hashtags.push('#중고');
       break;
+    default:
+      break;
   }
 
-  // battery_health 기반 해시태그
-  if (phone.battery_health >= 80) {
-    hashtags.push('#배터리 좋음');
-  } else if (phone.battery_health < 50) {
-    hashtags.push('#배터리 나쁨');
+  if (typeof batteryHealth === 'number') {
+    if (batteryHealth >= 80) {
+      hashtags.push('#배터리 좋음');
+    } else if (batteryHealth < 50) {
+      hashtags.push('#배터리 나쁨');
+    }
   }
 
   return hashtags;
+};
+
+interface NormalizedPhoneDetail {
+  id: string;
+  title: string;
+  modelName: string;
+  description: string;
+  condition: PhoneCondition;
+  price: number;
+  originalPrice?: number | null;
+  mainImageUrl?: string;
+  imageUrls: string[];
+  batteryHealth?: number | null;
+  sellerNickname?: string;
+  sellerId?: string;
+  hashtags: string[];
+  bookmarkCount: number;
+}
+
+const isSupabasePhone = (phone?: PhoneDetailProps['data']): phone is PhoneWithSeller => {
+  return Boolean(phone && 'model_name' in phone && 'seller_id' in phone);
+};
+
+const normalizePhoneData = (raw?: PhoneDetailProps['data']): NormalizedPhoneDetail | null => {
+  if (!raw) return null;
+
+  if (isSupabasePhone(raw)) {
+    const hashtags = generateHashtags(raw.condition, raw.battery_health);
+    return {
+      id: raw.id,
+      title: raw.title ?? raw.model_name,
+      modelName: raw.model_name,
+      description: raw.description ?? '',
+      condition: raw.condition,
+      price: raw.price,
+      originalPrice: raw.original_price ?? null,
+      mainImageUrl: raw.main_image_url ?? raw.images_urls?.[0],
+      imageUrls: raw.images_urls ?? [],
+      batteryHealth: raw.battery_health ?? null,
+      sellerNickname: raw.seller?.nickname ?? undefined,
+      sellerId: raw.seller?.id,
+      hashtags,
+      bookmarkCount: typeof raw.bookmark_count === 'number' ? raw.bookmark_count : 0,
+    };
+  }
+
+  const legacy = raw as PhoneDetailType;
+  const legacyCondition: PhoneCondition = legacy.condition ?? '중고';
+  const legacyBattery = typeof legacy.batteryHealth === 'number' ? legacy.batteryHealth : null;
+  const fallbackHashtags = legacy.hashtags && legacy.hashtags.length > 0
+    ? legacy.hashtags
+    : generateHashtags(legacyCondition, legacyBattery);
+
+  return {
+    id: legacy.id,
+    title: legacy.title,
+    modelName: legacy.model_name ?? legacy.title,
+    description: legacy.description,
+    condition: legacyCondition,
+    price: legacy.price,
+    originalPrice: legacy.originalPrice ?? null,
+    mainImageUrl: legacy.mainImage ?? legacy.images?.[0],
+    imageUrls: legacy.images ?? [],
+    batteryHealth: legacyBattery ?? undefined,
+    sellerNickname: legacy.seller?.nickname ?? legacy.seller?.name,
+    sellerId: legacy.seller?.id,
+    hashtags: fallbackHashtags,
+    bookmarkCount: legacy.likes ?? 0,
+  };
 };
 
 /**
@@ -51,70 +134,18 @@ const generateHashtags = (phone: PhoneWithSeller): string[] => {
  */
 
 /**
- * 더미 중고폰 데이터
- */
-const DUMMY_PHONE_DATA: PhoneDetailType = {
-  id: 'listing-001',
-  title: '아이폰 14 Pro 256GB 퍼플 - A급 상태',
-  price: 1180000,
-  originalPrice: 1390000,
-  description: `정식 출시 이후 1년간 사용한 아이폰 14 Pro 퍼플 색상 256GB 모델입니다.
-
-생활 기스 거의 없는 A급 상태이며, 보호필름 및 케이스 착용 후 사용했습니다.
-
-포함 구성품:
-• 정품 박스 및 미사용 기본 구성품
-• 애플 정품 20W 어댑터
-• 투명 실리콘 케이스 2개
-
-점검 내용:
-• 배터리 성능 91%
-• Face ID 및 카메라 모두 정상 작동
-• 통신 3사 자급제 모델로 잔여 할부 없음
-
-합정/홍대 부근 직거래 선호하며, 택배 거래 시 안전거래(에스크로)만 진행합니다.`,
-  category: '스마트폰',
-  subcategory: '애플',
-  hashtags: ['#A급', '#중고폰', '#직거래선호'],
-  seller: {
-    id: 'seller-001',
-    name: '믿음직한 중고폰샵',
-    rating: 4.8,
-    totalSales: 412,
-    responseRate: 98,
-    location: '서울시 마포구 합정동',
-    latitude: 37.5495,
-    longitude: 126.9144,
-    profileImage: '/images/프로필아이콘.png',
-  },
-  images: [
-    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=640&h=480&fit=crop',
-    'https://images.unsplash.com/photo-1512493017640-c2f999018b72?w=180&h=136&fit=crop',
-    'https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=180&h=136&fit=crop',
-    'https://images.unsplash.com/photo-1519228466311-244566c20b72?w=180&h=136&fit=crop',
-    'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=180&h=136&fit=crop',
-  ],
-  mainImage: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=640&h=480&fit=crop',
-  status: 'available',
-  views: 3275,
-  likes: 188,
-  createdAt: '2025-02-18T10:30:00Z',
-  updatedAt: '2025-02-20T09:15:00Z',
-};
-
-/**
  * 중고폰 상세 페이지 컴포넌트
  * @param data - 폰 데이터 (PhoneWithSeller 타입, 기본값: DUMMY_PHONE_DATA)
  * @param onShare - 공유 버튼 클릭 핸들러
  */
-export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneDetailProps & { data?: PhoneWithSeller }) {
-  const phoneData = data || DUMMY_PHONE_DATA;
-  const discountRate = calculateDiscountRate(phoneData.price, phoneData.original_price);
-  const hashtags = phoneData && 'battery_health' in phoneData ? generateHashtags(phoneData as PhoneWithSeller) : [];
+export default function PhoneDetail({ data = null, isLoading = false, onShare, onBookmark }: PhoneDetailProps) {
+  const phoneData = useMemo(() => normalizePhoneData(data), [data]);
+  const locationSectionRef = useRef<HTMLElement | null>(null);
 
-  // 이미지 갤러리 훅
   const {
+    galleryImages,
     currentMainImage,
+    mainImageKey,
     selectedThumbnailIndex,
     isZoomModalOpen,
     zoomLevel,
@@ -131,10 +162,85 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
     handleImageError,
     handleTouchStart,
     handleTouchEnd,
+    resetGallery,
   } = useImageGallery({
-    mainImageUrl: phoneData.mainImage || phoneData.images?.[0],
-    imageUrls: phoneData.images || [],
+    mainImageUrl: phoneData?.mainImageUrl,
+    imageUrls: phoneData?.imageUrls ?? [],
   });
+
+  const lastThumbnailIndex = Math.max(galleryImages.length - 1, 0);
+
+  const handleThumbnailSelect = useCallback((index: number) => {
+    if (index === selectedThumbnailIndex) {
+      resetGallery();
+      return;
+    }
+
+    selectThumbnail(index);
+  }, [resetGallery, selectThumbnail, selectedThumbnailIndex]);
+
+  const {
+    isBookmarked,
+    bookmarkCount,
+    isLoading: isBookmarkLoading,
+    error: bookmarkError,
+    toggleBookmark,
+  } = useBookmarkHook({
+    phoneId: phoneData?.id ?? '',
+    userId: phoneData?.sellerId ?? 'local-user',
+    initialBookmarkCount: phoneData?.bookmarkCount ?? 0,
+    mockDelayMs: 0,
+  });
+
+  const { openPurchaseGuideModal } = usePhoneDetailModalHook({
+    phoneId: phoneData?.id,
+    phonePrice: phoneData?.price,
+  });
+
+  const specs = usePhoneSpecs(isSupabasePhone(data) ? (data as PhoneWithSeller) : undefined);
+
+  const handleShare = useCallback(async () => {
+    if (onShare) {
+      await Promise.resolve(onShare());
+      return;
+    }
+
+    if (typeof window === 'undefined') return;
+    const currentUrl = window.location?.href ?? '';
+
+    if (!currentUrl) {
+      window.alert?.('공유할 링크가 없습니다.');
+      return;
+    }
+
+    if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+      window.alert?.('이 브라우저에서는 링크 복사가 지원되지 않습니다.');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      window.alert?.('상품 링크가 복사되었습니다.');
+    } catch (error) {
+      console.error(error);
+      window.alert?.('공유 링크 복사에 실패했습니다.');
+    }
+  }, [onShare]);
+
+  const handleScrollToLocation = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const target = locationSectionRef.current ?? (document.querySelector('[data-testid="location-section"]') as HTMLElement | null);
+    target?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const handleBookmarkClick = useCallback(async () => {
+    if (!phoneData || isBookmarkLoading) return;
+    await toggleBookmark();
+  }, [isBookmarkLoading, phoneData, toggleBookmark]);
+
+  const handleReportClick = useCallback(() => {
+    openPurchaseGuideModal();
+  }, [openPurchaseGuideModal]);
 
   // ESC 키 처리
   useEffect(() => {
@@ -152,6 +258,29 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
     };
   }, [isZoomModalOpen, closeZoomModal]);
 
+  useEffect(() => {
+    if (!onBookmark || !phoneData) return;
+    onBookmark({ isBookmarked, bookmarkCount });
+  }, [bookmarkCount, isBookmarked, onBookmark, phoneData]);
+
+  if (!phoneData) {
+    return (
+      <div className={styles.body} data-testid="phone-detail-placeholder">
+        <div className={styles.container} data-testid="phone-detail-container" style={{ padding: '80px 20px', textAlign: 'center' }}>
+          <p>{isLoading ? '중고폰 정보를 불러오는 중입니다.' : '표시할 중고폰 정보가 없습니다.'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const priceText = formatPrice(phoneData.price);
+  const originalPriceText = formatPrice(phoneData.originalPrice);
+  const discountRate = calculateDiscountRate(phoneData.price, phoneData.originalPrice);
+  const shouldShowOriginalPrice = typeof phoneData.originalPrice === 'number' && phoneData.originalPrice > phoneData.price;
+  const sellerLabel = phoneData.sellerNickname ?? '판매자 정보 없음';
+  const hashtags = phoneData.hashtags;
+  const descriptionLines = phoneData.description ? phoneData.description.split('\n') : ['상세 설명이 준비되지 않았습니다.'];
+
   return (
     <div className={styles.body} data-testid="phone-detail-body">
       <div className={styles.container} data-testid="phone-detail-container">
@@ -161,12 +290,13 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
           <div className={styles.titleArea} data-testid="title-area">
             <div className={styles.titleHeader}>
               <div className={styles.titleRow}>
-                <h1 className={styles.title}>{phoneData.title}</h1>
+                <h1 className={styles.title}>{phoneData.modelName}</h1>
                 <div className={styles.actionButtons} data-testid="action-buttons">
-                  {/* 삭제 아이콘 */}
+                  {/* 신고 아이콘 */}
                   <button
                     className={styles.iconButton}
-                    title="삭제"
+                    title="신고"
+                    onClick={handleReportClick}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path
@@ -180,7 +310,7 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                   <button
                     className={styles.iconButton}
                     title="공유"
-                    onClick={onShare}
+                    onClick={handleShare}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path
@@ -194,6 +324,8 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                   <button
                     className={styles.iconButton}
                     title="위치"
+                    onClick={handleScrollToLocation}
+                    data-testid="location-button"
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path
@@ -204,26 +336,35 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                   </button>
 
                   {/* 북마크 배지 */}
-                  <div className={styles.bookmarkBadge} data-testid="bookmark-badge">
+                  <div className={styles.bookmarkBadge} data-testid="bookmark-badge" data-state={isBookmarked ? 'bookmarked' : 'idle'}>
                     <button
                       className={styles.iconButton}
                       title="북마크"
+                      onClick={handleBookmarkClick}
+                      disabled={!phoneData.id || isBookmarkLoading}
+                      aria-pressed={isBookmarked}
+                      data-testid="bookmark-button"
                     >
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <path
                           d="M17 3H5c-1.11 0-2 .9-2 2v16l7-3 7 3V5c0-1.1.89-2 2-2z"
                           fill="none"
-                          stroke="#ffffff"
+                          stroke={isBookmarked ? '#ffcc00' : '#ffffff'}
                           strokeWidth="2"
                         />
                       </svg>
                     </button>
-                    <p className={styles.bookmarkCount}>{phoneData.likes}</p>
+                    <p className={styles.bookmarkCount} data-testid="bookmark-count">{bookmarkCount.toLocaleString('ko-KR')}</p>
+                    {bookmarkError && (
+                      <span className={styles.bookmarkError} data-testid="bookmark-error" style={{ color: '#ff6b6b', fontSize: '12px' }}>
+                        {bookmarkError}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
-              <p className={styles.subtitle}>{phoneData.seller.name}의 믿을 수 있는 중고폰 거래</p>
-              <p className={styles.hashtags}>{phoneData.hashtags.join(' ')}</p>
+              <p className={styles.subtitle}>{sellerLabel}</p>
+              <p className={styles.hashtags}>{hashtags.length > 0 ? hashtags.join(' ') : '#해시태그 없음'}</p>
             </div>
 
             {/* 이미지 갤러리 */}
@@ -273,6 +414,7 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                   </div>
                 )}
                 <img
+                  key={mainImageKey}
                   src={currentMainImage}
                   alt="메인 이미지"
                   className={styles.mainImage}
@@ -300,6 +442,8 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                 <div
                   className={styles.thumbnailContainer}
                   data-testid="thumbnail-container"
+                  role="tablist"
+                  aria-label="제품 이미지 썸네일"
                   style={{
                     display: 'flex',
                     overflowX: 'auto',
@@ -308,11 +452,15 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                     scrollBehavior: 'smooth',
                   }}
                 >
-                  {phoneData.images.map((image, index) => (
+                  {galleryImages.map((image, index) => (
                     <button
                       key={index}
+                      type="button"
+                      role="tab"
+                      aria-selected={selectedThumbnailIndex === index}
+                      tabIndex={selectedThumbnailIndex === index ? 0 : -1}
                       className={`${styles.thumbnail} ${selectedThumbnailIndex === index ? styles.thumbnailActive : ''}`}
-                      onClick={() => selectThumbnail(index)}
+                      onClick={() => handleThumbnailSelect(index)}
                       data-testid={`thumbnail-item-${index}`}
                       style={{
                         minWidth: '80px',
@@ -338,7 +486,7 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                 <button
                   className={styles.navButton}
                   onClick={nextThumbnail}
-                  disabled={selectedThumbnailIndex === phoneData.images.length - 1}
+                  disabled={selectedThumbnailIndex === lastThumbnailIndex}
                   data-testid="thumbnail-next-btn"
                   title="다음 이미지"
                   style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}
@@ -412,12 +560,12 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                   >
                     <button
                       onClick={zoomOut}
-                      disabled={zoomLevel <= 1}
+                      disabled={zoomLevel <= ZOOM_MIN}
                       data-testid="zoom-out-btn"
                       style={{
                         padding: '8px 12px',
-                        cursor: zoomLevel > 1 ? 'pointer' : 'not-allowed',
-                        opacity: zoomLevel > 1 ? 1 : 0.5,
+                        cursor: zoomLevel > ZOOM_MIN ? 'pointer' : 'not-allowed',
+                        opacity: zoomLevel > ZOOM_MIN ? 1 : 0.5,
                       }}
                     >
                       −
@@ -430,12 +578,12 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                     </span>
                     <button
                       onClick={zoomIn}
-                      disabled={zoomLevel >= 3}
+                      disabled={zoomLevel >= ZOOM_MAX}
                       data-testid="zoom-in-btn"
                       style={{
                         padding: '8px 12px',
-                        cursor: zoomLevel < 3 ? 'pointer' : 'not-allowed',
-                        opacity: zoomLevel < 3 ? 1 : 0.5,
+                        cursor: zoomLevel < ZOOM_MAX ? 'pointer' : 'not-allowed',
+                        opacity: zoomLevel < ZOOM_MAX ? 1 : 0.5,
                       }}
                     >
                       +
@@ -478,7 +626,7 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
             <div className={styles.basicInfoItem}>
               <p className={styles.basicInfoLabel}>모델명</p>
               <p className={styles.modelName} data-testid="model-name">
-                {phoneData.model_name}
+                {phoneData.modelName}
               </p>
             </div>
 
@@ -495,16 +643,18 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                 <p className={styles.basicInfoLabel}>판매가</p>
                 <div className={styles.priceInfo}>
                   <p className={styles.price} data-testid="price-display">
-                    {phoneData.price?.toLocaleString()}원
+                    {priceText}
                   </p>
-                  <div className={styles.priceRow}>
-                    <span className={styles.originalPrice}>
-                      {phoneData.original_price?.toLocaleString()}원
-                    </span>
-                    <span className={styles.discountRate} data-testid="discount-rate">
-                      {discountRate}% 할인
-                    </span>
-                  </div>
+                  {shouldShowOriginalPrice && (
+                    <div className={styles.priceRow}>
+                      <span className={styles.originalPrice} data-testid="original-price">
+                        {originalPriceText}
+                      </span>
+                      <span className={styles.discountRate} data-testid="discount-rate">
+                        {discountRate}% 할인
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -526,11 +676,52 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
         {/* === 구분선 === */}
         <div className={styles.divider} />
 
+        {/* === 스펙 섹션 === */}
+        {specs.length > 0 && (
+          <section className={styles.specsSection} data-testid="specs-section">
+            <h2 className={styles.sectionTitle}>사양 정보</h2>
+            <div className={styles.specsGrid}>
+              {specs.map((spec, index) => (
+                <div key={index} className={styles.specsGridItem} data-testid={`spec-item-${index}`}>
+                  <p className={styles.specsLabel}>{spec.label}</p>
+                  {spec.progress ? (
+                    <div className={styles.batteryProgressContainer}>
+                      <div className={styles.batteryProgressBar} data-testid={`battery-progress-bar-${index}`}>
+                        <div
+                          className={`${styles.batteryProgressFill} ${styles[spec.progress.colorClass]}`}
+                          style={{ width: `${spec.progress.percentage}%` }}
+                          data-testid={`battery-progress-fill-${index}`}
+                          data-color-class={spec.progress.colorClass}
+                        />
+                      </div>
+                      <p className={styles.batteryProgressText} data-testid={`battery-progress-text-${index}`}>
+                        {spec.displayText}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className={styles.specsValue} data-testid={`spec-value-${index}`}>{spec.displayText}</p>
+                      {spec.supplementText && (
+                        <p className={styles.specsSupplementText} data-testid={`spec-supplement-text-${index}`}>
+                          {spec.supplementText}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* === 구분선 === */}
+        <div className={styles.divider} />
+
         {/* === 상세 설명 섹션 === */}
         <section className={styles.descriptionSection} data-testid="description-section">
           <h2 className={styles.sectionTitle}>상세 설명</h2>
           <div className={styles.descriptionContent}>
-            {phoneData.description.split('\n').map((line, index) => (
+            {descriptionLines.map((line, index) => (
               <p key={index}>{line}</p>
             ))}
           </div>
@@ -540,7 +731,7 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
         <div className={styles.divider} />
 
         {/* === 위치 섹션 === */}
-        <section className={styles.locationSection} data-testid="location-section">
+        <section className={styles.locationSection} data-testid="location-section" ref={locationSectionRef}>
           <h2 className={styles.sectionTitle}>상세 위치</h2>
           <div className={styles.mapContainer} data-testid="map-container">
             <img

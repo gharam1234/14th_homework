@@ -47,10 +47,10 @@
                 - data-testid: "phone-safe-transaction-info"
 
 핵심요구사항) useTradeMethod Hook을 구현할 것.
-            1) 기능: 거래 방식 관련 필드 상태 관리 (로컬 상태만, Supabase에 저장 안 함)
+            1) 기능: 거래 방식 관련 필드 상태 관리 (Supabase + 로컬 동시 관리)
             2) 상태
-                - tradeMethod: "direct" | "delivery" | "parcel" | "" (로컬스토리지에만 저장)
-                - reservationAvailable: boolean (로컬스토리지에만 저장)
+                - tradeMethod: "direct" | "delivery" | "parcel" | "" (Supabase phones.trade_method 필드)
+                - reservationAvailable: boolean (Supabase phones.reservation_available 필드)
             3) 메서드
                 - setTradeMethod(value: "direct" | "delivery" | "parcel")
                 - setReservationAvailable(value: boolean)
@@ -58,9 +58,9 @@
                 - reset(): void
 
 핵심요구사항) 저장소 정책
-            1) phones 테이블에는 저장되지 않음 (거래 방식 필드 없음)
-            2) 로컬스토리지에만 저장: key = "phone-new-form-draft"
-            3) 폼 제출 시 해당 데이터는 Supabase에 저장되지 않고 로컬스토리지에만 유지
+            1) Supabase phones 테이블 필드 추가/활용: trade_method (text) + reservation_available (boolean)
+            2) 로컬스토리지: key = "phone-new-form-draft"에 동일 값 캐싱
+            3) 폼 제출 시 Supabase에 저장하고 성공 시 로컬 드래프트 정리
 
 핵심요구사항) 조건부 로직
             1) 예약 가능 필드 활성화/비활성화

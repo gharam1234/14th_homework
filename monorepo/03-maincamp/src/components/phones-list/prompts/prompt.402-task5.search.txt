@@ -16,6 +16,10 @@
 - 훅: `src/components/phones-list/hooks/use-search.hook.ts`
 - TSX: `src/components/phones-list/index.search.tsx`
 
+### 상태 관리 가이드
+- 검색어 및 필터 결과는 `src/components/phones-list/stores/use-phone-list.store.ts`에서 관리한다. 파일이 없다면 이번 작업에서 생성하고 `searchQuery`, `setSearchQuery`, `filteredCards`, `allCards` 등을 노출한다.
+- `samplePhones` 데이터가 문자열 기반이면 훅 내부에서 `toLowerCase()`로 비교하고, 검색 대상 필드를 명시적으로 정리한다.
+
 ### 데이터 구조
 ```typescript
 interface SearchState {
@@ -54,6 +58,7 @@ interface SearchableCard extends PhoneCardItem {
    - 페이지가 완전히 로드된 후 테스트할 것.
        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+   - Playwright 구성 파일이 없다면 `03-maincamp/playwright.config.ts`를 작성하고 `@playwright/test` 설치 및 npm 스크립트를 추가한 뒤 테스트한다.
 
 ---
 

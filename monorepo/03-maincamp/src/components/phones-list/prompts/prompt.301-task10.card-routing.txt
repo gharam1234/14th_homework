@@ -13,8 +13,8 @@
 @04-func.mdc
 
 ### 파일 경로
-- 훅: `src/components/phones-list/hooks/use-phone-card-routing.hook.ts`
-- TSX: `src/components/phones-list/index.card.tsx` (기존 카드 컴포넌트에 추가)
+- 훅: `src/components/phones-list/hooks/use-phone-card-routing.hook.ts` (없다면 생성)
+- TSX: `src/components/phones-list/index.card.tsx` (파일이 없다면 분리 컴포넌트를 새로 만들거나, 기존 `index.tsx`에서 카드 관련 부분만 import할 수 있도록 리팩터링)
 
 ### 라우팅 정보
 ```typescript
@@ -46,12 +46,13 @@ src/components/phone-detail/ // 상세 페이지 구조
    - 페이지가 완전히 로드된 후 테스트할 것.
        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+   - Playwright 설정이 없다면 `03-maincamp/playwright.config.ts` 작성 및 `@playwright/test` 설치 후 `package.json`에 e2e 스크립트를 추가한다.
 
 ---
 
 1) 라우팅 훅 구현
    1-1) usePhoneCardRouting() 훅 생성
-        - useRouter() 초기화
+        - useRouter() 초기화 또는 기존 `usePhonesListRouting`을 내부에서 호출
         - phoneId를 매개변수로 받음
    1-2) handleNavigateToDetail() 함수 정의
         - getPath('PHONE_DETAIL', { id: phoneId }) 사용

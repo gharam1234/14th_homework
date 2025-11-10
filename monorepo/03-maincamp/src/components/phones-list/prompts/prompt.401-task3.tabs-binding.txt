@@ -13,8 +13,12 @@
 @04-func.mdc
 
 ### 파일 경로
-- 훅: `src/components/phones-list/hooks/use-tabs-filter.hook.ts`
+- 훅: `src/components/phones-list/hooks/use-tabs-filter.hook.ts` (없다면 생성)
 - TSX: `src/components/phones-list/index.tabs.tsx`
+
+### 상태 관리 가이드
+- `activeTab`, `setActiveTab`, `allCards` 등은 `src/components/phones-list/stores/use-phone-list.store.ts` (또는 동등한 Context 스토어)에 보관한다. 파일이 없으면 이번 작업에서 생성한다.
+- Supabase 연동 전까지는 `samplePhones` 데이터를 스토어 초기값으로 넣고, 필요 시 이후 API 연동 시 같은 인터페이스를 유지한다.
 
 ### 데이터 구조
 ```typescript
@@ -62,6 +66,7 @@ interface TabsState {
    - 페이지가 완전히 로드된 후 테스트할 것.
        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+   - Playwright 환경이 준비되지 않았다면 `03-maincamp` 패키지에 `playwright.config.ts`를 생성하고 `@playwright/test` 설치 및 `package.json` 스크립트를 추가한 뒤 실행한다.
 
 ---
 

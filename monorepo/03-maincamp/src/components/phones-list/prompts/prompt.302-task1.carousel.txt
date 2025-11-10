@@ -14,9 +14,13 @@
 @03-ui.mdc
 
 ### 파일 경로
-- TSX: `src/components/phones-list/index.carousel.tsx`
+- TSX: `src/components/phones-list/index.carousel.tsx` (없다면 생성)
 - CSS: `src/components/phones-list/styles.carousel.module.css`
 - 훅: `src/components/phones-list/hooks/use-carousel.hook.ts`
+
+### 통합 가이드
+- 새로 만든 캐러셀 컴포넌트는 `src/components/phones-list/index.tsx` 상단(HOT 거래 영역)에 import하여 렌더링한다.
+- 데이터는 `samplePhones` 또는 `CarouselItem[]` 임시 배열에서 공급하며, 이후 API 연동 시 동일한 필드를 유지한다.
 
 ### 캐러셀 데이터 구조
 ```typescript

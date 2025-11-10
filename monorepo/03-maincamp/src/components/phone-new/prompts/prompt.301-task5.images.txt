@@ -13,7 +13,7 @@
 
 조건-백엔드) Supabase Storage 연동
             - 버킷명: phone-images
-            - 파일 경로: {seller_id}/{phone_id}/{timestamp}-{filename}
+            - 파일 경로: {seller_id}/{timestamp}-{uuid}-{filename} (phone_id 의존 금지)
 
 ==============================================
 

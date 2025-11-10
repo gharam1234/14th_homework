@@ -32,12 +32,18 @@ interface PhoneCardWithSeller extends PhoneCardItem {
 }
 ```
 
+### 상태 관리 가이드
+- 판매자 정보 및 카드 데이터는 `src/components/phones-list/stores/use-phone-list.store.ts`에 통합한다. 파일이 없다면 이번 과제에서 생성하고 `sellers`, `cardsWithSeller`, `setSellerCache` 등의 API를 준비한다.
+- `samplePhones` 데이터만 존재한다면 각 아이템에 `sellerId`와 `seller` 정보를 추가하고, 추후 Supabase 연동 시에도 동일한 구조를 유지한다.
+
 ### Supabase 데이터
 ```typescript
 // phones 테이블의 seller_id로 sellers 테이블 조인
 // SELECT phones.*, sellers.* FROM phones
 // LEFT JOIN sellers ON phones.seller_id = sellers.id
 ```
+
+> Supabase 연동이 아직 준비되지 않았다면 `samplePhones` 데이터에 `seller` 정보를 병합하거나 JSON Mock을 사용하고, 훅에서 동일한 인터페이스를 제공하도록 한다. 후속 작업에서 Supabase를 연결해도 훅 API가 바뀌지 않도록 설계한다.
 
 ==================================================
 

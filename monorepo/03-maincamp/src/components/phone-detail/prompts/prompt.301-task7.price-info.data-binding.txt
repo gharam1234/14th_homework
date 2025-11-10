@@ -7,73 +7,32 @@
             - @01-common.mdc
             - @04-func.mdc
 
-조건-파일경로) 구현될 HOOK 파일경로: src/app/components/phone-detail/hooks/index.priceInfo.hook.ts
-조건-파일경로) 기존 컴포넌트 파일: src/components/phone-detail/index.tsx (priceInfo 영역)
+조건-파일경로) 구현될 HOOK 파일: src/components/phone-detail/hooks/index.price-info.hook.ts (신규 생성)
+조건-파일경로) 수정될 컴포넌트 파일: src/components/phone-detail/index.tsx (basicInfo 가격 블록 분리)
+조건-파일경로) 스타일 파일: src/components/phone-detail/styles.module.css (price-info 관련 클래스 추가)
+조건-파일경로) 테스트 파일: src/components/phone-detail/tests/price-info.spec.ts
 
 ==============================================
 
-핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+핵심요구사항) 가격/거래 정보 블록을 독립적으로 구성하고 Supabase 데이터와 동기화할 것.
 
-            1) 테스트 제외 라이브러리
-                - jest
-                - @testing-library/react
+            1) usePriceInfo 훅
+                - 입력: { price?: number; originalPrice?: number; condition?: string; tradeType?: 'DIRECT' | 'DELIVERY' | 'BOTH'; shippingFee?: 'INCLUDED' | 'EXCLUDED'; safeTradeAvailable?: boolean; stockCount?: number; wishCount?: number }
+                - 출력: 통화 포맷된 priceText, originalPriceText, discountRate(정수%), discountAmount, tradeBadges, 안내 문구
+                - originalPrice가 없거나 price >= originalPrice면 할인율/할인금액 숨김
 
-            2) 테스트 조건
-                - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
-                - 페이지가 완전히 로드된 후 테스트할 것.
-                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
-                    - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대await 방법
+            2) PriceInfo UI
+                - data-testid="price-info-section" 추가
+                - 레이아웃: 판매가, 정가+할인, 거래 방식, 안전거래 배지, 재고/관심수 표기, 최근 거래/안전 가이드 링크 버튼
+                - 색상 규칙: 판매가=var(--gray-900), 할인율=var(--red-500), 안전거래 배지=var(--green-500)
+                - 모바일 환경에서는 세로 스택
 
-            3) 테스트 API 조건
-                3-1) 데이터
-                    - 실제 API 데이터를 사용할 것.
-                    - Mock 데이터를 사용하지 말 것.
+            3) 거래 정보
+                - tradeType 텍스트: DIRECT → "직거래만", DELIVERY → "배송만", BOTH → "직거래/배송"
+                - shippingFee 텍스트: INCLUDED → "배송료 포함", EXCLUDED → "배송료 별도"
+                - safeTradeAvailable true면 "안전거래 지원" 배지 노출 + `중고거래 안전도 가이드` 링크 연결 (URL: https://goorm.com/safety-guide 등 설명 텍스트로 대체 가능)
 
-                3-2) 성공 시나리오
-                    - Supabase phones 테이블에서 가격 정보를 조회하여 바인딩
-
-                3-3) 실패 시나리오
-                    - API 호출 실패 또는 데이터 없음 처리
-
-            4) 데이터 조건
-                - 저장소: Supabase
-                - 테이블: phones
-                - 요청 파라미터: 폰 ID (URL 파라미터에서 가져옴)
-
-핵심요구사항) 현재의 모든 구조를 그대로 유지하고, 다음의 Supabase 데이터를 실제로 바인딩할 것.
-
-            1) 바인딩할 데이터 (phones 테이블)
-                - price: 판매가격
-                - original_price: 정가
-                - condition: 단말기 상태
-
-            2) 데이터 바인딩 상세내용
-                - 판매가격: {price}원 (큰 글씨, 강조색)
-                - 정가: {original_price}원 (줄 그음 처리)
-                - 할인율: ((original_price - price) / original_price * 100)% (빨간색 강조)
-                - 할인 금액: {original_price - price}원
-
-            3) 거래 방식 안내
-                - 직거래 가능 여부: "직거래 가능" 또는 "배송만 가능"
-                - 거래 방식: "직거래/배송" 또는 "배송만"
-                - 배송료 정보: "배송료 별도" (운영 정책에 따라 조정)
-
-            4) 거래 안전 정보
-                - 안전거래 배지/뱃지 표시
-                - "중고거래 안전도 가이드" 링크
-                - "최근 거래 완료" 정보 표시
-
-            5) 추가 정보
-                - 남은 재고 표시 (선택사항)
-                - 관심 상품 수 표시 (선택사항)
-
-            6) CSS 처리
-                - 가격 영역: 레이아웃 분리 (판매가/할인율/거래방식)
-                - 색상: 할인율은 빨간색, 판매가는 검은색/강조색
-                - 반응형: 모바일에서 세로 정렬
-
-            7) 테스트
-                - 판매가격이 올바르게 표시되는지 확인
-                - 할인율이 올바르게 계산되는지 확인
-                - 거래 방식이 올바르게 표시되는지 확인
-                - 안전거래 배지가 표시되는지 확인
+            4) 테스트 (Playwright)
+                - page.waitForSelector('[data-testid="price-info-section"]', { timeout: 500 })
+                - 시나리오: 할인율 계산, 원가 없을 때 숨김, tradeType별 텍스트, 안전거래 배지 토글, 재고/관심수 표기
+                - jest / @testing-library/react 금지, networkidle 금지

@@ -8,8 +8,12 @@
             - @04-func.mdc
 
 조건-파일경로) 참고할 PAGE 경로: src/app/(protected)/phones/page.tsx
-조건-파일경로) 구현될 HOOK 경로: src/components/phones-list/hooks/index.tabs.hook.ts
+조건-파일경로) 구현될 HOOK 경로: src/components/phones-list/hooks/index.tabs.hook.ts (없다면 이번 작업에서 생성)
 조건-파일경로) 구현될 TSX 파일경로: src/components/phones-list/index.tsx
+
+### 상태 관리 가이드
+            - 공용 상태는 `src/components/phones-list/stores/use-phone-list.store.ts`에 정의한다. 해당 파일이 없으면 생성하고, `activeTab`, `selectedBrands`, `cards` 샘플 데이터를 이 스토어에서 관리한다.
+            - 훅에서는 Zustand 스토어를 사용하지만 Zustand 도입이 어렵다면 동일 경로에 React Context 기반의 간단한 스토어를 만들어 동일한 API(`activeTab`, `setActiveTab`, `selectedBrands`, `toggleBrand`)를 유지한다.
 
 ==============================================
 

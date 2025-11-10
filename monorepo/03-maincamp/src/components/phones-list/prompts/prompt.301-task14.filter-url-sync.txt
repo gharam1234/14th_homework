@@ -13,8 +13,12 @@
 @04-func.mdc
 
 ### 파일 경로
-- 훅: `src/components/phones-list/hooks/use-filter-url-sync.hook.ts`
+- 훅: `src/components/phones-list/hooks/use-filter-url-sync.hook.ts` (없다면 이번 작업에서 생성)
 - TSX: `src/components/phones-list/index.tsx` (기존 확장)
+
+### 상태 관리 가이드
+- URL과 동기화할 기준 상태는 `src/components/phones-list/stores/use-phone-list.store.ts`에 둔다. 파일이 없으면 생성하고 `filters`, `updateFilters`, `resetFilters`를 노출한다.
+- Zustand를 사용하기 어려운 경우 동일 경로에 React Context 기반 스토어를 만들되, 외부에서는 동일한 API를 사용하도록 맞춘다.
 
 ### 필터 쿼리 파라미터 구조
 ```typescript
@@ -56,6 +60,7 @@ interface FilterQueryParams {
    - 페이지가 완전히 로드된 후 테스트할 것.
        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+   - Playwright 설정이 없다면 `03-maincamp/playwright.config.ts`를 생성하고 `@playwright/test` 및 관련 스크립트를 추가한 뒤 테스트를 실행한다.
 
 ---
 

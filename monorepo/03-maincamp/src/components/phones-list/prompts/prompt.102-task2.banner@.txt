@@ -14,9 +14,13 @@
 @03-ui.mdc
 
 ### 파일 경로
-- TSX: `src/components/phones-list/index.banner.tsx`
+- TSX: `src/components/phones-list/index.banner.tsx` (없다면 생성)
 - CSS: `src/components/phones-list/styles.banner.module.css`
-- 타입: `src/components/phones-list/types.ts` (기존 확장)
+- 타입: `src/components/phones-list/types.ts` (파일이 없다면 생성하여 공용 타입 정의)
+
+### 통합 가이드
+- 구현된 배너 컴포넌트는 `src/components/phones-list/index.tsx` 상단 섹션에 import해 렌더링한다.
+- `PromotionalBanner` 데이터는 임시로 `samplePhones`가 선언된 동일 파일에서 관리하고, 추후 API 연동 시에도 동일한 필드를 유지한다.
 
 ### 데이터 구조
 ```typescript

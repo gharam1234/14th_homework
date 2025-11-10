@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import DaumPostcode from "react-daum-postcode";
 import styles from "./styles.module.css";
 import { usePhoneForm, savePhoneToStorage } from "./hooks/index.form.hook";
 import { usePhoneNewRouting } from "./hooks/index.routing.hook";
+import { useImageUpload } from "./hooks/index.image.hook";
+import { useAddressSearch } from "./hooks/index.address.hook";
 import { IPhoneNewProps, IPhoneFormInput } from "./types";
 
 /**
@@ -34,7 +37,22 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
   const { handleCancel: handleCancelRouting, navigateAfterSubmit } =
     usePhoneNewRouting({ isEdit, phoneId });
   const [isLoading, setIsLoading] = useState(false);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [isImagesFieldReady, setIsImagesFieldReady] = useState(false);
+  const {
+    imageFiles,
+    handleImageChange,
+    handleImageDelete,
+    clearAllImages,
+    canAddMoreImages,
+  } = useImageUpload();
+  const {
+    isAddressModalOpen,
+    openAddressModal,
+    closeAddressModal,
+    handleAddressSelect,
+  } = useAddressSearch();
+
+  const detailedAddressInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -42,10 +60,37 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
     formState: { errors, isValid },
     watch,
     reset,
+    setValue,
   } = form;
 
   // 폼 필드 값 모니터링
   const currentValues = watch();
+  const hasCoordinates =
+    Boolean(currentValues.latitude) && Boolean(currentValues.longitude);
+  const previewUrls = useMemo(
+    () => imageFiles.map((file) => URL.createObjectURL(file)),
+    [imageFiles]
+  );
+
+  useEffect(() => {
+    register("images");
+    setIsImagesFieldReady(true);
+  }, [register]);
+
+  useEffect(() => {
+    if (!isImagesFieldReady) return;
+    const serializedImages = imageFiles.map((file) => file.name);
+    setValue("images", serializedImages, {
+      shouldDirty: serializedImages.length > 0,
+      shouldValidate: true,
+    });
+  }, [imageFiles, isImagesFieldReady, setValue]);
+
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
 
   /**
    * 폼 제출 핸들러
@@ -76,7 +121,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
 
       // 폼 초기화
       reset();
-      setImageFiles([]);
+      clearAllImages();
 
       // 라우팅 처리
       navigateAfterSubmit();
@@ -94,7 +139,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
   const handleCancel = () => {
     // 원본 값으로 복구
     reset();
-    setImageFiles([]);
+    clearAllImages();
     // 라우팅 처리
     handleCancelRouting();
   };
@@ -103,32 +148,42 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
    * 우편번호 검색 버튼 핸들러
    */
   const handlePostcodeSearch = () => {
-    // react-daum-postcode 모달 표시 (향후 구현)
-    alert("우편번호 검색 기능은 준비 중입니다.");
+    openAddressModal();
   };
 
   /**
-   * 이미지 파일 변경 핸들러
+   * Daum Postcode API 주소 선택 핸들러
    */
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
+  const handleDaumAddressSelect = (data: any) => {
+    try {
+      // 주소 검색 결과 처리
+      const result = handleAddressSelect({
+        zonecode: data.zonecode,
+        address: data.address,
+        addressType: data.addressType,
+        roadAddress: data.roadAddress,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      });
 
-    const newFiles = Array.from(files).slice(0, 2 - imageFiles.length);
-    if (newFiles.length + imageFiles.length > 2) {
-      alert("최대 2개까지만 첨부할 수 있습니다.");
-      return;
+      // form에 값 설정
+      if (result.postalCode && result.address) {
+        setValue("postalCode", result.postalCode);
+        setValue("address", result.address);
+        setValue("latitude", result.latitude);
+        setValue("longitude", result.longitude);
+
+        // 상세주소 입력 필드에 포커스 이동
+        setTimeout(() => {
+          detailedAddressInputRef.current?.focus();
+        }, 0);
+      }
+    } catch (error) {
+      console.error("주소 선택 처리 실패:", error);
+      alert("주소 선택 중 오류가 발생했습니다.");
     }
-
-    setImageFiles([...imageFiles, ...newFiles]);
   };
 
-  /**
-   * 이미지 삭제 핸들러
-   */
-  const handleImageDelete = (index: number) => {
-    setImageFiles(imageFiles.filter((_, i) => i !== index));
-  };
 
   /**
    * 버튼 활성화 상태 판단
@@ -462,6 +517,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
               data-testid="detailed-address-input-group"
             >
               <input
+                ref={detailedAddressInputRef}
                 type="text"
                 placeholder="상세주소를 입력해 주세요."
                 className={`${styles.detailedAddressInput} ${
@@ -521,7 +577,15 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
             </h3>
 
             <div className={styles.mapContainer} data-testid="map-placeholder">
-              주소를 먼저 입력해 주세요.
+              {hasCoordinates ? (
+                <div data-testid="map-coordinates">
+                  <strong>선택된 거래 위치</strong>
+                  <p>위도: {currentValues.latitude}</p>
+                  <p>경도: {currentValues.longitude}</p>
+                </div>
+              ) : (
+                <p>주소를 먼저 입력해 주세요.</p>
+              )}
             </div>
           </div>
         </div>
@@ -538,101 +602,45 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
           {/* 미리보기 */}
           {imageFiles.length > 0 && (
             <div
-              style={{
-                display: "flex",
-                gap: "8px",
-                marginBottom: "16px",
-              }}
+              className={styles.imagePreviewGrid}
+              data-testid="image-preview-grid"
             >
               {imageFiles.map((file, index) => (
                 <div
-                  key={index}
-                  style={{
-                    position: "relative",
-                    width: "160px",
-                    height: "160px",
-                    borderRadius: "8px",
-                    border: "1px solid #e4e4e4",
-                    overflow: "hidden",
-                    backgroundColor: "#f2f2f2",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  className={styles.imagePreviewItem}
+                  key={`${file.name}-${index}`}
                 >
-                  {file.type.startsWith("image/") ? (
-                    <>
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={file.name}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleImageDelete(index)}
-                        style={{
-                          position: "absolute",
-                          top: "4px",
-                          right: "4px",
-                          width: "24px",
-                          height: "24px",
-                          borderRadius: "50%",
-                          backgroundColor: "rgba(0,0,0,0.5)",
-                          color: "white",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: "16px",
-                          lineHeight: "24px",
-                          padding: "0",
-                        }}
-                      >
-                        ×
-                      </button>
-                    </>
+                  {previewUrls[index] ? (
+                    <img
+                      src={previewUrls[index]}
+                      alt={`${file.name} 미리보기`}
+                      className={styles.imagePreview}
+                      data-testid="image-preview"
+                    />
                   ) : (
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: "24px" }}>📄</div>
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          color: "#666",
-                          marginTop: "4px",
-                        }}
-                      >
+                    <div className={styles.imageFileFallback}>
+                      <div className={styles.imageFileFallbackIcon}>📄</div>
+                      <div className={styles.imageFileFallbackName}>
                         {file.name}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleImageDelete(index)}
-                        style={{
-                          position: "absolute",
-                          top: "4px",
-                          right: "4px",
-                          width: "24px",
-                          height: "24px",
-                          borderRadius: "50%",
-                          backgroundColor: "rgba(0,0,0,0.5)",
-                          color: "white",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: "16px",
-                        }}
-                      >
-                        ×
-                      </button>
                     </div>
                   )}
+                  <button
+                    type="button"
+                    className={styles.imageDeleteButton}
+                    data-testid="btn-delete-image"
+                    aria-label={`${file.name} 삭제`}
+                    onClick={() => handleImageDelete(index)}
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>
           )}
 
           {/* 업로드 버튼 */}
-          {imageFiles.length < 2 && (
+          {canAddMoreImages && (
             <button
               className={styles.imageUploadBox}
               data-testid="btn-upload-image"
@@ -664,6 +672,28 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
           )}
         </div>
       </form>
+
+      {/* Daum Postcode 모달 */}
+      {isAddressModalOpen && (
+        <div className={styles.modalOverlay} data-testid="address-modal">
+          <div className={styles.modalContent}>
+            <button
+              className={styles.modalCloseButton}
+              data-testid="btn-close-address-modal"
+              type="button"
+              onClick={closeAddressModal}
+              aria-label="주소 검색 모달 닫기"
+            >
+              ×
+            </button>
+            <DaumPostcode
+              onComplete={handleDaumAddressSelect}
+              autoClose={false}
+              data-testid="daum-postcode-component"
+            />
+          </div>
+        </div>
+      )}
 
       {/* 버튼 섹션 */}
       <div className={styles.buttonSection} data-testid="button-section">

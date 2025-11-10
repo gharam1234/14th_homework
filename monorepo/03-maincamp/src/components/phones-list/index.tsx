@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import styles from "./styles.module.css";
 import { usePhonesListRouting } from "./hooks/index.routing.hook";
+import PromotionalBannerComponent from "./index.banner";
+import { PromotionalBanner } from "./types";
 
 /**
  * 중고폰 브랜드 필터 아이콘 컴포넌트
@@ -195,6 +197,19 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
   const [activeTab, setActiveTab] = useState<"selling" | "completed">("selling");
   const { navigateToPhoneDetail, navigateToPhoneCreate } = usePhonesListRouting();
 
+  // 프로모션 배너 데이터
+  const promotionalBanner: PromotionalBanner = {
+    id: "banner-1",
+    phoneModel: "iPhone 14 Pro",
+    condition: "새것",
+    originalPrice: 1500000,
+    salePrice: 1180000,
+    backgroundImageUrl:
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&h=400&fit=crop",
+    badges: ["안전거래 인증", "A급 조건", "즉시 구매 가능"],
+    description: "프리미엄 성능, 놀라운 가격",
+  };
+
   // 샘플 카드 데이터
   const samplePhones = [
     {
@@ -242,12 +257,24 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
       phoneId: index + 1,
     }));
 
+  const handleBannerClick = (bannerId: string) => {
+    console.log(`배너 클릭: ${bannerId}`);
+  };
+
   return (
     <div className={styles.container} data-testid="phones-list">
       {/* 제목 */}
       <h1 className={styles.title} data-testid="title">
         여기에서만 만날 수 있는 중고폰
       </h1>
+
+      {/* 프로모션 배너 */}
+      <div className={styles.banner} data-testid="promotional-banner-section">
+        <PromotionalBannerComponent
+          banner={promotionalBanner}
+          onClick={handleBannerClick}
+        />
+      </div>
 
       {/* 탭 섹션 */}
       <div className={styles.tabSection} data-testid="tab-section">
