@@ -182,6 +182,124 @@
   pointer-events: none;
 }
 
+/* === 기본 정보 섹션 === */
+.basicInfoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.basicInfoContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.basicInfoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.basicInfoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.basicInfoLabel {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--color-medium-gray);
+}
+
+.modelName {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
+  color: var(--color-dark-gray);
+}
+
+.condition {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--color-dark-gray);
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: var(--color-border-light);
+  display: inline-block;
+  width: fit-content;
+}
+
+.priceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.price {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--color-primary-blue);
+}
+
+.priceRow {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.originalPrice {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--color-light-gray);
+  text-decoration: line-through;
+}
+
+.discountRate {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  color: var(--color-primary-blue);
+}
+
+.basicInfoHashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.hashtag {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--color-primary-blue);
+  padding: 6px 12px;
+  border-radius: 4px;
+  background-color: rgba(41, 116, 229, 0.1);
+  display: inline-block;
+  white-space: nowrap;
+}
+
 /* === 구분선 === */
 .divider {
   height: 1px;

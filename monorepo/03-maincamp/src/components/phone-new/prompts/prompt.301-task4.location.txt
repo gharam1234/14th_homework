@@ -1,0 +1,84 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @03-ui.mdc
+
+조건-파일경로) 구현될 폼 필드 TSX 파일경로: src/components/phone-new/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/phone-new/styles.module.css
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-new/hooks/useLocation.hook.ts
+
+조건-외부라이브러리) Kakao Map API
+            - 라이브러리: react-kakao-maps-sdk
+            - API Key: process.env.NEXT_PUBLIC_KAKAO_MAP_KEY 환경변수 사용
+            - 설치: npm install react-kakao-maps-sdk
+
+==============================================
+
+핵심요구사항) 판매자 위치 정보 섹션(Task 4)을 구현할 것. 이 섹션은 다음 3가지 필드를 포함한다:
+
+1) 거래 장소 주소 입력 필드 (필수)
+                - HTML: <input type="text"> 또는 주소 검색 API 연동
+                - 라벨: "거래 장소 주소" (필수 표기 *)
+                - 필드 너비: 100%
+                - 높이: 40px
+                - 필드명: tradeAddress
+                - 플레이스홀더: "예) 서울시 강남구 테헤란로"
+                - 에러메시지: 미입력 시 "주소를 입력해주세요"
+                - data-testid: "phone-trade-address-input"
+
+2) 지도 표시 영역 (필수, Kakao Map)
+                - 라벨: "거래 장소" (지도 영역 위에 표시)
+                - Kakao Map 컴포넌트 사용
+                - 지도 높이: 300px
+                - 지도 너비: 100%
+                - 기능:
+                    - 주소 입력 시 지도 자동 갱신 (주소 → 좌표 변환, Kakao Geocoding API)
+                    - 마커 표시 (트레이드 위치)
+                    - 기본 줌 레벨: 15
+                - 주소 없으면: "주소를 먼저 입력해주세요" 메시지 표시 (지도 중앙에 텍스트)
+                - data-testid: "phone-location-map"
+
+3) 위치 상태 표시 (보조)
+                - 주소 입력 전: "주소를 먼저 입력해주세요" (지도 영역 중앙, 회색 텍스트)
+                - 주소 입력됨: 주소 텍스트 표시 (지도 아래, 작은 텍스트)
+                - 주소 변환 중: 로딩 스피너 표시
+                - 주소 변환 실패: "주소 조회에 실패했습니다" 에러 메시지
+                - data-testid: "phone-location-status"
+
+핵심요구사항) useLocation Hook을 구현할 것.
+            1) 기능: 위치 관련 필드 상태 관리 및 지도 좌표 변환 (로컬 상태만, Supabase에 저장 안 함)
+            2) 상태
+                - tradeAddress: string (로컬스토리지에만 저장)
+                - latitude?: number (로컬스토리지에만 저장)
+                - longitude?: number (로컬스토리지에만 저장)
+                - isLoadingMap: boolean
+                - mapError?: string
+            3) 메서드
+                - setTradeAddress(value: string)
+                - searchAddressAndUpdateMap(address: string): Promise<void> (Kakao Geocoding API 호출)
+                - setMapCoordinates(lat: number, lng: number)
+                - reset(): void
+
+핵심요구사항) 저장소 정책
+            1) phones 테이블에는 저장되지 않음 (위치 정보 필드 없음)
+            2) 로컬스토리지에만 저장: key = "phone-new-form-draft"
+            3) 폼 제출 시 해당 데이터는 Supabase에 저장되지 않고 로컬스토리지에만 유지
+
+핵심요구사항) Kakao Geocoding API 연동
+            1) 사용 시점: tradeAddress 입력값 변경 시 (debounce 300ms)
+            2) API 호출
+                - 엔드포인트: https://dapi.kakao.com/v2/local/search/address.json
+                - 파라미터: query=입력된 주소
+                - 헤더: Authorization: KakaoAK {API_KEY}
+            3) 응답 처리
+                - 성공: 첫 번째 결과의 y(위도), x(경도) 추출
+                - 실패: mapError 설정
+            4) data-testid: "phone-location-geocoding"
+
+핵심요구사항) 유효성 검증
+            1) tradeAddress: 필수, 문자열, 최소 5자 이상
+            2) latitude, longitude: 지도 표시 시 자동 계산

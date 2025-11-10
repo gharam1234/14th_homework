@@ -1,0 +1,184 @@
+# 프롬프트 301 - Task14: 필터 상태 URL 동기화
+
+**타입**: Routing with Query Parameters
+**컴포넌트**: phones-list
+**목표**: 검색 필터(탭, 브랜드, 가격, 검색어)를 URL 쿼리 파라미터로 관리 및 동기화
+
+==================================================
+
+## 조건
+
+### Cursor Rules
+@01-common.mdc
+@04-func.mdc
+
+### 파일 경로
+- 훅: `src/components/phones-list/hooks/use-filter-url-sync.hook.ts`
+- TSX: `src/components/phones-list/index.tsx` (기존 확장)
+
+### 필터 쿼리 파라미터 구조
+```typescript
+// URL 예시
+// /phones?status=selling&brand=apple&priceMin=100000&priceMax=500000&search=iphone
+
+interface FilterQueryParams {
+  status?: "selling" | "sold";        // 탭 상태
+  brand?: string;                      // 브랜드 필터 (쉼표 구분: apple,samsung)
+  priceMin?: number;                   // 최소 가격
+  priceMax?: number;                   // 최대 가격
+  search?: string;                     // 검색어
+  page?: number;                       // 페이지 번호 (선택)
+}
+```
+
+### Zustand 스토어 연동
+```typescript
+// phoneListStore에서 필터 상태 관리
+// store 예시:
+// - filterStore.status
+// - filterStore.brands (배열)
+// - filterStore.priceRange { min, max }
+// - filterStore.searchQuery
+```
+
+==================================================
+
+## 핵심요구사항
+
+핵심요구사항) playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+---
+
+1) URL 동기화 훅 구현
+   1-1) useFilterUrlSync() 훅 생성
+        - useRouter(), useSearchParams() 초기화
+        - Zustand 필터 스토어 연동
+   1-2) 초기 로드 시 쿼리 파라미터에서 필터 복원
+        - searchParams 읽기
+        - Zustand store에 상태 업데이트
+   1-3) 필터 변경 시 URL 업데이트
+        - store 상태 변경 감지
+        - router.push()로 쿼리 파라미터 업데이트 (replace 옵션)
+
+2) URL 인코딩/디코딩
+   2-1) 쿼리 파라미터 인코딩
+        - searchParams.set() 및 URLSearchParams 사용
+        - 특수문자 처리 (encodeURIComponent)
+   2-2) 브랜드 필터: 쉼표로 구분
+        - 입력: brands = ['apple', 'samsung']
+        - URL: brand=apple,samsung
+        - 디코딩: brand.split(',')
+
+3) 필터 상태 복원 로직
+   3-1) 페이지 로드 시 실행
+        - useEffect() 훅에서 초기 복원
+   3-2) searchParams 읽기
+        - status: "selling" | "sold"
+        - brand: 쉼표 구분 문자열 → 배열로 변환
+        - priceMin, priceMax: 숫자로 파싱
+        - search: URL 디코딩 후 적용
+   3-3) 유효하지 않은 값 무시
+        - 기본값 설정 (status="selling", brands=[], price={min:0, max:Infinity})
+
+4) 필터 변경 감지 및 URL 업데이트
+   4-1) Zustand store 변경 감지
+        - useEffect() 또는 store 구독 방식
+   4-2) 쿼리 파라미터 생성
+        - const params = new URLSearchParams()
+        - status, brands, priceMin, priceMax, search 추가
+   4-3) URL 업데이트
+        - router.push()로 변경된 URL로 이동
+        - replace: true (히스토리 스택에 쌓이지 않음)
+
+5) 뒤로가기 지원
+   5-1) 브라우저 뒤로가기 시 이전 필터 복원
+        - Next.js 기본 동작 (자동 지원)
+        - 필터 상태 초기 복원 로직이 useEffect()에 있으면 작동
+   5-2) 페이지 새로고침
+        - URL의 쿼리 파라미터 유지
+        - 초기 복원 로직으로 필터 복원
+
+6) 테스트 케이스 작성
+   6-1) 파일: `src/components/phones-list/tests/filter-url-sync.spec.ts`
+   6-2) 테스트 1: 필터 변경 시 URL 쿼리 파라미터 업데이트
+        - 조건: 필터 UI 로드됨
+        - 실행: 탭 클릭 (status 변경)
+        - 검증: URL이 ?status=selling으로 변경됨
+   6-3) 테스트 2: 페이지 로드 시 URL에서 필터 복원
+        - 조건: URL = /phones?status=sold&brand=apple
+        - 실행: 페이지 로드
+        - 검증: 필터가 복원됨 (UI에 선택 상태 반영)
+   6-4) 테스트 3: 가격 범위 필터 URL 동기화
+        - 조건: 가격 범위 설정 UI 로드됨
+        - 실행: 가격 범위 변경
+        - 검증: URL이 ?priceMin=100000&priceMax=500000로 업데이트
+   6-5) 테스트 4: 뒤로가기 시 이전 필터 복원
+        - 조건: 초기 URL = /phones?brand=apple
+        - 실행: samsung으로 변경 후 뒤로가기
+        - 검증: 필터가 apple로 복원됨
+
+7) Props & Types
+```typescript
+interface UseFilterUrlSyncReturn {
+  filters: FilterQueryParams;
+  updateFilters: (newFilters: Partial<FilterQueryParams>) => void;
+  resetFilters: () => void;
+}
+
+interface FilterUrlSyncConfig {
+  defaultFilters?: Partial<FilterQueryParams>;
+  debounceMs?: number;  // URL 업데이트 지연 (기본 300ms)
+}
+```
+
+8) 구현 예시 구조
+```typescript
+// hook
+export const useFilterUrlSync = (config?: FilterUrlSyncConfig) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const filters = usePhoneListStore(state => state.filters);
+  const updateFilters = usePhoneListStore(state => state.updateFilters);
+
+  // 초기 복원
+  useEffect(() => {
+    const status = searchParams.get('status') || 'selling';
+    const brands = searchParams.get('brand')?.split(',') || [];
+    const priceMin = Number(searchParams.get('priceMin')) || 0;
+    const priceMax = Number(searchParams.get('priceMax')) || Infinity;
+    const search = searchParams.get('search') || '';
+
+    updateFilters({ status, brands, priceMin, priceMax, search });
+  }, []); // 초기 로드만
+
+  // 필터 변경 감지
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.status) params.set('status', filters.status);
+    if (filters.brands?.length) params.set('brand', filters.brands.join(','));
+    // ... 기타 필터
+
+    router.push(`/phones?${params.toString()}`, { shallow: true });
+  }, [filters]);
+
+  return { filters };
+};
+```
+
+9) 추가 고려사항
+   9-1) 공유 가능한 URL: ?status=selling&brand=apple로 다른 사용자에게 공유 가능
+   9-2) 북마크: 필터가 적용된 URL 북마크 가능
+   9-3) 성능: debounce 처리로 URL 업데이트 빈도 제한
+   9-4) 캐시: 쿼리 파라미터 변경 시만 서버 요청 (ISR 또는 캐시 무효화)
+
+==================================================

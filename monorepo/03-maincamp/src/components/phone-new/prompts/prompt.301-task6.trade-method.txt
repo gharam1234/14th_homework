@@ -1,0 +1,75 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @03-ui.mdc
+
+조건-파일경로) 구현될 폼 필드 TSX 파일경로: src/components/phone-new/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/phone-new/styles.module.css
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-new/hooks/useTradeMethod.hook.ts
+
+==============================================
+
+핵심요구사항) 거래 방식 선택 섹션(Task 6)을 구현할 것. 이 섹션은 다음 3가지 필드를 포함한다:
+
+1) 거래 방식 선택 필드 (필수)
+                - HTML: Radio Button 그룹 (단일 선택)
+                - 라벨: "거래 방식" (필수 표기 *)
+                - 옵션 3가지 (단일 선택만 가능):
+                    - 직거래 (value: "direct")
+                    - 배송 (value: "delivery")
+                    - 택배 (value: "parcel")
+                - 기본값: "" (미선택)
+                - 레이아웃: 3개 Radio 버튼을 가로로 나열
+                - 에러메시지: 미선택 시 "거래 방식을 선택해주세요"
+                - data-testid: "phone-trade-method-radio"
+                - 각 radio data-testid: "phone-trade-method-direct", "phone-trade-method-delivery", "phone-trade-method-parcel"
+
+2) 예약 가능 여부 선택 (선택)
+                - HTML: Checkbox 또는 Toggle Switch
+                - 라벨: "예약 가능"
+                - 필드명: reservationAvailable
+                - 기본값: false (미선택)
+                - 부가 설명: 선택 시 "구매자가 이후 거래 예약을 할 수 있습니다"
+                - 유의사항: "직거래 선택 시에만 활성화" (배송/택배 선택 시 비활성화)
+                - data-testid: "phone-reservation-checkbox"
+
+3) 안심거래 옵션 표시 (보조 정보)
+                - HTML: 읽기전용 정보 표시 (아이콘 + 텍스트)
+                - 라벨: "안심거래"
+                - 텍스트: "모든 거래 방식에 안심거래 옵션이 적용됩니다"
+                - 아이콘: 정보 아이콘 (i) 또는 체크 아이콘
+                - 색상: 파란색 또는 회색 (정보성 색상)
+                - 위치: 거래 방식 선택 아래에 배치
+                - data-testid: "phone-safe-transaction-info"
+
+핵심요구사항) useTradeMethod Hook을 구현할 것.
+            1) 기능: 거래 방식 관련 필드 상태 관리 (로컬 상태만, Supabase에 저장 안 함)
+            2) 상태
+                - tradeMethod: "direct" | "delivery" | "parcel" | "" (로컬스토리지에만 저장)
+                - reservationAvailable: boolean (로컬스토리지에만 저장)
+            3) 메서드
+                - setTradeMethod(value: "direct" | "delivery" | "parcel")
+                - setReservationAvailable(value: boolean)
+                - isReservationDisabled(): boolean (직거래 아닐 시 true)
+                - reset(): void
+
+핵심요구사항) 저장소 정책
+            1) phones 테이블에는 저장되지 않음 (거래 방식 필드 없음)
+            2) 로컬스토리지에만 저장: key = "phone-new-form-draft"
+            3) 폼 제출 시 해당 데이터는 Supabase에 저장되지 않고 로컬스토리지에만 유지
+
+핵심요구사항) 조건부 로직
+            1) 예약 가능 필드 활성화/비활성화
+                - 거래 방식이 "direct"일 때만 활성화
+                - 다른 방식 선택 시 자동 비활성화 및 값 초기화 (false)
+            2) 안심거래 정보
+                - 항상 표시 (거래 방식 선택 관계없이)
+                - 읽기전용 정보
+
+핵심요구사항) 유효성 검증
+            1) tradeMethod: 필수, "direct" | "delivery" | "parcel" 중 하나
+            2) reservationAvailable: 선택, boolean, 직거래 선택 시에만 유효

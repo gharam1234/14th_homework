@@ -1,0 +1,81 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @03-ui.mdc
+
+조건-파일경로) 구현될 폼 필드 TSX 파일경로: src/components/phone-new/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/phone-new/styles.module.css
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-new/hooks/useCondition.hook.ts
+
+조건-외부라이브러리) Quill Rich Text Editor
+            - 라이브러리: quill (npm install quill react-quill)
+            - CSS: import 'quill/dist/quill.snow.css'
+
+==============================================
+
+핵심요구사항) 휴대폰 상태 상세 정보 섹션(Task 3)을 구현할 것. 이 섹션은 다음 3가지 필드를 포함한다:
+
+1) 휴대폰 상태 체크박스 섹션 (필수)
+                - HTML: <input type="checkbox"> 다중 선택
+                - 제목: "휴대폰 상태를 선택해주세요" (필수 표기 *)
+                - 체크박스 항목 (각 항목은 checkbox + label 쌍):
+                    - 화면 상태: "화면 상태 양호"
+                    - 본체 상태: "본체 상태 양호"
+                    - 배터리 상태: "배터리 상태 양호"
+                    - 모든 버튼 정상: "모든 버튼 정상"
+                    - 카메라 정상: "카메라 정상"
+                    - 스피커/마이크 정상: "스피커/마이크 정상"
+                - 데이터 구조: condition_details = { screenGood: boolean; bodyGood: boolean; batteryGood: boolean; buttonsGood: boolean; cameraGood: boolean; audioGood: boolean; }
+                - 레이아웃: 3열 그리드 (각 행에 2개씩 표시)
+                - data-testid: "phone-condition-checkbox-group"
+                - 각 checkbox data-testid: "phone-condition-screen", "phone-condition-body", 등
+
+2) 기능 정상 여부 입력 필드 (필수)
+                - HTML: <textarea>
+                - 라벨: "기능 정상 여부" (필수 표기 *)
+                - 플레이스홀더: "예) 모든 기능이 정상적으로 작동합니다."
+                - 높이: 60px
+                - 필드명: functionalStatus
+                - 필드 너비: 100%
+                - 제약: 최대 200자
+                - 에러메시지: 미입력 시 "기능 정상 여부를 입력해주세요"
+                - data-testid: "phone-functional-status-textarea"
+
+3) 추가 설명 에디터 (선택, Rich Text Editor - Quill)
+                - HTML: Quill 에디터 기반
+                - 라벨: "추가 설명 (결함, 특이사항)" (선택)
+                - 플레이스홀더: "예) 디스플레이 우측 상단에 작은 흠집이 있습니다."
+                - 에디터 높이: 200px
+                - 필드명: additionalDescription
+                - 기능: 굵게, 이탤릭, 언더라인, 리스트, 링크 등 기본 서식 지원
+                - 제약: 최대 1000자
+                - data-testid: "phone-additional-description-editor"
+
+핵심요구사항) useCondition Hook을 구현할 것.
+            1) 기능: 상태 관련 필드 상태 관리 (로컬 상태만, Supabase에 저장 안 함)
+            2) 상태
+                - conditionDetails: { screenGood: boolean; bodyGood: boolean; batteryGood: boolean; buttonsGood: boolean; cameraGood: boolean; audioGood: boolean; }
+                - functionalStatus: string
+                - additionalDescription: string
+            3) 메서드
+                - toggleConditionDetail(key: string, value: boolean)
+                - setFunctionalStatus(value: string)
+                - setAdditionalDescription(value: string)
+                - calculateBatteryHealth(): number (0-100, Task 8에서 phones.battery_health로 저장)
+                - reset(): void
+
+핵심요구사항) 유효성 검증
+            1) conditionDetails: 선택, 1개 이상 체크 권장 (필수 아님)
+            2) functionalStatus: 필수, 문자열, 최대 200자
+            3) additionalDescription: 선택, 문자열, 최대 1000자
+
+핵심요구사항) battery_health 계산 로직
+            1) calculateBatteryHealth() 메서드 구현
+                - conditionDetails의 각 항목을 점수화 (각 true = +15, +20 등으로 계산)
+                - 최대 100점, 최소 20점
+                - 계산 예시: 모두 선택 시 100, 미선택 시 20
+            2) 이 값은 Zustand Store를 통해 Task 8의 폼 제출 시 phones.battery_health로 저장됨

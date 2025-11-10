@@ -1,0 +1,186 @@
+# 프롬프트 401 - Task11: 판매자 프로필 표시 (데이터 바인딩)
+
+**타입**: Data Binding
+**컴포넌트**: phones-card-seller
+**목표**: 카드에 판매자 프로필(이미지, 닉네임) 표시 및 판매자 데이터 바인딩
+
+==================================================
+
+## 조건
+
+### Cursor Rules
+@01-common.mdc
+@04-func.mdc
+
+### 파일 경로
+- 훅: `src/components/phones-list/hooks/use-seller-info.hook.ts`
+- TSX: `src/components/phones-list/index.seller-profile.tsx` (또는 card에 포함)
+
+### 데이터 구조
+```typescript
+interface Seller {
+  id: string;
+  nickname: string;         // "빈얀트리", "홍길동"
+  avatarUrl?: string;       // 프로필 이미지 URL
+  rating?: number;          // 4.8 (선택)
+  reviewCount?: number;     // 24 (선택)
+  totalSales?: number;      // 156 (선택)
+}
+
+interface PhoneCardWithSeller extends PhoneCardItem {
+  seller: Seller;
+}
+```
+
+### Supabase 데이터
+```typescript
+// phones 테이블의 seller_id로 sellers 테이블 조인
+// SELECT phones.*, sellers.* FROM phones
+// LEFT JOIN sellers ON phones.seller_id = sellers.id
+```
+
+==================================================
+
+## 핵심요구사항
+
+1) 판매자 정보 훅 구현
+   1-1) useSellerInfo(sellerId: string) 훅 생성
+        - Supabase에서 sellers 테이블 조회
+        - SELECT * FROM sellers WHERE id = sellerId
+   1-2) 캐싱: 동일 sellerId에 대한 중복 조회 방지
+   1-3) 로딩 상태: isLoading, error 반환
+
+2) 판매자 프로필 컴포넌트
+   2-1) SellerProfile 컴포넌트 생성
+   2-2) Props: { seller: Seller, className?: string, showRating?: boolean }
+   2-3) 프로필 이미지
+        - 크기: 24px x 24px (카드 내 표시)
+        - 라운드: 50% (원형)
+        - 기본값: 회색 배경 + 아이콘 (이미지 없을 시)
+   2-4) 닉네임 표시
+        - 텍스트: 14px, 400 weight
+        - 색상: #333333 (검은색)
+        - 1줄 자르기
+
+3) 카드에 판매자 정보 바인딩
+   3-1) PhoneCard 컴포넌트에 seller 정보 추가
+   3-2) 카드 하단 우측에 판매자 정보 배치
+        - 좌측: 프로필 이미지
+        - 우측: 닉네임 + 선택사항(별점, 거래 건수)
+   3-3) 레이아웃: flex, gap 8px
+   3-4) data-testid="seller-profile" 속성 추가
+
+4) 데이터 조인 및 로드
+   4-1) 카드 목록 로드 시 판매자 정보 함께 로드
+        - Supabase JOIN 쿼리 사용
+        - 또는 분리된 쿼리로 판매자 정보 추가 로드
+   4-2) 판매자 데이터 캐싱
+        - Map<sellerId, Seller> 형태로 메모이제이션
+        - 또는 Zustand store에 저장
+
+5) 선택사항: 판매자 신뢰도 표시
+   5-1) 별점 표시 (⭐ 4.8)
+   5-2) 거래 건수 (거래 156건)
+   5-3) 배치: 닉네임 우측 또는 하단
+   5-4) 폰트: 12px, 회색 텍스트
+
+6) 선택사항: 판매자 프로필 페이지 라우팅
+   6-1) 프로필 이미지 또는 닉네임 클릭 시 판매자 페이지로 이동 (향후 구현)
+   6-2) 라우팅 경로: /sellers/[sellerId] 또는 /profile/[sellerId]
+   6-3) data-testid="seller-profile-link" 속성 추가
+
+7) Props & Types
+```typescript
+interface UseSellerInfoProps {
+  sellerId: string;
+  enableCache?: boolean;  // 기본값: true
+}
+
+interface UseSellerInfoReturn {
+  seller: Seller | null;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+interface SellerProfileProps {
+  seller: Seller;
+  showRating?: boolean;
+  showSalesCount?: boolean;
+  onClick?: () => void;
+  className?: string;
+}
+
+interface PhoneCardProps {
+  // ... 기존 props
+  seller: Seller;  // 추가
+}
+```
+
+8) 구현 예시 구조
+```typescript
+// hook
+export const useSellerInfo = (sellerId: string) => {
+  const [seller, setSeller] = useState<Seller | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!sellerId) return;
+
+    setIsLoading(true);
+    supabase
+      .from('sellers')
+      .select('*')
+      .eq('id', sellerId)
+      .single()
+      .then(({ data }) => setSeller(data))
+      .catch(err => setError(err))
+      .finally(() => setIsLoading(false));
+  }, [sellerId]);
+
+  return { seller, isLoading, error };
+};
+
+// component
+export const SellerProfile: React.FC<SellerProfileProps> = ({ seller, showRating }) => {
+  return (
+    <div data-testid="seller-profile" className={styles.sellerProfile}>
+      <img
+        src={seller.avatarUrl || '/default-avatar.png'}
+        alt={seller.nickname}
+        className={styles.avatar}
+      />
+      <div className={styles.info}>
+        <p className={styles.nickname}>{seller.nickname}</p>
+        {showRating && (
+          <p className={styles.rating}>⭐ {seller.rating}</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// 카드 통합
+export const PhoneCard: React.FC<PhoneCardProps> = ({ data, seller }) => {
+  return (
+    <div className={styles.card}>
+      {/* ... 이미지, 정보 */}
+      <SellerProfile seller={seller} showRating={false} />
+    </div>
+  );
+};
+```
+
+9) 에러 처리
+   9-1) 판매자 정보 로드 실패 시
+        - 기본 닉네임 표시 ("판매자")
+        - 기본 아이콘 표시
+   9-2) 이미지 로드 실패 시
+        - 대체 아이콘 또는 색상 배경 표시
+
+10) 성능 최적화
+    10-1) 판매자 정보 캐싱으로 중복 조회 방지
+    10-2) useMemo로 판매자 정보 메모이제이션
+    10-3) 이미지 최적화: next/image 사용 (선택)
+
+==================================================

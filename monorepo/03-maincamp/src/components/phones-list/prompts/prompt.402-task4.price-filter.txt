@@ -1,0 +1,243 @@
+# 프롬프트 402 - Task4: 가격 범위 필터 (제출 & 필터링)
+
+**타입**: Function Submit
+**컴포넌트**: phones-price-filter
+**목표**: 최소/최대 가격 입력 후 필터 적용 (Zustand 상태 업데이트)
+
+==================================================
+
+## 조건
+
+### Cursor Rules
+@01-common.mdc
+@04-func.mdc
+
+### 파일 경로
+- 훅: `src/components/phones-list/hooks/use-price-filter.hook.ts`
+- TSX: `src/components/phones-list/index.price-filter.tsx`
+
+### 데이터 구조
+```typescript
+interface PriceFilterState {
+  minPrice: number;           // 0
+  maxPrice: number;           // 2000000
+  tempMinPrice: string;       // 입력 폼 값
+  tempMaxPrice: string;       // 입력 폼 값
+}
+
+interface PriceFilterConfig {
+  minBound: number;           // 0 (최소값)
+  maxBound: number;           // 5000000 (최대값)
+  step: number;               // 10000 (증감 단위)
+}
+```
+
+### Zustand 스토어 연동
+```typescript
+// phoneListStore에 다음 상태 추가
+// - minPrice: number
+// - maxPrice: number
+// - updatePriceFilter: (min: number, max: number) => void
+// - filteredCards: PhoneCardItem[] (가격 필터링 적용)
+```
+
+==================================================
+
+## 핵심요구사항
+
+핵심요구사항) playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대애 방법
+
+---
+
+1) 가격 필터 훅 구현
+   1-1) usePriceFilter() 훅 생성
+        - Zustand 스토어에서 minPrice, maxPrice 구독
+        - updatePriceFilter(min, max) 함수 제공
+   1-2) 로컬 입력 상태 관리 (tempMinPrice, tempMaxPrice)
+   1-3) 초기값: minPrice = 0, maxPrice = 2000000
+   1-4) 유효성 검증 함수
+        - isValidPrice(min, max): min < max && min >= 0
+        - formatPrice(price): "1,180,000" 형식
+
+2) 가격 입력 필드 구현
+   2-1) 최소 가격 입력 필드
+        - placeholder: "최소 가격"
+        - 숫자만 입력 가능 (type: "number" 또는 수동 검증)
+        - data-testid="price-min-input"
+   2-2) 최대 가격 입력 필드
+        - placeholder: "최대 가격"
+        - 숫자만 입력 가능
+        - data-testid="price-max-input"
+   2-3) 폰트: 16px, 500 weight
+   2-4) 배경: #f2f2f2 (라이트 그레이)
+   2-5) 테두리: 1px solid #e0e0e0
+   2-6) 라운드: 8px
+   2-7) 패딩: 12px
+
+3) 필터 적용 버튼
+   3-1) "필터" 또는 "검색" 버튼
+   3-2) data-testid="apply-price-filter"
+   3-3) 버튼 클릭 시 handleApplyPriceFilter() 실행
+   3-4) 활성/비활성 상태
+        - 비활성: minPrice >= maxPrice 또는 입력값 없음
+        - 활성: minPrice < maxPrice && 둘 다 입력됨
+
+4) 가격 필터링 로직
+   4-1) handleApplyPriceFilter()
+        - 입력값 유효성 검증
+        - updatePriceFilter(minPrice, maxPrice) 호출
+        - Zustand 스토어 업데이트
+   4-2) 필터링된 카드 계산
+        - filteredCards = allCards.filter(
+            card => card.price >= minPrice && card.price <= maxPrice
+          )
+   4-3) 다른 필터(탭, 브랜드)와 결합
+        - filteredCards = cards.filter(
+            card =>
+              (tab 조건) AND
+              (브랜드 조건) AND
+              (card.price >= minPrice && card.price <= maxPrice)
+          )
+
+5) 유효성 검증
+   5-1) 최소 가격 > 최대 가격인 경우
+        - 에러 메시지: "최소 가격이 최대 가격보다 클 수 없습니다"
+        - 버튼 비활성화
+   5-2) 음수 입력 시
+        - 입력값 무시 또는 0으로 변환
+   5-3) 범위 초과 시
+        - 입력값을 범위 내로 제한 (min: 0, max: 5000000)
+
+6) 선택사항: 가격 범위 슬라이더
+   6-1) Input Range 또는 RC-Slider 라이브러리 사용
+   6-2) 시각적 피드백: 슬라이더 범위 표시
+   6-3) 실시간 업데이트 (선택사항)
+
+7) 테스트 케이스 작성
+   7-1) 파일: `src/components/phones-list/tests/price-filter.spec.ts`
+   7-2) 테스트 1: 가격 범위 입력 후 필터 적용
+        - 조건: 가격 필터 UI 로드됨
+        - 실행: 최소 100000, 최대 500000 입력 후 필터 버튼 클릭
+        - 검증: 해당 범위의 카드만 표시됨
+   7-3) 테스트 2: 최소 가격 > 최대 가격인 경우 에러
+        - 조건: 가격 필터 UI 로드됨
+        - 실행: 최소 500000, 최대 100000 입력 후 필터 버튼 클릭
+        - 검증: 에러 메시지 표시, 필터 미적용
+   7-4) 테스트 3: 필터 초기화 (입력값 제거)
+        - 조건: 가격 범위 설정됨
+        - 실행: 입력 필드 비우기
+        - 검증: 모든 가격대의 카드 표시
+   7-5) 테스트 4: 필터 버튼 활성/비활성 상태
+        - 조건: 가격 필터 UI 로드됨
+        - 실행: 입력값 변경
+        - 검증: 유효한 범위일 때만 버튼 활성화
+
+8) Props & Types
+```typescript
+interface UsePriceFilterReturn {
+  minPrice: number;
+  maxPrice: number;
+  tempMinPrice: string;
+  tempMaxPrice: string;
+  setTempMinPrice: (value: string) => void;
+  setTempMaxPrice: (value: string) => void;
+  applyPriceFilter: () => void;
+  isValid: boolean;
+  error: string | null;
+  filteredCards: PhoneCardItem[];
+}
+
+interface PriceFilterProps {
+  className?: string;
+  onFilterApply?: (min: number, max: number) => void;
+  defaultMin?: number;
+  defaultMax?: number;
+}
+```
+
+9) 구현 예시 구조
+```typescript
+// hook
+export const usePriceFilter = () => {
+  const minPrice = usePhoneListStore(state => state.minPrice);
+  const maxPrice = usePhoneListStore(state => state.maxPrice);
+  const updatePriceFilter = usePhoneListStore(state => state.updatePriceFilter);
+  const allCards = usePhoneListStore(state => state.allCards);
+
+  const [tempMinPrice, setTempMinPrice] = useState(String(minPrice));
+  const [tempMaxPrice, setTempMaxPrice] = useState(String(maxPrice));
+
+  const isValid = useMemo(() => {
+    const min = Number(tempMinPrice) || 0;
+    const max = Number(tempMaxPrice) || Infinity;
+    return min < max && min >= 0;
+  }, [tempMinPrice, tempMaxPrice]);
+
+  const applyPriceFilter = () => {
+    if (!isValid) return;
+    const min = Number(tempMinPrice) || 0;
+    const max = Number(tempMaxPrice) || Infinity;
+    updatePriceFilter(min, max);
+  };
+
+  const filteredCards = useMemo(
+    () => allCards.filter(card => card.price >= minPrice && card.price <= maxPrice),
+    [minPrice, maxPrice, allCards]
+  );
+
+  return {
+    minPrice,
+    maxPrice,
+    tempMinPrice,
+    tempMaxPrice,
+    setTempMinPrice,
+    setTempMaxPrice,
+    applyPriceFilter,
+    isValid,
+    filteredCards
+  };
+};
+
+// component
+export const PriceFilter = () => {
+  const { tempMinPrice, tempMaxPrice, setTempMinPrice, setTempMaxPrice, applyPriceFilter, isValid } = usePriceFilter();
+
+  return (
+    <div className={styles.priceFilter}>
+      <input
+        data-testid="price-min-input"
+        type="number"
+        value={tempMinPrice}
+        onChange={e => setTempMinPrice(e.target.value)}
+        placeholder="최소 가격"
+      />
+      <input
+        data-testid="price-max-input"
+        type="number"
+        value={tempMaxPrice}
+        onChange={e => setTempMaxPrice(e.target.value)}
+        placeholder="최대 가격"
+      />
+      <button
+        data-testid="apply-price-filter"
+        onClick={applyPriceFilter}
+        disabled={!isValid}
+      >
+        필터
+      </button>
+    </div>
+  );
+};
+```
+
+==================================================

@@ -1,0 +1,176 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구험 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 참고할 PAGE 경로: src/app/(protected)/phones/new/page.tsx
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-new/hooks/usePhoneNewSubmit.hook.ts
+조건-파일경로) 구현될 SERVER ACTION 파일경로: src/app/(protected)/phones/new/actions.ts (필요시)
+
+조건-백엔드) Supabase 연동
+            - 테이블: phones
+            - 이미지 버킷: phone-images
+            - 파일 경로: {seller_id}/{phone_id}/{timestamp}-{filename}
+
+==============================================
+
+핵심요구사항) playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+==============================================
+
+핵심요구사항) 폼 액션 및 네비게이션 기능(Task 8)을 구현할 것. 폼 제출 시 Supabase에 데이터를 저장하고, 성공/실패 처리를 수행한다.
+
+1) 폼 액션 버튼 UI 구현
+                - 레이아웃: 하단 버튼 그룹 (2개 버튼: 취소, 등록/수정)
+                - 폭: 100% (부모 컨테이너)
+                - 높이: 50px (버튼 기본 높이)
+                - 간격: 12px
+
+                1-1) 취소 버튼
+                    - 텍스트: "취소"
+                    - 타입: Secondary 또는 Outline 버튼
+                    - 동작: 이전 페이지로 이동 (useRouter().back() 또는 /phones 페이지로 이동)
+                    - data-testid: "phone-form-cancel-button"
+
+                1-2) 등록/수정 버튼
+                    - 텍스트: 신규 등록 시 "등록", 수정 모드 시 "수정"
+                    - 타입: Primary 버튼
+                    - 동작: 폼 제출 (handleSubmit)
+                    - 로딩 상태: 제출 중일 때 로딩 스피너 표시 및 버튼 비활성화
+                    - data-testid: "phone-form-submit-button"
+
+2) 폼 제출 시나리오 (등록)
+                2-1) 데이터 검증
+                    - 모든 필수 필드 확인:
+                        - basicInfo.modelName (필수)
+                        - pricing.price (필수)
+                        - condition.functionalStatus (필수)
+                        - location.tradeAddress (필수)
+                        - images.images (필수, 1개)
+                        - tradeMethod.tradeMethod (필수)
+                    - 유효성 검증 실패 시:
+                        - 에러 메시지 표시 (각 필드 아래에 빨강색 텍스트)
+                        - 제출 중단
+                        - data-testid: "phone-form-validation-error"
+
+                2-2) 이미지 업로드 (Supabase Storage)
+                    - 버킷: phone-images
+                    - 파일 경로: {seller_id}/{generatedPhoneId}/{timestamp}-{originalFilename}
+                    - 반환: 업로드된 이미지 URL (public URL 또는 signed URL)
+                    - 실패 시: 에러 메시지 "이미지 업로드에 실패했습니다. 다시 시도해주세요"
+
+                2-3) 데이터베이스 저장 (Supabase phones 테이블)
+                    - 테이블: phones
+                    - 저장할 필드 (phones 테이블 스키마):
+                        - seller_id: 현재 로그인 사용자 ID (auth.id) [필수]
+                        - model_name: basicInfo.modelName [필수]
+                        - condition: basicInfo.condition [필수, 새것|거의새것|약간사용|많이사용]
+                        - color: basicInfo.color [필수]
+                        - manufacturer: basicInfo.manufacturer [선택]
+                        - storage: basicInfo.storage [선택]
+                        - ram: basicInfo.ram [선택]
+                        - release_year: basicInfo.releaseYear [선택]
+                        - price: pricing.price [필수, bigint]
+                        - original_price: pricing.originalPrice [선택, bigint]
+                        - battery_health: conditionData.batteryHealth [선택, 0-100의 정수]
+                        - main_image_url: 업로드된 이미지 URL [필수]
+                        - images_urls: [업로드된 이미지 URL] (text 배열)
+                        - created_at: 자동 (now())
+                        - updated_at: 자동 (now())
+
+                    - 저장하지 않는 필드 (로컬스토리지에만 저장):
+                        - pricing.includesShipping (배송비 포함 여부)
+                        - condition.conditionDetails (세부 상태 체크박스)
+                        - condition.functionalStatus (기능 정상 여부)
+                        - condition.additionalDescription (추가 설명)
+                        - location.tradeAddress (거래 주소)
+                        - location.latitude, longitude (거래 위치 좌표)
+                        - tradeMethod.tradeMethod (거래 방식)
+                        - tradeMethod.reservationAvailable (예약 가능 여부)
+
+                    - 반환: 생성된 phone 객체 (id 포함)
+
+                2-4) 성공 처리
+                    - 알림: 토스트 메시지 "휴대폰 정보가 등록되었습니다"
+                    - 페이지 이동: 등록된 전화 상세 페이지로 이동 (/phones/[id])
+                    - 로컬스토리지 드래프트 삭제
+                    - data-testid: "phone-form-success-toast"
+
+                2-5) 실패 처리
+                    - 알림: 토스트 메시지 "등록에 실패하였습니다. 다시 시도해주세요"
+                    - 에러 로깅: console.error 또는 에러 추적 서비스
+                    - 드래프트 유지: 로컬스토리지에 현재 상태 유지 (재시도 가능)
+                    - data-testid: "phone-form-error-toast"
+
+3) 수정 모드 시나리오
+                3-1) editingPhoneId 확인
+                    - /phones/[id]/edit 페이지에서 URL 파라미터로 phoneId 확인
+                    - Zustand Store에 editingPhoneId 설정
+                    - Supabase phones 테이블에서 기존 데이터 조회 (Task 7에서 처리)
+
+                3-2) 데이터 검증 (등록과 동일)
+                    - 필수 필드 확인 (Task 2-1 참조)
+
+                3-3) 이미지 업로드 (조건부)
+                    - 새로운 이미지만 업로드 (File 객체 선택된 경우만)
+                    - 기존 이미지 유지 시: main_image_url, images_urls 그대로 사용
+
+                3-4) 데이터베이스 업데이트 (UPDATE)
+                    - 테이블: phones
+                    - WHERE: id = editingPhoneId
+                    - UPDATE 필드 (2-3에서 저장하는 필드만):
+                        - model_name, condition, color, manufacturer, storage, ram, release_year
+                        - price, original_price
+                        - battery_health
+                        - main_image_url (이미지 업로드 시에만)
+                        - images_urls (이미지 업로드 시에만)
+                        - updated_at: new Date().toISOString()
+                    - created_at은 업데이트하지 않음
+                    - 반환: 업데이트된 phone 객체
+
+                3-5) 성공/실패 처리 (등록과 동일, 메시지만 수정)
+                    - 성공: "휴대폰 정보가 수정되었습니다"
+                    - 실패: "수정에 실패하였습니다. 다시 시도해주세요"
+
+핵심요구사항) usePhoneNewSubmit Hook을 구현할 것.
+            1) 기능: 폼 제출 로직 관리
+            2) 파라미터:
+                - formData: 전체 폼 데이터 (Zustand Store에서 가져옴)
+                - onSuccess?: (phoneId: string) => void (콜백)
+                - onError?: (error: Error) => void (콜백)
+            3) 반환:
+                - isSubmitting: boolean
+                - submitError?: string
+                - handleSubmit(): Promise<void>
+                - resetError(): void
+
+핵심요구사항) 네비게이션 구현
+            1) 취소 버튼: useRouter().back() 또는 '/phones'로 이동
+            2) 제출 성공: useRouter().push(`/phones/${phoneId}`)로 상세 페이지 이동
+            3) 로딩 상태: 버튼 비활성화 및 스피너 표시
+
+핵심요구사항) 에러 처리 및 사용자 피드백
+            1) 유효성 검증 에러: 필드별 에러 메시지 표시 (inline)
+            2) 이미지 업로드 에러: 토스트 메시지
+            3) 데이터베이스 에러: 토스트 메시지 + 드래프트 유지
+            4) 네트워크 에러: "네트워크 연결을 확인해주세요" 메시지
+            5) 타임아웃 에러: "요청 시간이 초과되었습니다. 다시 시도해주세요"
+
+핵심요구사항) 타입 정의
+            - PhoneNewSubmitParams: { formData: PhoneNewFormState; onSuccess?: (phoneId: string) => void; onError?: (error: Error) => void; }
+            - SubmitResult: { success: boolean; phoneId?: string; error?: string; }
+            - src/components/phone-new/types.ts에 정의

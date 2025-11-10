@@ -1,63 +1,69 @@
 /**
- * 중고폰 상세 페이지 타입 정의
+ * Supabase 데이터 타입 정의
  */
 
 /**
- * 판매자 정보
+ * Supabase phones 테이블 스키마
  */
-export interface PhoneSeller {
+export interface Phone {
   id: string;
-  name: string;
-  rating: number;
-  totalSales: number;
-  responseRate: number;
-  location: string;
-  latitude: number;
-  longitude: number;
-  profileImage: string;
-}
-
-/**
- * 중고폰 상세 정보
- */
-export interface PhoneDetail {
-  id: string;
-  title: string;
+  model_name: string;
+  condition: '미개봉' | '새것' | '중고';
   price: number;
-  originalPrice?: number;
-  description: string;
-  category: string;
-  subcategory: string;
-  hashtags: string[];
-  seller: PhoneSeller;
-  images: string[];
-  mainImage: string;
-  status: 'available' | 'sold' | 'reserved';
-  views: number;
-  likes: number;
-  createdAt: string;
-  updatedAt: string;
-  features?: string[];
-  specifications?: Record<string, string>;
+  original_price: number;
+  main_image_url?: string;
+  images_urls: string[];
+  battery_health: number;
+  seller_id: string;
 }
 
 /**
- * 문의 메시지
+ * Supabase sellers 테이블 스키마
  */
-export interface InquiryMessage {
+export interface Seller {
   id: string;
-  phoneId: string;
-  senderId: string;
-  senderName: string;
-  message: string;
-  createdAt: string;
+  nickname: string;
 }
 
 /**
- * 컴포넌트 Props
+ * Phone + Seller 조인 결과
  */
-export interface PhoneDetailProps {
-  phoneId?: string;
-  data?: PhoneDetail;
-  onShare?: () => void;
+export interface PhoneWithSeller extends Phone {
+  seller: Seller;
+}
+
+/**
+ * 데이터 페칭 훅 반환 타입
+ */
+export interface UseFetchPhoneDetailResult {
+  phone: PhoneWithSeller | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * 문의 컴포넌트 타입 정의
+ */
+
+/**
+ * 문의 항목
+ */
+export interface InquiryItem {
+  id: string;
+  profileName: string;
+  profileImage?: string;
+  content: string;
+  createdAt: string;
+  canEdit?: boolean;
+  canDelete?: boolean;
+}
+
+/**
+ * 문의하기 컴포넌트 Props
+ */
+export interface PhonesInquiryProps {
+  inquiries?: InquiryItem[];
+  onSubmit?: (content: string) => void;
+  placeholderText?: string;
+  maxLength?: number;
 }
