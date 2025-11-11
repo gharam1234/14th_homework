@@ -1,0 +1,99 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 참고할 파일경로: src/commons/constants/url.ts
+조건-파일경로) 구현될 파일경로: src/components/phone-new/hooks/index.routing.hook.ts
+조건-파일경로) 구현될 TSX 파일경로: src/components/phone-new/index.tsx
+
+==============================================
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+                1) 테스트 제외 라이브러리
+                    - jest
+                    - @testing-library/react
+
+                2) 테스트 조건
+                    - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+                    - 페이지가 완전히 로드된 후 테스트할 것.
+                        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+                        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+핵심요구사항) url.ts에 다음의 경로를 정의하고, 라우팅 로직에서 사용할 것.
+                1) 신규 등록 완료 후 이동 경로
+                    - 경로 패턴: /phones/[phoneId]
+                    - 설명: 등록한 중고폰 상세 페이지로 이동
+
+                2) 수정 완료 후 이동 경로
+                    - 경로 패턴: /phones/[phoneId]
+                    - 설명: 수정한 중고폰 상세 페이지로 이동
+
+                3) 취소 시 이동 경로
+                    - 경로 패턴: /phones
+                    - 설명: 중고폰 리스트 페이지로 이동
+
+핵심요구사항) 폼 제출 버튼 클릭 시 다음 로직을 수행할 것.
+                1) 폼 검증 수행
+                    - 모든 필수 필드 확인
+                    - 에러 발생 시 제출 중단
+
+                2) 폼 데이터 저장
+                    - 로컬스토리지에 데이터 저장
+                    - 저장 경로: localStorage['phones'] (배열)
+                    - 신규: 새로운 ID 생성 후 추가
+                    - 수정: 기존 데이터 업데이트
+
+                3) 성공 안내
+                    - alert: "등록이 완료되었습니다." (신규 모드)
+                    - alert: "수정이 완료되었습니다." (수정 모드)
+
+                4) 페이지 이동
+                    - useRouter 사용하여 /phones/[phoneId]로 이동
+                    - 저장된 데이터의 ID 사용
+
+핵심요구사항) 취소 버튼 클릭 시 다음 로직을 수행할 것.
+                1) 폼 초기화
+                    - reset() 함수 호출
+                    - 입력된 모든 데이터 삭제
+
+                2) 이미지 초기화
+                    - imageFiles state 초기화
+
+                3) 페이지 이동
+                    - useRouter 사용하여 /phones로 이동
+                    - 리스트 페이지로 돌아가기
+
+핵심요구사항) 라우팅 훅을 다음과 같이 구현할 것.
+                1) usePhoneNewRouting 훅
+                    - export: { handleCancel, navigateAfterSubmit }
+                    - props: { isEdit: boolean, phoneId?: string }
+
+                2) navigateAfterSubmit 함수
+                    - 신규 등록: /phones/[newPhoneId]로 이동
+                    - 수정: /phones/[phoneId]로 이동
+                    - 로컬스토리지에서 ID 조회
+
+                3) handleCancel 함수
+                    - /phones로 이동
+
+핵심요구사항) Playwright 테스트를 TDD 기반으로 작성할 것.
+                1) 테스트 파일경로: src/components/phone-new/tests/index.routing.spec.ts
+                2) 테스트 케이스
+                    - 폼 제출 후 상세 페이지로 이동: /phones/[phoneId] 경로 확인
+                    - 취소 버튼 클릭: /phones 페이지로 이동
+                    - 수정 모드에서 제출: /phones/[phoneId]로 이동 (기존 ID 유지)
+                    - 브라우저 뒤로가기: 이전 페이지로 이동
+                    - 신규 등록 후 localStorage 확인: 데이터가 저장되었는지 검증
+
+                3) 테스트 데이터
+                    - localStorage 키: phones
+                    - 데이터 구조: { id, title, summary, description, price, tags, postalCode, detailedAddress, latitude, longitude, images }
+
+                4) 테스트 조건
+                    - timeout: 500ms 미만
+                    - 페이지 로드 식별: data-testid 대기

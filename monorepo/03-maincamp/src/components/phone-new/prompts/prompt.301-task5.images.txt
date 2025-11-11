@@ -1,0 +1,83 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @03-ui.mdc
+
+조건-파일경로) 구현될 폼 필드 TSX 파일경로: src/components/phone-new/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/phone-new/styles.module.css
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-new/hooks/useImages.hook.ts
+
+조건-백엔드) Supabase Storage 연동
+            - 버킷명: phone-images
+            - 파일 경로: {seller_id}/{timestamp}-{uuid}-{filename} (phone_id 의존 금지)
+
+==============================================
+
+핵심요구사항) 휴대폰 이미지 등록 섹션(Task 5)을 구현할 것. 이 섹션은 이미지 업로드 기능을 포함한다:
+
+1) 이미지 업로드 필드 (필수)
+                - HTML: <input type="file" accept="image/*"> 또는 드래그&드롭 영역
+                - 라벨: "휴대폰 사진" (필수 표기 *)
+                - 필드 너비: 100%
+                - 필드 높이: 150px (드래그&드롭 영역의 경우)
+                - 드래그&드롭 지원: "파일을 드래그하여 놓으세요" 텍스트
+                - 필드명: images
+                - accept 속성: image/jpeg, image/png, image/webp (.jpg, .jpeg, .png, .webp)
+                - 에러메시지:
+                    - 파일 미선택 시: "휴대폰 사진을 업로드해주세요"
+                    - 지원하지 않는 형식: "jpg, png, webp 형식만 지원합니다"
+                    - 파일 크기 초과: "파일 크기는 5MB 이하여야 합니다"
+                - data-testid: "phone-images-input"
+
+2) 이미지 미리보기 영역 (필수)
+                - 미리보기 이미지 출력
+                - 이미지 크기: 100x100px (썸네일)
+                - 레이아웃: 1개 이미지 표시 (단일 업로드)
+                - 삭제 버튼: 각 미리보기 우측 상단에 "X" 아이콘 버튼
+                - 파일명 표시: 미리보기 하단에 파일명 표시 (20자 이상 시 ... 로 말줄임)
+                - data-testid: "phone-image-preview"
+                - 삭제 버튼 data-testid: "phone-image-remove-button"
+
+3) 파일 유효성 검사 (필수)
+                - 최대 개수: 1개 (단일 선택)
+                - 최소 개수: 1개 (필수)
+                - 최대 파일 크기: 5MB (5,242,880 bytes)
+                - 지원 형식: jpg, jpeg, png, webp (MIME type 체크)
+                - 검증 시점: 파일 선택 직후
+                - 검증 오류 시: 해당 에러메시지 표시 (빨강색 텍스트)
+                - data-testid: "phone-images-validation-error"
+
+핵심요구사항) useImages Hook을 구현할 것.
+            1) 기능: 이미지 관련 상태 관리
+            2) 상태
+                - images: File | null
+                - imagePreview: string | null (로컬 미리보기 URL)
+                - isValidated: boolean
+                - validationError?: string
+            3) 메서드
+                - handleFileSelect(files: FileList | null)
+                - validateFile(file: File): { valid: boolean; error?: string }
+                - removeImage()
+                - reset(): void
+
+핵심요구사항) 파일 검증 로직 구현
+            1) 파일 타입 검증
+                - MIME type: image/jpeg, image/png, image/webp
+                - 파일 확장자: .jpg, .jpeg, .png, .webp (소문자만 허용)
+            2) 파일 크기 검증
+                - 최대 5MB (5 * 1024 * 1024 bytes)
+            3) 개수 검증
+                - 정확히 1개만 선택
+
+핵심요구사항) 로컬 미리보기 구현
+            1) FileReader API 사용하여 로컬 미리보기 URL 생성 (data:image/...)
+            2) 파일 삭제 시 URL 해제 (URL.revokeObjectURL())
+            3) 컴포넌트 언마운트 시 URL 정리
+
+핵심요구사항) 이미지는 Task 8에서 Supabase Storage 업로드 처리
+            - 실제 업로드는 폼 제출 시 수행
+            - 이 Task에서는 로컬 미리보기만 구현

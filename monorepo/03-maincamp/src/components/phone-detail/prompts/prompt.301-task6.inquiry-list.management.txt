@@ -1,0 +1,39 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 HOOK 파일: src/components/phones-inquiry/hooks/index.manage.hook.ts (신규 생성)
+조건-파일경로) 수정될 컴포넌트 파일: src/components/phones-inquiry/index.tsx (문의 목록 영역)
+조건-파일경로) 타입 정의 파일: src/components/phones-inquiry/types.ts (InquiryItem에 buyerNickname, sellerReply, isSeller, isMine 등 필드 추가)
+조건-파일경로) 테스트 파일: src/components/phones-inquiry/tests/inquiry-list.spec.ts
+
+==============================================
+
+핵심요구사항) Supabase phone_inquiries 데이터를 조회/관리하는 목록 기능을 구현할 것.
+
+            1) useInquiryList 훅
+                - 입력: { phoneId: string; currentUserId?: string; sellerId: string }
+                - 제공 기능: 목록 조회(fetch + subscribe), 낙관적 UI 업데이트, 문의 삭제, 문의 수정, 판매자 답변 등록, 내 문의 추가 댓글(append)
+                - supabase.from('phone_inquiries').select('*').eq('phone_id', phoneId).order('created_at', { ascending: false }) 형태로 구현
+                - buyer 닉네임은 profiles(user_metadata) 조회 or phone_inquiries 뷰의 buyer_nickname 필드 사용 (없으면 "구매자")
+
+            2) UI 업데이트
+                - 비어 있을 때 메시지: "등록된 문의가 없습니다." (data-testid="empty-state")
+                - 각 문의 카드에 구매자 닉네임, 상대시간(1시간 전 등), 문의 내용, seller_reply 뱃지, action 버튼 노출 조건 정의
+                - 판매자 전용 답변 textarea + 제출 버튼, 구매자 전용 수정/삭제 버튼, 자신의 문의에만 추가 댓글 입력 필드 표시
+                - 삭제 전 confirm 모달(브라우저 confirm으로 대체 가능)
+
+            3) 접근 제어
+                - currentUserId === sellerId → 판매자 기능 노출
+                - currentUserId === inquiry.buyer_id → 수정/삭제/추가댓글 노출
+                - 기타 사용자는 읽기만 가능
+
+            4) 테스트 (Playwright)
+                - page.waitForSelector('[data-testid="inquiries-list-section"]', { timeout: 500 })
+                - 시나리오: 목록 렌더링, 빈 상태, 판매자 답변 작성 → UI 반영, 구매자 수정 → 텍스트 변경, 삭제 → confirm 후 제거, 권한 없는 버튼 비표시
+                - jest / @testing-library/react 금지, networkidle 금지

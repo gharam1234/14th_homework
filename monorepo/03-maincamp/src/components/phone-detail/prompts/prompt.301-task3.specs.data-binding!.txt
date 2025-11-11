@@ -1,0 +1,38 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 HOOK 파일: src/components/phone-detail/hooks/index.specs.hook.ts (신규 생성)
+조건-파일경로) 수정될 컴포넌트 파일: src/components/phone-detail/index.tsx (specs 전용 섹션 추가)
+조건-파일경로) 타입 정의 파일: src/components/phone-detail/types.ts (Phone 인터페이스에 manufacturer, release_year, ram, storage, battery_health, color 필수 반영)
+조건-파일경로) 테스트 파일: src/components/phone-detail/tests/specs-section.spec.ts (신규 작성)
+
+==============================================
+
+핵심요구사항) phones 테이블의 스펙 데이터를 시각적으로 노출하는 섹션을 추가할 것.
+
+            1) usePhoneSpecs 훅
+                - 입력: { phone?: PhoneWithSeller }
+                - 출력: 스펙 행 목록(라벨, 값, 보조 텍스트, progress 값)을 memoize하여 반환
+                - 값이 없으면 displayText="정보 없음"으로 통일
+                - 배터리 건강도 progress meta(percentage, colorClass)를 함께 제공
+
+            2) Specs 섹션 UI
+                - basicInfo 아래, description 위에 `<section data-testid="specs-section">` 추가
+                - 3열 그리드(제조사/모델/출시년도, RAM/저장용량/배터리, 색상/상태) → CSS module에 desktop/tablet/mobile 반응형 규칙 명시
+                - 배터리 건강도는 progress bar + 퍼센트 텍스트를 함께 표시하고, 80 이상 green, 50~79 yellow, 0~49 red 클래스 적용
+                - 출시년도에는 현재 연도-출시년도 차이를 "(n년 전)" 형태로 표시
+
+            3) 타입/데이터 처리
+                - release_year, ram, storage, battery_health, color가 없을 때는 "정보 없음"으로 대체
+                - condition/ram/storage는 그대로 노출하되, 다국어 포맷은 toLocaleString('ko-KR') 유지
+
+            4) 테스트 (Playwright)
+                - page.waitForSelector('[data-testid="specs-section"]', { timeout: 500 })
+                - 케이스: 모든 필드 표기, 정보 없음 처리, 배터리 progress 색상(className), 출시년도 텍스트, 배터리 퍼센트 숫자
+                - jest / @testing-library/react 금지, networkidle 금지

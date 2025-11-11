@@ -1,0 +1,79 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @03-ui.mdc
+
+조건-파일경로) 구현될 폼 필드 TSX 파일경로: src/components/phone-new/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/phone-new/styles.module.css
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-new/hooks/usePricing.hook.ts
+
+==============================================
+
+핵심요구사항) 가격 및 판매 조건 설정 섹션(Task 2)을 구현할 것. 이 섹션은 다음 3가지 필드를 포함한다:
+
+1) 판매 가격 입력 필드 (필수)
+                - HTML: <input type="number"> 또는 <input type="text"> + 천단위 포매팅
+                - 필드명: price
+                - 필드 너비: 100%
+                - 높이: 40px
+                - 라벨: "판매 가격" (필수 표기 *)
+                - 단위 표시: "원" (우측에 작은 텍스트)
+                - 입력 제약: 숫자만, 음수 불가, 최대 10자리
+                - 포매팅: 1,000,000 형식 (천단위 쉼표)
+                - 에러메시지: 미입력 시 "판매 가격을 입력해주세요", 형식 오류 시 "숫자만 입력 가능합니다"
+                - data-testid: "phone-price-input"
+
+2) 정가/할인율 표시 필드 (선택)
+                - HTML: 2개 열 레이아웃 (정가 입력 + 할인율 자동 계산)
+                - 필드1: original_price (정가)
+                    - <input type="number"> 또는 <input type="text">
+                    - 라벨: "정가" (선택)
+                    - 단위: "원"
+                    - 입력 제약: 숫자만, 음수 불가
+                    - 포매팅: 1,000,000 형식
+                    - data-testid: "phone-original-price-input"
+
+                - 필드2: 할인율 표시 (읽기전용)
+                    - 계산식: ((original_price - price) / original_price * 100).toFixed(0) + "%"
+                    - 값이 없으면 "-" 표시
+                    - 라벨: "할인율"
+                    - 색상: 할인율이 있으면 빨강색 (#FF6B6B 등) 표시
+                    - data-testid: "phone-discount-rate-display"
+
+3) 배송비 포함 여부 선택 (선택, 로컬스토리지에만 저장)
+                - HTML: Checkbox 또는 Radio Button
+                - 라벨: "배송비 포함"
+                - 필드명: includesShipping (로컬스토리지에만 저장, phones 테이블에 저장 안 함)
+                - 기본값: false (미선택)
+                - 포함 시 부가 설명 텍스트: "배송비가 판매 가격에 포함됩니다"
+                - data-testid: "phone-shipping-checkbox"
+
+핵심요구사항) usePricing Hook을 구현할 것.
+            1) 기능: 가격 관련 필드 상태 관리
+            2) 상태
+                - price: number (phones 테이블에 저장)
+                - originalPrice?: number (phones 테이블에 저장)
+                - includesShipping: boolean (로컬스토리지에만 저장, Supabase에 저장 안 함)
+            3) 메서드
+                - setPrice(value: number)
+                - setOriginalPrice(value?: number)
+                - setIncludesShipping(value: boolean)
+                - calculateDiscount(): number | null (할인율 계산)
+                - formatPrice(value: number): string (천단위 포매팅)
+                - reset(): void
+
+핵심요구사항) Supabase 저장 정책
+            1) phones 테이블에 저장되는 필드:
+                - price (필수)
+                - original_price (선택)
+            2) 로컬스토리지에만 저장되는 필드:
+                - includesShipping (배송비 포함 여부)
+
+핵심요구사항) 유효성 검증
+            1) price: 필수, 숫자, 0 초과, 최대 10자리
+            2) originalPrice: 선택, 숫자, price보다 크거나 같아야 함
+            3) includesShipping: 선택, boolean
