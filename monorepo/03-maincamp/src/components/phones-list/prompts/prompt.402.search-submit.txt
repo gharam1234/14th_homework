@@ -1,0 +1,172 @@
+참고할 PAGE 경로: src/components/phones-list/index.tsx
+구현될 HOOK 경로: src/components/phones-list/hooks/index.search.hook.ts
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phones-list/hooks/index.search.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/phones-list/tests/search.spec.ts
+
+==============================================
+
+핵심요구사항) playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+3) 테스트 Supabase 조건
+   3-1) 데이터
+        - 실제 Supabase 데이터를 사용할 것.
+        - Mock 데이터를 사용하지 말 것.
+
+   3-2) 성공 시나리오
+        - 검색 조건에 맞는 데이터가 반환되는지 검증
+        - 검색 결과가 카드 영역에 표시되는지 검증
+        - 로딩 상태 표시 검증
+
+   3-3) 실패 시나리오
+        - 검색 결과가 없을 때 "검색 결과가 없습니다" 메시지 표시 검증
+        - Supabase 에러 발생 시 에러 메시지 표시 검증
+
+4) 테스트 데이터 조건
+   - 저장소: Supabase (usedphones 테이블)
+   - 검색 필드:
+       - model_name (모델명)
+       - price (가격)
+       - sale_status (판매상태: 'available', 'reserved')
+       - available_date (거래가능날짜)
+
+핵심요구사항) 다음의 기능을 Supabase를 연동하여 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+
+1. 검색 시나리오
+   1-1) 검색 조건 처리
+        - Zustand filterStore에서 필터 상태 가져오기
+            - availableNow: boolean (즉시 구매 가능 여부)
+            - dateRange: { startDate: string | null, endDate: string | null }
+            - keyword: string (모델명 검색)
+
+   1-2) Supabase 쿼리 구성
+        - 테이블: usedphones
+        - 쿼리 조건:
+            - keyword가 있으면: model_name.ilike(`%${keyword}%`)
+            - availableNow가 true면: sale_status.eq('available')
+            - availableNow가 false면: sale_status.eq('reserved')
+            - dateRange.startDate가 있으면: available_date.gte(startDate)
+            - dateRange.endDate가 있으면: available_date.lte(endDate)
+        - 정렬: created_at.desc()
+        - 제한: 최대 50개
+
+   1-3) 검색 성공 이후 로직
+        - 검색 결과를 컴포넌트 상태에 저장
+        - 카드 영역(data-testid="card-area")에 검색 결과 표시
+        - 검색 결과가 없으면 "검색 결과가 없습니다" 메시지 표시 (data-testid="no-results")
+
+   1-4) 로딩 및 에러 처리
+        - 로딩 중: 검색 버튼 비활성화, "검색 중..." 텍스트 표시
+        - 에러 발생: 알림메시지 "검색에 실패하였습니다. 다시 시도해주세요."
+        - 성공: 검색 결과 카드 표시
+
+2. 검색 버튼 활성화 조건
+   2-1) 버튼 활성화 조건
+        - keyword.trim().length >= 2 (최소 2자 이상)
+        - 로딩 중이 아닐 것
+
+   2-2) 버튼 비활성화 조건
+        - keyword.trim().length < 2
+        - 로딩 중일 때
+
+3. 판매글 등록 버튼 활성화 조건
+   3-1) 항상 활성화
+        - data-testid="sell-button"
+        - 클릭 시 /phones/new 페이지로 이동 (이미 구현됨)
+
+핵심요구사항) 커스텀 훅 usePhoneSearch를 다음 조건으로 구현할 것.
+
+1) 훅 구조
+   - 파일 경로: src/components/phones-list/hooks/index.search.hook.ts
+   - 훅명: usePhoneSearch
+
+2) 반환값
+   - searchResults: IPhoneCard[] (검색 결과)
+   - isLoading: boolean (로딩 상태)
+   - error: string | null (에러 메시지)
+   - handleSearch: () => Promise<void> (검색 실행 함수)
+   - isSearchEnabled: boolean (검색 버튼 활성화 여부)
+
+3) Supabase 클라이언트 설정
+   - Supabase 클라이언트 import: import { createClient } from '@supabase/supabase-js'
+   - 환경변수 사용: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+4) 검색 로직
+   - filterStore의 상태를 실시간으로 반영
+   - 검색 버튼 클릭 시 handleSearch 함수 실행
+   - Supabase 쿼리 결과를 searchResults에 저장
+
+핵심요구사항) 컴포넌트 연동을 다음 조건으로 완성할 것.
+
+1) src/components/phones-list/index.tsx 수정
+   1-1) usePhoneSearch 훅 import 및 사용
+        - const { searchResults, isLoading, error, handleSearch, isSearchEnabled } = usePhoneSearch()
+
+   1-2) 검색 버튼 연결
+        - data-testid="search-button"
+        - onClick={handleSearch}
+        - disabled={!isSearchEnabled || isLoading}
+        - 버튼 텍스트: 로딩 중 "검색 중...", 기본 "검색"
+
+   1-3) 카드 영역 연결
+        - searchResults가 있으면 searchResults 표시
+        - searchResults가 없고 검색을 실행한 적 있으면 "검색 결과가 없습니다" 표시
+        - searchResults가 없고 검색을 실행하지 않았으면 샘플 데이터 표시 (기본 동작 유지)
+
+   1-4) 에러 처리
+        - error가 있으면 알림 메시지 표시
+        - 알림 메시지: "검색에 실패하였습니다. 다시 시도해주세요."
+
+2) 데이터 바인딩
+   - PhoneCard 컴포넌트에 검색 결과 데이터 전달
+   - 필드 매핑:
+       - title: model_name
+       - description: description
+       - tags: tags
+       - price: price
+       - sellerName: seller_name
+       - imageUrl: image_url
+       - likeCount: like_count
+       - phoneId: id
+
+핵심요구사항) Supabase 테이블 스키마 정의
+
+**중요**: 아래 테이블명과 필드명은 실제 프로젝트에 맞게 수정하여 사용할 것.
+
+1) 테이블명: usedphones
+
+2) 필드 구조
+   - id: bigint (Primary Key)
+   - model_name: text (모델명)
+   - description: text (상품 설명)
+   - tags: text (태그)
+   - price: bigint (가격)
+   - seller_name: text (판매자명)
+   - image_url: text (이미지 URL)
+   - like_count: int (좋아요 수, 기본값 0)
+   - sale_status: text (판매상태: 'available' | 'reserved' | 'sold')
+   - available_date: date (거래가능날짜)
+   - created_at: timestamp (생성일시)
+   - updated_at: timestamp (수정일시)
+
+3) 테이블이 없는 경우
+   - 위 스키마를 참고하여 Supabase에서 테이블 생성
+   - RLS(Row Level Security) 정책 설정: 읽기 권한 모두 허용
