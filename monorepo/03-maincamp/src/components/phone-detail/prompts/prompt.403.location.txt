@@ -1,0 +1,46 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 TSX 파일경로: src/components/phone-detail/index.tsx
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-detail/hooks/index.location.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/phone-detail/tests/index.location.hook.spec.ts
+
+==============================================
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+핵심요구사항) 다음의 기능을 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1. 지도 보기 시나리오
+                1-1) 위치 아이콘 클릭 시 거래 지역을 외부 지도 서비스로 열 것
+                        - 지도 서비스: 카카오맵 또는 네이버 지도
+                        - 검색 키워드: 상품의 거래 지역 정보 (예: phones 테이블의 location 필드)
+                        - 새 창으로 열기: window.open() 사용
+
+                1-2) 지도 URL 생성 규칙
+                        - 카카오맵: https://map.kakao.com/link/search/{검색어}
+                        - 네이버 지도: https://map.naver.com/v5/search/{검색어}
+                        - 검색어는 encodeURIComponent()로 인코딩할 것
+
+            2. 거래 지역 정보 확인
+                2-1) 거래 지역 정보가 없는 경우
+                        - 토스트 알림메시지: "거래 지역 정보가 없습니다."
+                        - 알림 타입: warning
+                        - 지도 창을 열지 말 것
