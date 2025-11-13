@@ -1,0 +1,131 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 PAGE 경로: src/app/phones/new/page.tsx
+조건-파일경로) 구현될 HOOK 경로: src/app/phones/new/hooks/index.submit.hook.ts
+조건-파일경로) 구현될 TEST 경로: src/app/phones/new/tests/index.submit.hook.spec.ts
+
+==============================================
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+핵심요구사항) 다음의 기능을 supabase를 연동하여 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+
+1. 임시 저장 시나리오
+   1-1) 다음의 데이터를 로컬스토리지에 저장할 것
+        - 저장소: 로컬스토리지
+        - key: phone
+        - 데이터
+            - name: string (상품명)
+            - summary: string (한줄 요약)
+            - description: string (상품 설명)
+            - price: number (판매 가격)
+            - tags: string[] (태그)
+            - address: string (주소)
+            - addressDetail: string (상세주소)
+            - lat: number (위도)
+            - lng: number (경도)
+            - images: string[] (사진 URL 목록)
+
+   1-2) 임시 저장 조건
+        - 페이지 새로고침 시에도 데이터 유지
+        - 탭 전환 시에도 데이터 유지
+        - 자동 저장: 필드 값 변경 시 자동으로 로컬스토리지에 저장 (debounce 1초 적용)
+
+   1-3) 임시 저장 데이터 불러오기
+        - 페이지 진입 시 로컬스토리지에 저장된 데이터가 있으면 자동 복원
+        - 복원 시 사용자에게 "임시 저장된 데이터를 불러왔습니다" 알림
+
+2. 등록 시나리오
+   2-1) 유효성 검증
+        - name: 필수, 최대 100자, 빈 값 불가
+        - summary: 필수, 최대 200자, 빈 값 불가
+        - description: 필수, 최소 10자, 빈 값 불가
+        - price: 필수, 0보다 큰 숫자
+        - tags: 선택, 최대 10개
+        - address: 필수, 빈 값 불가
+        - addressDetail: 선택
+        - lat: 필수, -90~90 범위
+        - lng: 필수, -180~180 범위
+        - images: 선택, jpg/png/webp만 허용, 각 파일 10MB 이하
+
+   2-2) 유효성 검증 실패 시
+        - 각 필드별 에러 메시지 표시
+        - 첫 번째 에러 필드로 포커스 이동
+        - 제출 중단
+
+   2-3) 다음의 데이터를 supabase에 등록할 것
+        - 접속키: ANON키
+        - 테이블명: phones
+        - 데이터
+            - name: string
+            - summary: string
+            - description: string
+            - price: number
+            - tags: string[] | null
+            - address: string
+            - address_detail: string | null
+            - lat: number
+            - lng: number
+            - images: string[] (이미지 업로드 후 URL 배열)
+
+        - 이미지 업로드
+            - 버킷명: phones-images
+            - 파일명 패턴: yyyy/mm/dd/{UUID}.{확장자}
+            - 각 이미지를 순차적으로 업로드한 후 URL 배열 생성
+
+   2-4) 등록 성공 이후 로직을 완성할 것.
+        - 로컬스토리지에 저장된 임시 데이터 삭제 (key: phone)
+        - 알림메시지: "상품 등록에 성공하였습니다."
+        - 이동할페이지: "/phones/[id]" (등록된 상품의 ID 사용)
+
+   2-5) 등록 실패 시
+        - 알림메시지: "상품 등록에 실패하였습니다. 다시 시도해주세요."
+        - 에러 로그 콘솔 출력
+        - 페이지 이동하지 않음
+
+3. 커스텀 훅 인터페이스 (usePhoneSubmit)
+   - 반환값:
+       - isSubmitting: boolean (제출 중 상태)
+       - submitData: (data: ProductState) => Promise<void>
+       - saveDraft: (data: ProductState) => void
+       - loadDraft: () => ProductState | null
+       - clearDraft: () => void
+       - validationErrors: Record<string, string> (필드별 에러)
+
+4. 테스트 시나리오
+   4-1) 임시 저장 테스트
+        - 데이터 입력 후 로컬스토리지에 자동 저장되는지 검증
+        - 페이지 새로고침 후 데이터 복원되는지 검증
+
+   4-2) 유효성 검증 테스트
+        - 필수 필드 누락 시 에러 표시 검증
+        - 잘못된 형식 입력 시 에러 표시 검증
+
+   4-3) 등록 성공 테스트
+        - 모든 필드 입력 후 제출 시 supabase에 저장되는지 검증
+        - 이미지 업로드 후 URL이 정상 생성되는지 검증
+        - 등록 후 상세 페이지로 이동하는지 검증
+        - 로컬스토리지 임시 데이터 삭제 검증
+
+   4-4) 등록 실패 테스트
+        - 네트워크 오류 시 에러 처리 검증
+        - 실패 후 데이터가 유지되는지 검증
