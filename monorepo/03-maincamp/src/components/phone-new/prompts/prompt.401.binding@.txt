@@ -61,16 +61,24 @@
         - 조건: id = [URL에서 추출한 ID]
         - 조회 필드:
             - id
-            - name
+            - title
             - summary
             - description
             - price
+            - currency
             - tags
+            - categories
             - address
             - address_detail
-            - lat
-            - lng
-            - images
+            - zipcode
+            - latitude
+            - longitude
+            - sale_state
+            - sale_type
+            - main_image_url
+
+        - 연관 미디어: phone_media 테이블에서 phone_id = id 조건으로 url, file_name, is_primary, display_order 조회
+            
 
    2-2) 데이터 로드 성공 시
         - 조회한 데이터를 상태 객체에 바인딩
@@ -82,16 +90,21 @@
         - 목록 페이지로 리다이렉트: /phones
 
 3) 데이터 바인딩 상세 내용
-   - 상품명 필드: phones.name
+   - 상품명 필드: phones.title
    - 한줄 요약 필드: phones.summary
    - 상품 설명 필드: phones.description
    - 판매 가격 필드: phones.price
    - 태그 필드: phones.tags (배열)
+   - 카테고리 필드: phones.categories (JSONB)
    - 주소 필드: phones.address
    - 상세주소 필드: phones.address_detail
-   - 위도 필드: phones.lat
-   - 경도 필드: phones.lng
-   - 사진 목록: phones.images (URL 배열)
+   - 우편번호 필드: phones.zipcode
+   - 위도 필드: phones.latitude
+   - 경도 필드: phones.longitude
+   - 거래 상태 필드: phones.sale_state
+   - 판매 유형 필드: phones.sale_type
+   - 대표 이미지: phones.main_image_url
+   - 사진 목록: phone_media.url 배열 (is_primary, display_order 기준 정렬)
 
 4) 로딩 상태 관리
    4-1) 로딩 중 표시

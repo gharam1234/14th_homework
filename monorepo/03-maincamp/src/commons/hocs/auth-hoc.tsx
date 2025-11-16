@@ -13,7 +13,7 @@ export const withAuth = <P extends object>(Component:React.FC<P>) => (props:P)=>
   useEffect(() => {
     if (hasChecked.current) return; 
 
-    const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("accessToken");
     if (!token) {
       alert("로그인 후 이용 가능합니다!");
       router.push("/");

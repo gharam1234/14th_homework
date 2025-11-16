@@ -1,10 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
+import dynamic from "next/dynamic";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { message } from "antd";
 import styles from "./styles.module.css";
-import { usePhoneForm, savePhoneToStorage } from "./hooks/index.form.hook";
-import { usePhoneNewRouting } from "./hooks/index.routing.hook";
-import { IPhoneNewProps, IPhoneFormInput } from "./types";
+import { usePhoneForm, getPhoneFromStorage } from "./hooks/index.form.hook";
+import { usePhoneBinding } from "./hooks/index.binding.hook";
+import { usePhoneSubmit, SubmitProductState } from "./hooks/index.submit.hook";
+import type { Address } from "react-daum-postcode";
+import type { IPhoneFormInput, IPhoneMediaMetadata } from "./types";
+import { IPhoneNewProps } from "./types";
+
+const DaumPostcodeEmbed = dynamic(
+  () =>
+    import("react-daum-postcode").then((mod) => mod.DaumPostcodeEmbed ?? mod.default),
+  { ssr: false }
+);
+
+const MAX_MEDIA_COUNT = 2;
+
+const fileToDataUrl = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
+const createCoordinatesFromAddress = (address: string) => {
+  const hash = address.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const latitude = Number((37.4979 + (hash % 100) * 0.0001).toFixed(6));
+  const longitude = Number((127.0276 + (hash % 100) * 0.0001).toFixed(6));
+  return { latitude, longitude };
+};
+
+const buildMetaFromUrls = (urls: string[], seed = "media"): IPhoneMediaMetadata[] =>
+  urls.slice(0, MAX_MEDIA_COUNT).map((url, index) => ({
+    id: `${seed}-${index}`,
+    url,
+    fileName: `image-${index + 1}`,
+    isPrimary: index === 0,
+  }));
 
 /**
  * 중고폰 판매 등록 컴포넌트
@@ -30,121 +67,371 @@ import { IPhoneNewProps, IPhoneFormInput } from "./types";
  */
 export default function PhoneNew(props: IPhoneNewProps = {}) {
   const { isEdit = false, phoneId } = props;
-  const form = usePhoneForm({ isEdit, phoneId });
-  const { handleCancel: handleCancelRouting, navigateAfterSubmit } =
-    usePhoneNewRouting({ isEdit, phoneId });
-  const [isLoading, setIsLoading] = useState(false);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const searchParams = useSearchParams();
 
+  // URL에서 ID 추출 (쿼리 파라미터 우선)
+  const urlId = (searchParams.get("id") || phoneId) ?? undefined;
+
+  // usePhoneBinding 훅으로 Supabase에서 데이터 로드
+  const { data: bindingData, isLoading: isBingingLoading } = usePhoneBinding(urlId || null);
+
+  const form = usePhoneForm({ isEdit: isEdit || !!urlId, phoneId: urlId });
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     watch,
     reset,
+    setValue,
+    trigger,
   } = form;
+  const { isSubmitting, submitData, saveDraft, loadDraft, validationErrors } = usePhoneSubmit();
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<IPhoneMediaMetadata[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const draftLoadedRef = useRef(false);
+
+  useEffect(() => {
+    form.register("mediaUrls");
+  }, [form]);
+
+  const updateMediaState = useCallback(
+    (nextFiles: IPhoneMediaMetadata[], options?: { pristine?: boolean }) => {
+      const normalized = nextFiles.map((file, index) => ({
+        ...file,
+        isPrimary: index === 0,
+      }));
+      setMediaFiles(normalized);
+      setValue(
+        "mediaUrls",
+        normalized.map((file) => file.url),
+        {
+          shouldDirty: !options?.pristine,
+          shouldTouch: !options?.pristine,
+          shouldValidate: true,
+        }
+      );
+      void trigger("mediaUrls");
+    },
+    [setValue, trigger]
+  );
+
+  useEffect(() => {
+    if (draftLoadedRef.current) return;
+    const stored = loadDraft();
+    if (!stored) {
+      draftLoadedRef.current = true;
+      return;
+    }
+
+    draftLoadedRef.current = true;
+    const storedMedia =
+      Array.isArray(stored.mediaFiles) && stored.mediaFiles.length > 0
+        ? stored.mediaFiles
+        : stored.main_image_url
+        ? [
+            {
+              url: stored.main_image_url,
+              isPrimary: true,
+              fileName: stored.mediaFiles?.[0]?.fileName ?? "image-1",
+            },
+          ]
+        : [];
+    const storedMediaUrls = storedMedia.map((file) => file.url).filter((url): url is string => !!url);
+    reset({
+      title: stored.title,
+      summary: stored.summary,
+      description: stored.description,
+      price: stored.price,
+      tags: stored.tags.join(", "),
+      address: stored.address,
+      address_detail: stored.address_detail,
+      zipcode: stored.zipcode,
+      latitude: stored.latitude,
+      longitude: stored.longitude,
+      mediaUrls: storedMediaUrls,
+    });
+
+    if (storedMedia.length > 0) {
+      const draftFiles = storedMedia.map((file, index) => ({
+        id: `draft-${index}-${Date.now()}`,
+        url: file.url,
+        fileName: file.fileName ?? `image-${index + 1}`,
+        isPrimary: file.isPrimary ?? index === 0,
+      }));
+      updateMediaState(draftFiles, { pristine: true });
+    }
+
+    message.info("임시 저장된 데이터를 불러왔습니다.");
+    void trigger();
+  }, [loadDraft, reset, trigger, updateMediaState]);
+
+  const buildSubmitState = useCallback(
+    (values: IPhoneFormInput, nextMedia: IPhoneMediaMetadata[]): SubmitProductState => {
+      const tags = (values.tags ?? "")
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0);
+
+      const normalizedMedia = nextMedia.map((file) => ({
+        url: file.url,
+        isPrimary: file.isPrimary,
+        fileName: file.fileName,
+      }));
+
+      return {
+        title: values.title,
+        summary: values.summary,
+        description: values.description,
+        price: Number(values.price) || 0,
+        tags,
+        address: values.address,
+        address_detail: values.address_detail,
+        zipcode: values.zipcode,
+        latitude: Number(values.latitude) || 0,
+        longitude: Number(values.longitude) || 0,
+        categories: [],
+        sale_state: "available",
+        sale_type: "instant",
+        currency: "KRW",
+        available_from: new Date().toISOString(),
+        available_until: null,
+        model_name: "",
+        storage_capacity: "",
+        device_condition: "",
+        main_image_url: normalizedMedia[0]?.url ?? null,
+        mediaFiles: normalizedMedia,
+      };
+    },
+    []
+  );
+
+  // 바인딩 데이터가 로드되면 폼에 바인딩
+  useEffect(() => {
+    if (!bindingData) return;
+    const { id: _id, ...formValues } = bindingData;
+    reset(formValues as IPhoneFormInput);
+    if (bindingData.mediaUrls?.length) {
+      updateMediaState(
+        buildMetaFromUrls(bindingData.mediaUrls, bindingData.id ?? "binding"),
+        { pristine: true }
+      );
+    }
+    void trigger();
+  }, [bindingData, reset, trigger, updateMediaState]);
+
+  // 로컬스토리지 데이터로 이미지 메타데이터 복원
+  useEffect(() => {
+    if (!urlId) return;
+    const stored = getPhoneFromStorage(urlId);
+    if (!stored) return;
+    const storedMeta =
+      stored.mediaMeta && stored.mediaMeta.length > 0
+        ? stored.mediaMeta.slice(0, MAX_MEDIA_COUNT)
+        : buildMetaFromUrls(stored.form.mediaUrls, urlId);
+    if (storedMeta.length === 0) return;
+    updateMediaState(storedMeta, { pristine: true });
+    reset(stored.form);
+    void trigger();
+  }, [reset, trigger, updateMediaState, urlId]);
 
   // 폼 필드 값 모니터링
   const currentValues = watch();
+  const mapSrc = useMemo(() => {
+    if (!currentValues.latitude && !currentValues.longitude) return null;
+    if (currentValues.latitude === 0 && currentValues.longitude === 0) return null;
+    return `https://maps.google.com/maps?q=${currentValues.latitude},${currentValues.longitude}&z=16&output=embed`;
+  }, [currentValues.latitude, currentValues.longitude]);
+  const isSubmitEnabled = isValid && mediaFiles.length > 0 && !isSubmitting;
+  
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const timer = window.setTimeout(() => {
+      const draftPayload = buildSubmitState(currentValues, mediaFiles);
+      saveDraft(draftPayload);
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [currentValues, mediaFiles, buildSubmitState, saveDraft]);
 
   /**
    * 폼 제출 핸들러
    */
   const onSubmit = async (data: IPhoneFormInput) => {
-    try {
-      setIsLoading(true);
-
-      // 이미지 파일 처리 (현재는 dummy 처리)
-      const imageDataUrls: string[] = [];
-      for (const file of imageFiles) {
-        // 실제 구현: 파일을 서버에 업로드하거나 Data URL로 변환
-        // 현재는 파일 이름만 저장
-        imageDataUrls.push(file.name);
-      }
-
-      // 검증된 데이터에 이미지 추가
-      const finalData: IPhoneFormInput = {
-        ...data,
-        images: imageDataUrls.length > 0 ? imageDataUrls : currentValues.images,
-      };
-
-      // 로컬스토리지 저장
-      savePhoneToStorage(isEdit, phoneId, finalData);
-
-      // 성공 메시지 표시 (실제 구현에서는 Toast 등 사용)
-      alert(`${isEdit ? "수정" : "등록"}이 완료되었습니다.`);
-
-      // 폼 초기화
-      reset();
-      setImageFiles([]);
-
-      // 라우팅 처리
-      navigateAfterSubmit();
-    } catch (error) {
-      console.error("폼 제출 실패:", error);
-      alert("처리 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
+    const payload = buildSubmitState(data, mediaFiles);
+    await submitData(payload);
   };
 
   /**
    * 취소 버튼 핸들러
    */
   const handleCancel = () => {
-    // 원본 값으로 복구
-    reset();
-    setImageFiles([]);
-    // 라우팅 처리
-    handleCancelRouting();
+    setIsPostcodeOpen(false);
+    if (isEdit && urlId) {
+      const stored = getPhoneFromStorage(urlId);
+      if (stored) {
+        reset(stored.form);
+        const meta =
+          stored.mediaMeta && stored.mediaMeta.length > 0
+            ? stored.mediaMeta.slice(0, MAX_MEDIA_COUNT)
+            : buildMetaFromUrls(stored.form.mediaUrls, urlId);
+        updateMediaState(meta, { pristine: true });
+      }
+    } else {
+      reset();
+      updateMediaState([], { pristine: true });
+    }
   };
 
   /**
    * 우편번호 검색 버튼 핸들러
    */
   const handlePostcodeSearch = () => {
-    // react-daum-postcode 모달 표시 (향후 구현)
-    alert("우편번호 검색 기능은 준비 중입니다.");
+    setIsPostcodeOpen(true);
   };
+
+  const handlePostcodeComplete = useCallback(
+    (addressData: Address) => {
+      const resolvedAddress = addressData.roadAddress || addressData.address;
+      const { latitude, longitude } = createCoordinatesFromAddress(resolvedAddress);
+
+      setValue("zipcode", addressData.zonecode, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue("address", resolvedAddress, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue("latitude", latitude, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue("longitude", longitude, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setIsPostcodeOpen(false);
+    },
+    [setValue]
+  );
 
   /**
    * 이미지 파일 변경 핸들러
    */
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
 
-    const newFiles = Array.from(files).slice(0, 2 - imageFiles.length);
-    if (newFiles.length + imageFiles.length > 2) {
-      alert("최대 2개까지만 첨부할 수 있습니다.");
+    const availableSlots = MAX_MEDIA_COUNT - mediaFiles.length;
+    if (availableSlots <= 0) {
+      alert(`최대 ${MAX_MEDIA_COUNT}개까지만 첨부할 수 있습니다.`);
       return;
     }
 
-    setImageFiles([...imageFiles, ...newFiles]);
+    const selectedFiles = Array.from(files).slice(0, availableSlots);
+    try {
+      const converted = await Promise.all(
+        selectedFiles.map(async (file, index) => ({
+          id: `${file.name}-${Date.now()}-${index}`,
+          url: await fileToDataUrl(file),
+          fileName: file.name,
+          isPrimary: false,
+        }))
+      );
+      updateMediaState([...mediaFiles, ...converted]);
+    } catch (error) {
+      console.error("이미지 변환 실패:", error);
+      alert("이미지를 처리하는 중 오류가 발생했습니다.");
+    } finally {
+      event.target.value = "";
+    }
   };
 
   /**
    * 이미지 삭제 핸들러
    */
   const handleImageDelete = (index: number) => {
-    setImageFiles(imageFiles.filter((_, i) => i !== index));
+    const nextFiles = mediaFiles.filter((_, i) => i !== index);
+    updateMediaState(nextFiles);
   };
 
-  /**
-   * 버튼 활성화 상태 판단
-   * - 폼이 유효하고
-   * - 이미지가 1개 이상
-   */
-  const isSubmitEnabled = isValid && imageFiles.length > 0;
+  const handleOpenFileDialog = () => {
+    fileInputRef.current?.click();
+  };
+
+  useEffect(() => {
+    const handleInjectedAddress = (event: Event) => {
+      const customEvent = event as CustomEvent<Address>;
+      if (customEvent.detail) {
+        handlePostcodeComplete(customEvent.detail);
+      }
+    };
+    window.addEventListener("phone:apply-address", handleInjectedAddress as EventListener);
+    return () => {
+      window.removeEventListener("phone:apply-address", handleInjectedAddress as EventListener);
+    };
+  }, [handlePostcodeComplete]);
 
   return (
     <div className={styles.container} data-testid="phone-new-container">
-      {/* 페이지 제목 */}
-      <h1 className={styles.title} data-testid="page-title">
-        {isEdit ? "중고폰 수정하기" : "중고폰 판매하기"}
-      </h1>
+      {isPostcodeOpen && (
+        <div className={styles.postcodeModalOverlay} data-testid="postcode-modal">
+          <div className={styles.postcodeModalContent}>
+            <DaumPostcodeEmbed
+              onComplete={handlePostcodeComplete}
+              style={{ width: "100%", height: "420px" }}
+            />
+            <button
+              type="button"
+              className={styles.postcodeCloseButton}
+              data-testid="btn-close-postcode"
+              onClick={() => setIsPostcodeOpen(false)}
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.formSection}>
+      {/* 로딩 표시 */}
+      {isBingingLoading && (
+        <div data-testid="loading-indicator" style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '40px',
+          fontSize: '16px',
+          color: '#666',
+        }}>
+          불러오는 중...
+        </div>
+      )}
+
+      {/* 로딩 완료 후 폼 표시 */}
+      {!isBingingLoading && (
+        <>
+          {/* 페이지 제목 */}
+          <h1 className={styles.title} data-testid="page-title">
+            {isEdit || urlId ? "중고폰 수정하기" : "중고폰 판매하기"}
+          </h1>
+
+          {Object.keys(validationErrors).length > 0 && (
+            <div className={styles.validationErrors} data-testid="submit-validation-errors">
+              {Object.entries(validationErrors).map(([field, message]) => (
+                <p key={field}>{message}</p>
+              ))}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className={styles.formSection}>
         {/* 기기명 입력 */}
         <div className={styles.inputWrapper} data-testid="phone-name-section">
           <label className={styles.label} htmlFor="phone-name">
@@ -379,13 +666,15 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
           </label>
           <input
             id="phone-price"
-            type="text"
+            type="number"
+            inputMode="numeric"
+            min="0"
             placeholder="판매 가격을 입력해 주세요. (원 단위)"
             className={`${styles.inputField} ${
               errors.price ? styles.inputError : ""
             }`}
             data-testid="input-phone-price"
-            {...register("price")}
+            {...register("price", { valueAsNumber: true })}
           />
           {errors.price && (
             <span className={styles.errorMessage}>{errors.price.message}</span>
@@ -416,29 +705,23 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
           {/* 좌측: 주소 입력 */}
           <div className={styles.addressColumnLeft}>
             {/* 주소 입력 그룹 */}
-            <div
-              className={styles.addressInputGroup}
-              data-testid="address-input-group"
-            >
+            <div className={styles.addressInputGroup} data-testid="address-input-group">
               <label className={styles.label}>
                 주소
                 <span className={styles.labelRequired}>*</span>
               </label>
 
-              <div
-                className={styles.addressWithButton}
-                data-testid="postcode-input-group"
-              >
+              <div className={styles.addressWithButton} data-testid="postcode-input-group">
                 <input
                   type="text"
                   placeholder="01234"
-                  className={`${styles.addressInput} ${
-                    errors.postalCode ? styles.inputError : ""
-                  }`}
+                  className={`${styles.addressInput} ${errors.zipcode ? styles.inputError : ""}`}
                   data-testid="input-postcode"
-                  disabled
-                  {...register("postalCode")}
+                  readOnly
+                  {...register("zipcode")}
                 />
+                {/* 숨겨진 주소 필드 (바인딩용) */}
+                <input type="hidden" data-testid="input-address" {...register("address")} />
                 <button
                   className={styles.postcodeButton}
                   data-testid="btn-postcode-search"
@@ -449,39 +732,35 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                 </button>
               </div>
 
-              {errors.postalCode && (
-                <span className={styles.errorMessage}>
-                  {errors.postalCode.message}
-                </span>
+              {currentValues.address && (
+                <p className={styles.selectedAddress} data-testid="selected-address">
+                  {currentValues.address}
+                </p>
+              )}
+
+              {errors.zipcode && (
+                <span className={styles.errorMessage}>{errors.zipcode.message}</span>
               )}
             </div>
 
             {/* 상세주소 입력 */}
-            <div
-              className={styles.inputWrapper}
-              data-testid="detailed-address-input-group"
-            >
+            <div className={styles.inputWrapper} data-testid="detailed-address-input-group">
               <input
                 type="text"
                 placeholder="상세주소를 입력해 주세요."
                 className={`${styles.detailedAddressInput} ${
-                  errors.detailedAddress ? styles.inputError : ""
+                  errors.address_detail ? styles.inputError : ""
                 }`}
                 data-testid="input-detailed-address"
-                {...register("detailedAddress")}
+                {...register("address_detail")}
               />
-              {errors.detailedAddress && (
-                <span className={styles.errorMessage}>
-                  {errors.detailedAddress.message}
-                </span>
+              {errors.address_detail && (
+                <span className={styles.errorMessage}>{errors.address_detail.message}</span>
               )}
             </div>
 
             {/* 좌표 입력 (위도/경도) */}
-            <div
-              className={styles.coordinatesGroup}
-              data-testid="coordinates-section"
-            >
+            <div className={styles.coordinatesGroup} data-testid="coordinates-section">
               <div className={styles.inputWrapper}>
                 <label className={styles.label} htmlFor="latitude">
                   위도(LAT)
@@ -490,10 +769,12 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                   id="latitude"
                   type="text"
                   placeholder="주소를 먼저 입력해 주세요."
-                  className={styles.coordinateInput}
+                  className={`${styles.coordinateInput} ${
+                    errors.latitude ? styles.inputError : ""
+                  }`}
                   data-testid="input-latitude"
-                  disabled
-                  {...register("latitude")}
+                  readOnly
+                  {...register("latitude", { valueAsNumber: true })}
                 />
               </div>
 
@@ -505,10 +786,12 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                   id="longitude"
                   type="text"
                   placeholder="주소를 먼저 입력해 주세요."
-                  className={styles.coordinateInput}
+                  className={`${styles.coordinateInput} ${
+                    errors.longitude ? styles.inputError : ""
+                  }`}
                   data-testid="input-longitude"
-                  disabled
-                  {...register("longitude")}
+                  readOnly
+                  {...register("longitude", { valueAsNumber: true })}
                 />
               </div>
             </div>
@@ -520,8 +803,20 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
               거래 위치
             </h3>
 
-            <div className={styles.mapContainer} data-testid="map-placeholder">
-              주소를 먼저 입력해 주세요.
+            <div className={styles.mapContainer} data-testid="map-container">
+              {mapSrc ? (
+                <iframe
+                  src={mapSrc}
+                  title="거래 위치 지도"
+                  className={styles.mapFrame}
+                  data-testid="map-frame"
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              ) : (
+                <span data-testid="map-placeholder-text">주소를 먼저 선택해 주세요.</span>
+              )}
             </div>
           </div>
         </div>
@@ -534,163 +829,99 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
             사진 첨부
             <span className={styles.labelRequired}>*</span>
           </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className={styles.fileInput}
+            data-testid="input-upload-image"
+            onChange={handleImageChange}
+          />
 
           {/* 미리보기 */}
-          {imageFiles.length > 0 && (
-            <div
-              style={{
-                display: "flex",
-                gap: "8px",
-                marginBottom: "16px",
-              }}
-            >
-              {imageFiles.map((file, index) => (
+          {mediaFiles.length > 0 && (
+            <div className={styles.imagePreviewGrid}>
+              {mediaFiles.map((file, index) => (
                 <div
-                  key={index}
-                  style={{
-                    position: "relative",
-                    width: "160px",
-                    height: "160px",
-                    borderRadius: "8px",
-                    border: "1px solid #e4e4e4",
-                    overflow: "hidden",
-                    backgroundColor: "#f2f2f2",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  key={file.id}
+                  className={styles.imagePreviewItem}
+                  data-testid={`image-preview-${index}`}
                 >
-                  {file.type.startsWith("image/") ? (
-                    <>
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={file.name}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleImageDelete(index)}
-                        style={{
-                          position: "absolute",
-                          top: "4px",
-                          right: "4px",
-                          width: "24px",
-                          height: "24px",
-                          borderRadius: "50%",
-                          backgroundColor: "rgba(0,0,0,0.5)",
-                          color: "white",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: "16px",
-                          lineHeight: "24px",
-                          padding: "0",
-                        }}
-                      >
-                        ×
-                      </button>
-                    </>
-                  ) : (
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: "24px" }}>📄</div>
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          color: "#666",
-                          marginTop: "4px",
-                        }}
-                      >
-                        {file.name}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleImageDelete(index)}
-                        style={{
-                          position: "absolute",
-                          top: "4px",
-                          right: "4px",
-                          width: "24px",
-                          height: "24px",
-                          borderRadius: "50%",
-                          backgroundColor: "rgba(0,0,0,0.5)",
-                          color: "white",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: "16px",
-                        }}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
+                  <img
+                    src={file.url}
+                    alt={file.fileName}
+                    className={styles.imagePreview}
+                  />
+                  <div className={styles.imageMeta}>
+                    <span>{file.fileName}</span>
+                    {file.isPrimary && (
+                      <span className={styles.primaryBadge} data-testid="badge-primary">
+                        대표
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.deleteImageButton}
+                    data-testid={`btn-delete-image-${index}`}
+                    onClick={() => handleImageDelete(index)}
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>
           )}
 
           {/* 업로드 버튼 */}
-          {imageFiles.length < 2 && (
+          {mediaFiles.length < MAX_MEDIA_COUNT && (
             <button
               className={styles.imageUploadBox}
               data-testid="btn-upload-image"
               type="button"
-              onClick={() => {
-                const input = document.createElement("input");
-                input.type = "file";
-                input.multiple = true;
-                input.accept = "image/*";
-                input.onchange = (e) => {
-                  handleImageChange(
-                    e as unknown as React.ChangeEvent<HTMLInputElement>
-                  );
-                };
-                input.click();
-              }}
+              onClick={handleOpenFileDialog}
             >
               <div className={styles.imageUploadContent}>
                 <div className={styles.imageUploadIcon}>+</div>
-                <p className={styles.imageUploadText}>
-                  클릭해서 사진 업로드
-                </p>
+                <p className={styles.imageUploadText}>클릭해서 사진 업로드</p>
               </div>
             </button>
           )}
 
-          {errors.images && (
-            <span className={styles.errorMessage}>{errors.images.message}</span>
+          {errors.mediaUrls && (
+            <span className={styles.errorMessage}>{errors.mediaUrls.message}</span>
           )}
         </div>
-      </form>
 
-      {/* 버튼 섹션 */}
-      <div className={styles.buttonSection} data-testid="button-section">
-        <button
-          className={styles.cancelButton}
-          data-testid="btn-cancel"
-          type="button"
-          onClick={handleCancel}
-        >
-          취소
-        </button>
-        <button
-          className={`${styles.submitButton} ${
-            isSubmitEnabled ? styles.active : ""
-          }`}
-          data-testid="btn-submit"
-          type="submit"
-          disabled={!isSubmitEnabled || isLoading}
-          onClick={handleSubmit(onSubmit)}
-        >
-          {isLoading
-            ? "처리 중..."
-            : isEdit
-            ? "수정하기"
-            : "등록하기"}
-        </button>
-      </div>
+        {/* 버튼 섹션 */}
+        <div className={styles.buttonSection} data-testid="button-section">
+          <button
+            className={styles.cancelButton}
+            data-testid="btn-cancel"
+            type="button"
+            onClick={handleCancel}
+          >
+            취소
+          </button>
+          <button
+            className={`${styles.submitButton} ${
+              isSubmitEnabled ? styles.active : ""
+            }`}
+            data-testid="btn-submit"
+            type="submit"
+            disabled={!isSubmitEnabled}
+          >
+            {isSubmitting
+              ? "처리 중..."
+              : isEdit || urlId
+              ? "수정하기"
+              : "등록하기"}
+          </button>
+        </div>
+      </form>
+        </>
+      )}
     </div>
   );
 }

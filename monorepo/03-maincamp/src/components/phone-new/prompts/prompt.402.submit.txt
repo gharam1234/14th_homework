@@ -10,9 +10,8 @@
 ==============================================
 
 조건-파일경로) 참고할 PAGE 경로: src/app/phones/new/page.tsx
-조건-파일경로) 구현될 HOOK 경로: src/app/phones/new/hooks/index.submit.hook.ts
-조건-파일경로) 구현될 TEST 경로: src/app/phones/new/tests/index.submit.hook.spec.ts
-
+조건-파일경로) 구현될 HOOK 경로: /src/components/phone-new/hooks/index.submit.hook.ts
+조건-파일경로) 구현될 TEST 경로: /src/components/phone-new/tests/index.submit.hook.spec.ts
 ==============================================
 
 핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
@@ -34,16 +33,27 @@
         - 저장소: 로컬스토리지
         - key: phone
         - 데이터
-            - name: string (상품명)
+            - title: string (상품명, phones.title)
             - summary: string (한줄 요약)
             - description: string (상품 설명)
             - price: number (판매 가격)
             - tags: string[] (태그)
             - address: string (주소)
-            - addressDetail: string (상세주소)
-            - lat: number (위도)
-            - lng: number (경도)
-            - images: string[] (사진 URL 목록)
+            - address_detail: string (상세주소)
+            - zipcode: string (우편번호)
+            - latitude: number (위도)
+            - longitude: number (경도)
+            - categories: string[] (카테고리)
+            - sale_state: 'available' | 'reserved' | 'sold'
+            - sale_type: string
+            - currency: string
+            - available_from: string
+            - available_until: string | null
+            - model_name: string
+            - storage_capacity: string
+            - device_condition: string
+            - main_image_url: string | null
+            - mediaFiles: { url: string; isPrimary: boolean }[] (phone_media 매핑용)
 
    1-2) 임시 저장 조건
         - 페이지 새로고침 시에도 데이터 유지
@@ -56,41 +66,57 @@
 
 2. 등록 시나리오
    2-1) 유효성 검증
-        - name: 필수, 최대 100자, 빈 값 불가
+        - title: 필수, 최대 100자, 빈 값 불가
         - summary: 필수, 최대 200자, 빈 값 불가
         - description: 필수, 최소 10자, 빈 값 불가
         - price: 필수, 0보다 큰 숫자
         - tags: 선택, 최대 10개
         - address: 필수, 빈 값 불가
-        - addressDetail: 선택
-        - lat: 필수, -90~90 범위
-        - lng: 필수, -180~180 범위
-        - images: 선택, jpg/png/webp만 허용, 각 파일 10MB 이하
+        - address_detail: 선택
+        - zipcode: 필수, 5자리 이상
+        - latitude: 필수, -90~90 범위
+        - longitude: 필수, -180~180 범위
+        - categories: 선택, JSON 배열
+        - mediaFiles: 선택, jpg/png/webp만 허용, 각 파일 10MB 이하 (phone_media.url에 저장될 항목)
 
    2-2) 유효성 검증 실패 시
         - 각 필드별 에러 메시지 표시
         - 첫 번째 에러 필드로 포커스 이동
         - 제출 중단
 
-   2-3) 다음의 데이터를 supabase에 등록할 것
-        - 접속키: ANON키
-        - 테이블명: phones
-        - 데이터
-            - name: string
-            - summary: string
-            - description: string
-            - price: number
-            - tags: string[] | null
-            - address: string
-            - address_detail: string | null
-            - lat: number
-            - lng: number
-            - images: string[] (이미지 업로드 후 URL 배열)
+    2-3) 다음의 데이터를 supabase에 등록할 것
+            - 접속키: ANON키
+            - 테이블명: phones
+            - 데이터
+                - seller_id: auth.users.id
+                - status: 'draft' | 'published' | 'archived'
+                - sale_state: 'available' | 'reserved' | 'sold'
+                - sale_type: string
+                - title: string
+                - summary: string
+                - description: string
+                - price: number
+                - currency: string
+                - available_from: string (ISO 날짜)
+                - available_until: string | null
+                - model_name: string
+                - storage_capacity: string
+                - device_condition: string
+                - tags: string[] | null (JSONB)
+                - categories: string[] | null (JSONB)
+                - address: string
+                - address_detail: string | null
+                - zipcode: string
+                - latitude: number
+                - longitude: number
+                - main_image_url: string (대표 이미지)
 
-        - 이미지 업로드
-            - 버킷명: phones-images
-            - 파일명 패턴: yyyy/mm/dd/{UUID}.{확장자}
-            - 각 이미지를 순차적으로 업로드한 후 URL 배열 생성
+            - 이미지 업로드
+                - 버킷명: phones-images
+                - 파일명 패턴: yyyy/mm/dd/{UUID}.{확장자}
+                - 각 이미지를 순차적으로 업로드한 후 phone_media 테이블에 레코드 삽입
+                        · phone_media 필드: phone_id, storage_path, url, file_name, file_size, mime_type, display_order, is_primary, status, progress
+                - 대표 이미지는 phones.main_image_url로 저장하고, 추가 이미지는 phone_media.url 값으로 관리
 
    2-4) 등록 성공 이후 로직을 완성할 것.
         - 로컬스토리지에 저장된 임시 데이터 삭제 (key: phone)

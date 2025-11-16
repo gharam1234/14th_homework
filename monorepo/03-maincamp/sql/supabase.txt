@@ -1,0 +1,79 @@
+다음은 모든 사용자 필드를 auth.users(id)로 연결해 정리한 최종 스키마입니다.
+
+테이블명: phones – 상품·주소·좌표·가격·필터 태그를 모두 담는 핵심 기기 테이블
+
+필드명: id – 기기 UUID PK
+필드명: seller_id – 판매자(auth.users.id) 참조
+필드명: status – 작성 모드(draft/published/archived)
+필드명: sale_state – 거래 상태(available/reserved/sold)
+필드명: sale_type – 즉시/예약 판매 유형
+필드명: title – 상품명
+필드명: summary – 한줄 요약
+필드명: description – 상세 설명
+필드명: price – 판매 가격
+필드명: currency – 통화 코드
+필드명: available_from – 거래 가능 시작일
+필드명: available_until – 거래 가능 종료일
+필드명: model_name – 모델명
+필드명: storage_capacity – 저장 용량
+필드명: device_condition – 기기 상태
+필드명: address – 거래 주소
+필드명: address_detail – 상세 주소
+필드명: zipcode – 우편번호
+필드명: latitude – 위도
+필드명: longitude – 경도
+필드명: tags – 태그 목록(JSONB)
+필드명: categories – 카테고리 목록(JSONB)
+필드명: main_image_url – 대표 이미지 URL
+필드명: created_at – 생성 시각
+필드명: updated_at – 수정 시각
+테이블명: phone_media – 사진 업로드 상태와 메타데이터를 관리하는 미디어 큐
+
+필드명: id – 미디어 UUID PK
+필드명: phone_id – 연결된 기기 ID
+필드명: storage_path – 스토리지 경로
+필드명: url – 접근 URL
+필드명: file_name – 파일명
+필드명: file_size – 파일 용량
+필드명: mime_type – MIME 타입
+필드명: display_order – 정렬 순서
+필드명: is_primary – 대표 여부
+필드명: status – 업로드 상태(pending/uploading/success/failed)
+필드명: progress – 업로드 진행률(%)
+필드명: error_code – 실패 시 에러 코드
+필드명: created_at – 생성 시각
+테이블명: phone_reactions – 찜/조회/공유 등 사용자 반응을 통합 추적하는 테이블
+
+필드명: id – 반응 UUID PK
+필드명: phone_id – 대상 기기 ID
+필드명: user_id – 사용자(auth.users.id)
+필드명: type – 반응 유형(favorite/view/share 등)
+필드명: created_at – 반응 생성 시각
+필드명: deleted_at – 반응 취소 시각
+필드명: metadata – 추가 정보(JSON)
+테이블명: phone_inquiries – 문의/답글/대댓글을 트리 구조로 저장하는 메시지 테이블
+
+필드명: id – 문의 UUID PK
+필드명: phone_id – 대상 기기 ID
+필드명: parent_id – 부모 문의 ID(없으면 NULL)
+필드명: thread_path – 트리 정렬용 경로 문자열
+필드명: author_id – 작성자(auth.users.id)
+필드명: content – 문의 내용(100자 제한)
+필드명: link_url – 본문 내 URL
+필드명: link_title – 링크 제목
+필드명: link_description – 링크 설명
+필드명: link_image – 링크 썸네일
+필드명: status – 상태(active/edited/deleted)
+필드명: is_answer – 판매자 답변 여부
+필드명: created_at – 생성 시각
+필드명: updated_at – 수정 시각
+테이블명: activity_logs – 주소 검색·지도 조작·업로드·제출 등 주요 이벤트를 기록하는 로그 테이블
+
+필드명: id – 로그 UUID PK
+필드명: phone_id – 관련 기기 ID(없으면 NULL)
+필드명: user_id – 이벤트 발생 사용자(auth.users.id, 없으면 NULL)
+필드명: event_type – 이벤트 종류
+필드명: context – 마스킹된 상세 정보(JSONB)
+필드명: result – 결과(success/error)
+필드명: retryable – 재시도 가능 여부
+필드명: created_at – 로그 시각

@@ -61,11 +61,11 @@
     price: string;
     tags: string;
     address: string;
-    postalCode: string;
-    detailedAddress: string;
+    zipcode: string;
+    address_detail: string;
     latitude: string;
     longitude: string;
-    images: string[];
+    mediaUrls: string[];
   }
 
 핵심요구사항) isEdit props를 추가하여 신규등록/수정 모드를 구분할 것.
@@ -97,11 +97,11 @@
 - 판매 가격: 숫자, 필수, 최소값 0
 - 태그: 문자열, 선택
 - 주소: 문자열, 필수
-- 우편번호: 문자열, 필수
-- 상세주소: 문자열, 필수
+- 우편번호(zipcode): 문자열, 필수
+- 상세주소(address_detail): 문자열, 필수
 - 위도: 숫자, 자동생성 필드 (사용자 입력 불가)
 - 경도: 숫자, 자동생성 필드 (사용자 입력 불가)
-- 사진: 배열, 최소 1개 필수
+- 미디어(URL) 배열: 최소 1개 필수, phone_media.url에 대응
 
 2) 폼 기본값 설정
 - isEdit=false: 모든 필드 빈 값
@@ -134,6 +134,7 @@
 - 파일 선택 시 이미지 미리보기 표시
 - 최대 2개 첨부 (기존 UI 참고)
 - 각 사진에 삭제 버튼 제공
+- 첨부 목록은 추후 phone_media.url / file_name / is_primary 필드와 매핑될 메타데이터를 유지할 것
 
 핵심요구사항) 다음의 CSS 처리를 적용할 것.
 
@@ -171,11 +172,12 @@
 - 우편번호 검색 버튼 클릭 시 react-daum-postcode 모달 표시
 - 주소 선택 시 폼 필드 자동 채움
 
-4) 사진 첨부 테스트
-- 파일 선택 시 이미지 미리보기 표시
-- 최대 2개까지만 첨부 가능
-- 삭제 버튼으로 사진 제거
-- 사진 없이 제출 불가 (에러 메시지)
+4) 사진(미디어) 첨부 테스트
+ - 파일 선택 시 이미지 미리보기 표시
+ - 최대 2개까지만 첨부 가능
+ - 삭제 버튼으로 사진 제거
+ - 첨부 결과가 phone_media 테이블용 메타데이터와 동기화되는지 검증
+ - 미디어 없이 제출 불가 (에러 메시지)
 
 5) 폼 검증 테스트
 - 필수 필드 누락 시 에러 메시지 표시

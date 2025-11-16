@@ -40,17 +40,19 @@
             2. 즐겨찾기 토글 시나리오
                 2-1) 로그인된 경우, 즐겨찾기 상태를 토글할 것
                         - 접속키: ANON키
-                        - 테이블명: phones
-                        - 업데이트 필드: bookmark (boolean 타입)
-                        - 조건: phoneId가 현재 상품의 ID와 일치하는 레코드
-                        - 토글 로직: 현재 bookmark 값의 반대로 업데이트 (true → false, false → true)
+                        - 테이블명: phone_reactions
+                        - 조작 필드: phone_id, user_id, type, deleted_at, metadata
+                        - 조건: phone_id가 현재 상품 ID, user_id가 로그인 사용자 ID, type='favorite'
+                        - 토글 로직:
+                                · 활성 반응 존재(조건을 만족하고 deleted_at이 NULL) 시 deleted_at=현재시각으로 업데이트하여 즐겨찾기 해제
+                                · 반응이 없거나 deleted_at이 설정된 경우 deleted_at을 NULL로 upsert하여 즐겨찾기 추가
 
-                2-2) 즐겨찾기 추가 성공 시 (bookmark: false → true)
+                2-2) 즐겨찾기 추가 성공 시 (삭제 상태 → 활성 상태)
                         - 토스트 알림메시지: "관심상품에 추가되었습니다."
                         - 알림 타입: success
                         - UI 상태 업데이트: 즐겨찾기 아이콘을 채워진 하트로 변경
 
-                2-3) 즐겨찾기 제거 성공 시 (bookmark: true → false)
+                2-3) 즐겨찾기 제거 성공 시 (활성 상태 → 삭제 상태)
                         - 토스트 알림메시지: "관심상품에서 제거되었습니다."
                         - 알림 타입: success
                         - UI 상태 업데이트: 즐겨찾기 아이콘을 빈 하트로 변경

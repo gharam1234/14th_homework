@@ -4,6 +4,7 @@ import "./globals.css";
 // import ApolloUploadSetting from "@/commons/setttings/apollo-setting";
 import dynamic from "next/dynamic";
 import Layout from "@/commons/layout";
+import ModalProvider from "@/commons/providers/modal/modal.provider";
 
 const ApiHeaderProvider = dynamic(
   () => import("@/commons/setttings/apollo-setting"),
@@ -46,7 +47,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
        <ApiHeaderProvider>
-        <Layout>{children}</Layout>
+        <ModalProvider>
+          <Layout>{children}</Layout>
+        </ModalProvider>
        </ApiHeaderProvider>
       </body>
     </html>

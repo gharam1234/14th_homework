@@ -31,7 +31,7 @@
             1. 지도 보기 시나리오
                 1-1) 위치 아이콘 클릭 시 거래 지역을 외부 지도 서비스로 열 것
                         - 지도 서비스: 카카오맵 또는 네이버 지도
-                        - 검색 키워드: 상품의 거래 지역 정보 (예: phones 테이블의 location 필드)
+                        - 검색 키워드: phones 테이블의 address, address_detail, zipcode 필드를 조합한 거래 주소 전체 문자열
                         - 새 창으로 열기: window.open() 사용
 
                 1-2) 지도 URL 생성 규칙
@@ -41,6 +41,7 @@
 
             2. 거래 지역 정보 확인
                 2-1) 거래 지역 정보가 없는 경우
+                        - phones.address, phones.address_detail, phones.zipcode 값이 모두 비어 있거나 NULL인 상태를 의미함
                         - 토스트 알림메시지: "거래 지역 정보가 없습니다."
                         - 알림 타입: warning
                         - 지도 창을 열지 말 것

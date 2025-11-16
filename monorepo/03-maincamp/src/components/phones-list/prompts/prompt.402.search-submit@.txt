@@ -41,12 +41,13 @@
         - Supabase 에러 발생 시 에러 메시지 표시 검증
 
 4) 테스트 데이터 조건
-   - 저장소: Supabase (usedphones 테이블)
+   - 저장소: Supabase (phones 테이블)
    - 검색 필드:
        - model_name (모델명)
+       - title (상품명)
        - price (가격)
-       - sale_status (판매상태: 'available', 'reserved')
-       - available_date (거래가능날짜)
+       - sale_state (판매상태: 'available' | 'reserved' | 'sold')
+       - available_from / available_until (거래 가능 기간)
 
 핵심요구사항) 다음의 기능을 Supabase를 연동하여 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
 
@@ -58,13 +59,13 @@
             - keyword: string (모델명 검색)
 
    1-2) Supabase 쿼리 구성
-        - 테이블: usedphones
+        - 테이블: phones
         - 쿼리 조건:
-            - keyword가 있으면: model_name.ilike(`%${keyword}%`)
-            - availableNow가 true면: sale_status.eq('available')
-            - availableNow가 false면: sale_status.eq('reserved')
-            - dateRange.startDate가 있으면: available_date.gte(startDate)
-            - dateRange.endDate가 있으면: available_date.lte(endDate)
+            - keyword가 있으면: model_name.ilike(`%${keyword}%`).or(`title.ilike.%${keyword}%`)
+            - availableNow가 true면: sale_state.eq('available')
+            - availableNow가 false면: sale_state.eq('reserved') (추가 선택지가 없으면 reserved만 조회)
+            - dateRange.startDate가 있으면: available_from.gte(startDate)
+            - dateRange.endDate가 있으면: available_until.lte(endDate)
         - 정렬: created_at.desc()
         - 제한: 최대 50개
 
@@ -135,38 +136,52 @@
         - error가 있으면 알림 메시지 표시
         - 알림 메시지: "검색에 실패하였습니다. 다시 시도해주세요."
 
-2) 데이터 바인딩
-   - PhoneCard 컴포넌트에 검색 결과 데이터 전달
-   - 필드 매핑:
-       - title: model_name
-       - description: description
-       - tags: tags
-       - price: price
-       - sellerName: seller_name
-       - imageUrl: image_url
-       - likeCount: like_count
-       - phoneId: id
+    2) 데이터 바인딩
+    - PhoneCard 컴포넌트에 검색 결과 데이터 전달
+    - 필드 매핑:
+        - title: title
+        - description: summary
+        - tags: tags
+        - price: price
+        - sellerLabel: seller_id (필요 시 일부 마스킹하여 표시)
+        - imageUrl: main_image_url
+        - likeCount: phone_reactions에서 type='favorite' count (조인 또는 RPC)
+        - phoneId: id
+        - modelName: model_name
 
 핵심요구사항) Supabase 테이블 스키마 정의
 
 **중요**: 아래 테이블명과 필드명은 실제 프로젝트에 맞게 수정하여 사용할 것.
 
-1) 테이블명: usedphones
+1) 테이블명: phones
 
-2) 필드 구조
-   - id: bigint (Primary Key)
-   - model_name: text (모델명)
-   - description: text (상품 설명)
-   - tags: text (태그)
-   - price: bigint (가격)
-   - seller_name: text (판매자명)
-   - image_url: text (이미지 URL)
-   - like_count: int (좋아요 수, 기본값 0)
-   - sale_status: text (판매상태: 'available' | 'reserved' | 'sold')
-   - available_date: date (거래가능날짜)
-   - created_at: timestamp (생성일시)
-   - updated_at: timestamp (수정일시)
+2) 필드 구조 (supabase.txt에 정의된 최종본 준수)
+   - id: uuid (Primary Key)
+   - seller_id: uuid (auth.users.id 참조)
+   - status: text (draft/published/archived)
+   - sale_state: text (available/reserved/sold)
+   - sale_type: text (즉시/예약 유형)
+   - title: text (상품명)
+   - summary: text (한줄 요약)
+   - description: text (상세 설명)
+   - price: numeric (판매 가격)
+   - currency: text (통화 코드)
+   - available_from: date
+   - available_until: date | null
+   - model_name: text
+   - storage_capacity: text
+   - device_condition: text
+   - address: text
+   - address_detail: text
+   - zipcode: text
+   - latitude: numeric
+   - longitude: numeric
+   - tags: jsonb
+   - categories: jsonb
+   - main_image_url: text
+   - created_at: timestamptz
+   - updated_at: timestamptz
 
 3) 테이블이 없는 경우
-   - 위 스키마를 참고하여 Supabase에서 테이블 생성
-   - RLS(Row Level Security) 정책 설정: 읽기 권한 모두 허용
+   - 위 필드 정의를 그대로 사용하여 Supabase에서 생성 (필드명 변경 금지)
+   - RLS(Row Level Security) 정책: 읽기 권한 공개, 쓰기 권한은 인증 사용자만 허용

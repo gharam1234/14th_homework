@@ -3,6 +3,29 @@
 import React, { useState } from "react";
 import styles from "./styles.module.css";
 import { usePhonesListRouting } from "./hooks/index.routing.hook";
+import { usePhoneFilters } from "./hooks/index.filter.hook";
+import { usePhoneSearch } from "./hooks/index.search.hook";
+import type { IPhoneCard } from "./hooks/index.search.hook";
+
+/**
+ * 디바이스 타입 필터 아이콘 데이터
+ */
+const DEVICE_TYPE_FILTERS = ["phone", "tablet", "laptop", "watch"] as const;
+
+type DeviceType = typeof DEVICE_TYPE_FILTERS[number];
+
+/**
+ * 디바이스 타입 아이콘 렌더링 함수
+ */
+function getDeviceTypeIcon(type: DeviceType) {
+  const iconMap: Record<DeviceType, string> = {
+    phone: "📱",
+    tablet: "📱",
+    laptop: "💻",
+    watch: "⌚",
+  };
+  return iconMap[type];
+}
 
 /**
  * 중고폰 브랜드 필터 아이콘 컴포넌트
@@ -107,22 +130,7 @@ function FilterIconOthers() {
   );
 }
 
-/**
- * 중고폰 카드 컴포넌트
- * @description 중고폰 정보를 표시하는 카드
- */
-interface IPhoneCard {
-  title: string;
-  description: string;
-  tags: string;
-  price: string;
-  sellerName: string;
-  imageUrl?: string;
-  likeCount?: number;
-}
-
 interface IPhoneCardWithRouting extends IPhoneCard {
-  phoneId?: string | number;
   onCardClick?: (phoneId: string | number) => void;
 }
 
@@ -131,9 +139,10 @@ function PhoneCard({
   description,
   tags,
   price,
-  sellerName,
+  sellerLabel,
   imageUrl,
   likeCount = 24,
+  modelName,
   phoneId,
   onCardClick,
 }: IPhoneCardWithRouting) {
@@ -164,13 +173,20 @@ function PhoneCard({
       <div className={styles.cardContent}>
         <div className={styles.cardHeader}>
           <h3 className={styles.cardTitle}>{title}</h3>
+          {modelName && (
+            <p className={styles.cardModel} data-testid="card-model-name">
+              모델명: {modelName}
+            </p>
+          )}
           <p className={styles.cardDescription}>{description}</p>
         </div>
         <div className={styles.cardTags}>
           <p className={styles.tags}>{tags}</p>
         </div>
         <div className={styles.cardFooter}>
-          <span className={styles.hostName}>{sellerName}</span>
+          <span className={styles.hostName} data-testid="card-seller-label">
+            {sellerLabel}
+          </span>
           <div className={styles.priceArea}>
             <span className={styles.price}>{price}</span>
             <span className={styles.currency}>원</span>
@@ -193,45 +209,80 @@ interface IPhonesListProps {
 
 export default function PhonesList({ onSearch }: IPhonesListProps) {
   const [activeTab, setActiveTab] = useState<"selling" | "completed">("selling");
+  const [hasSearched, setHasSearched] = useState(false);
+  const [isSearchInFlight, setIsSearchInFlight] = useState(false);
+  const [selectedDeviceType, setSelectedDeviceType] = useState<DeviceType | null>(null);
+  const [iconFilterError, setIconFilterError] = useState<string | null>(null);
   const { navigateToPhoneDetail, navigateToPhoneCreate } = usePhonesListRouting();
+  const {
+    availableNow,
+    dateRange,
+    keyword,
+    setAvailableNow,
+    setDateRange,
+    setKeyword,
+    resetFilters,
+  } = usePhoneFilters();
+  const { searchResults, isLoading, error, handleSearch, isSearchEnabled } = usePhoneSearch();
+
+  /**
+   * 아이콘 필터 선택 토글
+   * - 같은 아이콘을 클릭하면 선택 해제
+   * - 다른 아이콘을 클릭하면 선택 변경
+   * - 한 번에 하나만 선택 가능
+   */
+  const handleIconFilterToggle = (deviceType: DeviceType) => {
+    try {
+      setIconFilterError(null);
+      setSelectedDeviceType((prev) =>
+        prev === deviceType ? null : deviceType
+      );
+    } catch (err) {
+      setIconFilterError("필터를 불러올 수 없습니다.");
+    }
+  };
 
   // 샘플 카드 데이터
-  const samplePhones = [
+  const samplePhones: IPhoneCard[] = [
     {
       title: "아이폰 14 Pro 256GB",
       description: "A급 상태, 자급제 모델",
       tags: "#Apple #A급 #안전거래",
       price: "1,180,000",
-      sellerName: "홍대직거래",
+      sellerLabel: "판매자 홍대직",
       likeCount: 142,
       imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop",
+      modelName: "iPhone 14 Pro",
     },
     {
       title: "갤럭시 S23 울트라 512GB",
       description: "삼성 케어 잔여 6개월",
       tags: "#Samsung #자급제 #S펜포함",
       price: "1,090,000",
-      sellerName: "삼성중고샵",
+      sellerLabel: "판매자 삼성샵",
       likeCount: 98,
       imageUrl: "https://images.unsplash.com/photo-1580898434531-5700dde6756c?w=400&h=300&fit=crop",
+      modelName: "Galaxy S23 Ultra",
     },
     {
       title: "픽셀 8 프로 128GB",
       description: "미개봉 수준, 국내 정식",
       tags: "#Google #미개봉 #AI카메라",
       price: "980,000",
-      sellerName: "픽셀러버",
+      sellerLabel: "판매자 픽셀러버",
       likeCount: 74,
       imageUrl: "https://images.unsplash.com/photo-1510557880182-3f8c5fed2fa8?w=400&h=300&fit=crop",
+      modelName: "Pixel 8 Pro",
     },
     {
       title: "노트20 울트라 256GB",
       description: "생활기스 적은 B급",
       tags: "#Samsung #S펜 #대화면",
       price: "520,000",
-      sellerName: "부산직거래",
+      sellerLabel: "판매자 부산직",
       likeCount: 61,
       imageUrl: "https://images.unsplash.com/photo-1451188502541-13943edb6acb?w=400&h=300&fit=crop",
+      modelName: "Galaxy Note20 Ultra",
     },
   ];
 
@@ -273,7 +324,30 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
           <div className={styles.datepickerInput} data-testid="datepicker">
             📅
             <div style={{ fontSize: "16px", color: "#777777" }}>
-              최소 가격 - 최대 가격
+              <input
+                type="date"
+                value={dateRange.startDate || ''}
+                onChange={(e) => setDateRange(e.target.value || null, dateRange.endDate)}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  padding: "4px",
+                  backgroundColor: "transparent",
+                }}
+              />
+              ~
+              <input
+                type="date"
+                value={dateRange.endDate || ''}
+                onChange={(e) => setDateRange(dateRange.startDate, e.target.value || null)}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  padding: "4px",
+                  backgroundColor: "transparent",
+                  marginLeft: "8px",
+                }}
+              />
             </div>
           </div>
           <div className={styles.searchBarInput} data-testid="search-bar">
@@ -281,6 +355,9 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
             <input
               type="text"
               placeholder="모델명이나 기기명을 검색해 주세요."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              data-testid="search-input"
               style={{
                 border: "none",
                 outline: "none",
@@ -290,8 +367,21 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
               }}
             />
           </div>
-          <button className={styles.searchButton} data-testid="search-button">
-            검색
+          <button
+            className={styles.searchButton}
+            data-testid="search-button"
+            onClick={() => {
+              if (isSearchInFlight) return;
+              setIsSearchInFlight(true);
+              handleSearch()
+                .finally(() => {
+                  setHasSearched(true);
+                  setIsSearchInFlight(false);
+                });
+            }}
+            disabled={!isSearchEnabled || isLoading || isSearchInFlight}
+          >
+            {isLoading || isSearchInFlight ? '검색 중...' : '검색'}
           </button>
         </div>
         <button
@@ -302,7 +392,93 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
           <div className={styles.sellButtonIcon}>📝</div>
           <span>중고폰 판매 등록</span>
         </button>
+        <button
+          className={styles.resetButton}
+          data-testid="reset-button"
+          onClick={resetFilters}
+          style={{
+            marginLeft: '8px',
+            padding: '8px 16px',
+            backgroundColor: '#f0f0f0',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          초기화
+        </button>
       </div>
+
+      {/* 토글 필터 */}
+      <div style={{ marginBottom: '16px' }}>
+        <label data-testid="toggle-available" style={{ marginRight: '16px' }}>
+          <input
+            type="checkbox"
+            checked={availableNow}
+            onChange={(e) => setAvailableNow(e.target.checked)}
+          />
+          {' '}즉시 구매 가능
+        </label>
+      </div>
+
+      {/* 아이콘 필터 */}
+      <div
+        className={styles.iconFilterContainer}
+        data-testid="icon-filter"
+      >
+        {DEVICE_TYPE_FILTERS.map((deviceType) => (
+          <button
+            key={deviceType}
+            className={`${styles.iconFilterItem} ${
+              selectedDeviceType === deviceType ? styles.iconFilterItemSelected : ''
+            }`}
+            onClick={() => handleIconFilterToggle(deviceType)}
+            data-testid={`icon-${deviceType}`}
+            aria-pressed={selectedDeviceType === deviceType}
+          >
+            <span className={styles.iconFilterIcon}>
+              {getDeviceTypeIcon(deviceType)}
+            </span>
+            <span className={styles.iconFilterLabel}>
+              {deviceType.charAt(0).toUpperCase() + deviceType.slice(1)}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* 아이콘 필터 에러 메시지 */}
+      {!isLoading && iconFilterError && (
+        <div
+          data-testid="icon-filter-error"
+          role="alert"
+          style={{
+            padding: '12px',
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            borderRadius: '4px',
+            marginBottom: '16px',
+          }}
+        >
+          {iconFilterError}
+        </div>
+      )}
+
+      {/* 에러 메시지 */}
+      {error && (
+        <div
+          role="alert"
+          data-testid="error-alert"
+          style={{
+            padding: '12px',
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            borderRadius: '4px',
+            marginBottom: '16px',
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       {/* 콘텐츠 섹션 */}
       <div className={styles.contentSection}>
@@ -348,13 +524,39 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
 
         {/* 카드 영역 */}
         <div className={styles.cardArea} data-testid="card-area">
-          {sampleCards.map((card, index) => (
-            <PhoneCard
-              key={index}
-              {...card}
-              onCardClick={navigateToPhoneDetail}
-            />
-          ))}
+          {searchResults.length > 0 ? (
+            // 검색 결과 표시
+            searchResults.map((card, index) => (
+              <PhoneCard
+                key={card.phoneId ?? index}
+                {...card}
+                phoneId={card.phoneId}
+                onCardClick={navigateToPhoneDetail}
+              />
+            ))
+          ) : hasSearched ? (
+            // 검색 결과가 없을 때
+            <div
+              data-testid="no-results"
+              style={{
+                gridColumn: '1 / -1',
+                padding: '40px',
+                textAlign: 'center',
+                color: '#999',
+              }}
+            >
+              검색 결과가 없습니다
+            </div>
+          ) : (
+            // 검색을 하지 않았을 때 샘플 데이터 표시
+            sampleCards.map((card, index) => (
+              <PhoneCard
+                key={index}
+                {...card}
+                onCardClick={navigateToPhoneDetail}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

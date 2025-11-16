@@ -25,11 +25,13 @@
     {
       id: String,
       title: String!,
-      description: String!,
-      tags: String,
-      price: String!,
-      sellerName: String!,
-      likeCount: Number
+      summary: String!,
+      tags: String[],
+      price: Number!,
+      seller_id: String!,
+      sale_state: 'available' | 'reserved' | 'sold',
+      main_image_url: String | null,
+      favoriteCount: Number (phone_reactions에서 type='favorite' 집계)
     }
   ]
 

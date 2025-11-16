@@ -30,16 +30,19 @@
 핵심요구사항) 상품 정보를 관리하는 상태 객체와 모드 관리 시스템을 구현할 것.
 
 1) 상태 객체 타입 정의 (types/index.ts)
-   - name: string (상품명)
+   - title: string (상품명, phones.title)
    - summary: string (한줄 요약)
    - description: string (상품 설명)
    - price: number (판매 가격)
    - tags: string[] (태그)
    - address: string (주소)
-   - addressDetail: string (상세주소)
-   - lat: number (위도)
-   - lng: number (경도)
-   - images: string[] (사진 목록 URL)
+   - address_detail: string (상세주소)
+   - zipcode: string (우편번호)
+   - latitude: number (위도)
+   - longitude: number (경도)
+   - categories: string[] (카테고리 JSONB 매핑)
+   - sale_state: 'available' | 'reserved' | 'sold'
+   - mediaUrls: string[] (phone_media.url 목록)
 
 2) 모드 타입 정의
    - 'draft': 초안 모드 (새로 작성)
@@ -49,16 +52,19 @@
 3) 모드별 초기값 정의
    3-1) 초안 모드 (draft)
         - 모든 필드 빈 값으로 초기화
-        - name: ''
+       - title: ''
         - summary: ''
         - description: ''
         - price: 0
         - tags: []
         - address: ''
-        - addressDetail: ''
-        - lat: 0
-        - lng: 0
-        - images: []
+       - address_detail: ''
+       - zipcode: ''
+       - latitude: 0
+       - longitude: 0
+       - categories: []
+       - sale_state: 'available'
+       - mediaUrls: []
 
    3-2) 완료 모드 (completed)
         - 제출된 데이터를 그대로 유지

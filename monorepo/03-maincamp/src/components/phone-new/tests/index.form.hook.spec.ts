@@ -1,341 +1,193 @@
+import { Buffer } from 'buffer';
 import { test, expect, Page } from '@playwright/test';
 
-/**
- * 중고폰 신규등록/수정 폼 테스트
- *
- * TDD 기반으로 작성된 테스트
- * 신규등록(isEdit=false), 수정(isEdit=true) 모드 모두 테스트
- */
+const NEW_PAGE_URL = '/phones/new';
+const SAMPLE_IMAGE_BUFFER = Buffer.from(
+  '89504e470d0a1a0a0000000d49484452000000010000000108020000009077053d0000000a49444154789c6360000002000154a20af50000000049454e44ae426082',
+  'hex'
+);
 
-/**
- * 테스트 유틸: 페이지 로드 완료 대기
- */
-async function waitForPageLoad(page: Page) {
-  // data-testid="phone-new-container"가 나타날 때까지 대기
+async function waitForForm(page: Page) {
   await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible' });
 }
 
-/**
- * 테스트 유틸: 로컬스토리지 초기화
- */
 async function clearLocalStorage(page: Page) {
+  await page.evaluate(() => localStorage.clear());
+}
+
+async function resetAndOpenNewPage(page: Page) {
+  await page.goto(NEW_PAGE_URL);
+  await waitForForm(page);
+  await clearLocalStorage(page);
+  await page.reload();
+  await waitForForm(page);
+}
+
+async function applyAddress(page: Page) {
   await page.evaluate(() => {
-    localStorage.clear();
+    window.dispatchEvent(
+      new CustomEvent('phone:apply-address', {
+        detail: {
+          zonecode: '06236',
+          address: '서울특별시 강남구 테헤란로 123',
+          roadAddress: '서울특별시 강남구 테헤란로 123',
+        },
+      })
+    );
+  });
+  await expect(page.locator('[data-testid="selected-address"]')).toContainText('테헤란로 123');
+}
+
+async function fillRequiredFields(page: Page) {
+  await page.locator('[data-testid="input-phone-name"]').fill('테스트 중고폰');
+  await page.locator('[data-testid="input-phone-summary"]').fill('테스트 요약');
+  await page.locator('[data-testid="editor-content"]').fill('테스트 설명입니다.');
+  await page.locator('[data-testid="input-phone-price"]').fill('150000');
+  await applyAddress(page);
+  await page.locator('[data-testid="input-detailed-address"]').fill('101동 1001호');
+}
+
+async function uploadImage(page: Page, name = 'sample.png') {
+  await page.setInputFiles('[data-testid="input-upload-image"]', {
+    name,
+    mimeType: 'image/png',
+    buffer: SAMPLE_IMAGE_BUFFER,
   });
 }
 
-/**
- * 테스트 유틸: 로컬스토리지에 테스트 데이터 저장
- */
-async function setPhoneData(page: Page, phoneId: string, data: Record<string, unknown>) {
+async function setPhoneData(page: Page, phoneId: string) {
+  const storedValue = {
+    phoneId,
+    title: '기존 중고폰',
+    summary: '기존 요약',
+    description: '기존 설명',
+    price: 90000,
+    tags: '태그1, 태그2',
+    address: '서울특별시 강남구 기존로 11',
+    address_detail: '기존 상세주소',
+    zipcode: '06000',
+    latitude: 37.4979,
+    longitude: 127.0276,
+    mediaUrls: ['data:image/png;base64,aGVsbG8='],
+    mediaMeta: [
+      {
+        id: `${phoneId}-0`,
+        url: 'data:image/png;base64,aGVsbG8=',
+        fileName: 'image-1.png',
+        isPrimary: true,
+      },
+    ],
+    updatedAt: new Date().toISOString(),
+  };
+
   await page.evaluate(
-    ({ key, value }) => {
-      localStorage.setItem(key, JSON.stringify(value));
-    },
-    { key: `phone-${phoneId}`, value: data }
+    ({ key, value }) => localStorage.setItem(key, JSON.stringify(value)),
+    { key: `phone-${phoneId}`, value: storedValue }
   );
 }
 
 test.describe('PhoneNew Form 컴포넌트 테스트', () => {
   test.beforeEach(async ({ page }) => {
-    // 각 테스트 전에 로컬스토리지 초기화
-    await clearLocalStorage(page);
+    await resetAndOpenNewPage(page);
   });
 
-  test.describe('신규등록 모드 (isEdit=false)', () => {
-    test('모든 필드가 빈 값으로 렌더링됨', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
-
-      // 제목 확인
-      const title = await page.locator('[data-testid="page-title"]').textContent();
-      expect(title).toContain('중고폰 판매하기');
-
-      // 입력 필드 확인
-      const titleInput = page.locator('[data-testid="input-phone-name"]');
-      const summaryInput = page.locator('[data-testid="input-phone-summary"]');
-      const priceInput = page.locator('[data-testid="input-phone-price"]');
-
-      await expect(titleInput).toHaveValue('');
-      await expect(summaryInput).toHaveValue('');
-      await expect(priceInput).toHaveValue('');
-    });
-
-    test('"등록하기" 버튼이 표시됨', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
-
-      const submitButton = page.locator('[data-testid="btn-submit"]');
-      await expect(submitButton).toBeVisible();
-
-      const buttonText = await submitButton.textContent();
-      expect(buttonText).toBe('등록하기');
-    });
-
-    test('필수 필드를 모두 입력하면 버튼 활성화', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
-
-      const submitButton = page.locator('[data-testid="btn-submit"]');
-
-      // 초기 상태: disabled
-      await expect(submitButton).toBeDisabled();
-
-      // 필수 필드 입력
-      await page.locator('[data-testid="input-phone-name"]').fill('테스트 중고폰');
-      await page.locator('[data-testid="input-phone-summary"]').fill('테스트 요약');
-      await page.locator('[data-testid="editor-content"]').fill('테스트 설명');
-      await page.locator('[data-testid="input-phone-price"]').fill('10000');
-      await page.locator('[data-testid="input-postcode"]').fill('12345');
-      await page.locator('[data-testid="input-detailed-address"]').fill('서울시 강남구');
-
-      // 이미지 업로드 (테스트용 dummy 이미지 처리)
-      // 실제 파일 업로드는 복잡하므로, 추후 이미지 필드는 별도 처리
-
-      // 버튼 활성화 확인 (모든 필드가 입력되었을 때)
-      // 주의: 현재는 이미지가 필수이므로, 이미지 없이는 활성화되지 않음
-    });
-
-    test('형식 정보 입력 시 에러 메시지 표시', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
-
-      // 가격에 문자 입력
-      const priceInput = page.locator('[data-testid="input-phone-price"]');
-      await priceInput.fill('abc');
-      await priceInput.blur();
-
-      // 에러 메시지 확인
-      // (실제 에러 메시지는 폼 렌더링에 따라 달라질 수 있음)
-    });
-
-    test('폼 제출 시 로컬스토리지에 저장', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
-
-      // 폼 데이터 입력
-      await page.locator('[data-testid="input-phone-name"]').fill('테스트 중고폰');
-      await page.locator('[data-testid="input-phone-summary"]').fill('테스트 요약');
-      await page.locator('[data-testid="editor-content"]').fill('테스트 설명');
-      await page.locator('[data-testid="input-phone-price"]').fill('10000');
-      await page.locator('[data-testid="input-postcode"]').fill('12345');
-      await page.locator('[data-testid="input-detailed-address"]').fill('서울시 강남구');
-
-      // 로컬스토리지 확인
-      const storedData = await page.evaluate(() => {
-        // 로컬스토리지에 저장된 데이터 확인
-        const keys = Object.keys(localStorage);
-        const phoneKey = keys.find((k) => k.startsWith('phone-'));
-        if (phoneKey) {
-          return JSON.parse(localStorage.getItem(phoneKey) || '{}');
-        }
-        return null;
-      });
-
-      // 초기 상태: 저장되지 않음
-      expect(storedData).toBeNull();
-    });
+  test('신규등록 모드 - 기본 상태 확인', async ({ page }) => {
+    await expect(page.locator('[data-testid="input-phone-name"]')).toHaveValue('');
+    await expect(page.locator('[data-testid="btn-submit"]')).toHaveText('등록하기');
+    await expect(page.locator('[data-testid="btn-submit"]')).toBeDisabled();
+    await expect(page.locator('[data-testid="map-placeholder-text"]')).toBeVisible();
   });
 
-  test.describe('수정 모드 (isEdit=true, phoneId="001")', () => {
-    const testPhoneId = '001';
-    const testData = {
-      phoneId: testPhoneId,
-      title: '기존 중고폰',
-      summary: '기존 요약',
-      description: '기존 설명',
-      price: '5000',
-      tags: '기존 태그',
-      address: '서울시 강남구',
-      postalCode: '06000',
-      detailedAddress: '테헤란로 123',
-      latitude: '37.4979',
-      longitude: '127.0276',
-      images: ['image1.jpg'],
-    };
+  test('신규등록 모드 - 필수값 입력 후 저장', async ({ page }) => {
+    await fillRequiredFields(page);
+    await uploadImage(page);
 
-    test('로컬스토리지에서 기존 데이터 조회하여 폼 초기화', async ({ page }) => {
-      // 테스트 데이터 저장
-      await page.goto('/phones/new');
-      await setPhoneData(page, testPhoneId, testData);
+    const submitButton = page.locator('[data-testid="btn-submit"]');
+    await expect(submitButton).toBeEnabled();
 
-      // 수정 페이지로 이동
-      await page.goto(`/phones/${testPhoneId}/edit`);
-      await waitForPageLoad(page);
+    const dialogPromise = page.waitForEvent('dialog');
+    await submitButton.click();
+    const dialog = await dialogPromise;
+    await dialog.accept();
+    await page.waitForTimeout(200);
 
-      // 폼 필드 값 확인
-      const titleInput = page.locator('[data-testid="input-phone-name"]');
-      const summaryInput = page.locator('[data-testid="input-phone-summary"]');
-      const priceInput = page.locator('[data-testid="input-phone-price"]');
-
-      // 값이 로드되는 것을 대기
-      await expect(titleInput).toHaveValue(testData.title);
-      await expect(summaryInput).toHaveValue(testData.summary);
-      await expect(priceInput).toHaveValue(testData.price);
+    const storedEntries = await page.evaluate(() => {
+      return Object.keys(localStorage)
+        .filter((key) => key.startsWith('phone-'))
+        .map((key) => JSON.parse(localStorage.getItem(key) as string));
     });
 
-    test('"수정하기" 버튼이 표시됨', async ({ page }) => {
-      // 테스트 데이터 저장
-      await page.goto('/phones/new');
-      await setPhoneData(page, testPhoneId, testData);
-
-      // 수정 페이지로 이동
-      await page.goto(`/phones/${testPhoneId}/edit`);
-      await waitForPageLoad(page);
-
-      const submitButton = page.locator('[data-testid="btn-submit"]');
-      await expect(submitButton).toBeVisible();
-
-      const buttonText = await submitButton.textContent();
-      expect(buttonText).toBe('수정하기');
-    });
-
-    test('데이터 수정 후 제출 시 로컬스토리지 업데이트', async ({ page }) => {
-      // 테스트 데이터 저장
-      await page.goto('/phones/new');
-      await setPhoneData(page, testPhoneId, testData);
-
-      // 수정 페이지로 이동
-      await page.goto(`/phones/${testPhoneId}/edit`);
-      await waitForPageLoad(page);
-
-      // 데이터 수정
-      await page.locator('[data-testid="input-phone-name"]').fill('수정된 중고폰');
-      await page.locator('[data-testid="input-phone-summary"]').fill('수정된 요약');
-
-      // 폼 제출
-      const submitButton = page.locator('[data-testid="btn-submit"]');
-      // 활성화될 때까지 대기하고 클릭
-      await submitButton.waitFor({ state: 'enabled' });
-      await submitButton.click();
-
-      // 로컬스토리지 확인
-      const storedData = await page.evaluate(
-        ({ phoneId }) => {
-          const key = `phone-${phoneId}`;
-          const stored = localStorage.getItem(key);
-          return stored ? JSON.parse(stored) : null;
-        },
-        { phoneId: testPhoneId }
-      );
-
-      expect(storedData).toBeTruthy();
-      expect(storedData.title).toBe('수정된 중고폰');
-      expect(storedData.summary).toBe('수정된 요약');
-    });
-
-    test('취소 버튼 클릭 시 원본 값으로 복구', async ({ page }) => {
-      // 테스트 데이터 저장
-      await page.goto('/phones/new');
-      await setPhoneData(page, testPhoneId, testData);
-
-      // 수정 페이지로 이동
-      await page.goto(`/phones/${testPhoneId}/edit`);
-      await waitForPageLoad(page);
-
-      // 데이터 수정
-      const titleInput = page.locator('[data-testid="input-phone-name"]');
-      await titleInput.fill('임시 수정');
-
-      // 취소 버튼 클릭
-      const cancelButton = page.locator('[data-testid="btn-cancel"]');
-      await cancelButton.click();
-
-      // 원본 값으로 복구 확인
-      await expect(titleInput).toHaveValue(testData.title);
-    });
+    expect(storedEntries.length).toBeGreaterThan(0);
+    expect(storedEntries[0].title).toBe('테스트 중고폰');
+    expect(storedEntries[0].mediaUrls.length).toBe(1);
   });
 
-  test.describe('필수 필드 검증', () => {
-    test('필수 필드 누락 시 에러 메시지 표시', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
-
-      // 필수 필드 중 일부 입력
-      await page.locator('[data-testid="input-phone-name"]').fill('테스트');
-
-      // 다른 필드로 이동하여 검증 트리거
-      await page.locator('[data-testid="input-phone-summary"]').blur();
-
-      // 에러 메시지 확인 (폼 렌더링에 따라 달라질 수 있음)
-    });
-
-    test('가격에 음수 입력 불가', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
-
-      // 음수 입력 시도
-      const priceInput = page.locator('[data-testid="input-phone-price"]');
-      await priceInput.fill('-1000');
-      await priceInput.blur();
-
-      // 에러 메시지 확인
-    });
-
-    test('우편번호 형식 검증', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
-
-      // 잘못된 우편번호 입력 (버튼을 통해서만 입력되므로 직접 테스트 어려움)
-      // 우편번호 검색 버튼 클릭 테스트로 대체
-      const postcodeButton = page.locator('[data-testid="btn-postcode-search"]');
-      await expect(postcodeButton).toBeVisible();
-    });
+  test('신규등록 모드 - 가격 검증 실패 시 에러 메시지', async ({ page }) => {
+    const priceInput = page.locator('[data-testid="input-phone-price"]');
+    await priceInput.fill('-1000');
+    await priceInput.blur();
+    await expect(page.getByText('판매 가격은 0 이상이어야 합니다.')).toBeVisible();
   });
 
-  test.describe('이미지 업로드 테스트', () => {
-    test('파일 선택 시 이미지 미리보기 표시', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
+  test('수정 모드 - 기존 데이터 로드 및 저장', async ({ page }) => {
+    const phoneId = 'phone-001';
+    await setPhoneData(page, phoneId);
 
-      // 이미지 업로드 버튼 확인
-      const uploadButton = page.locator('[data-testid="btn-upload-image"]');
-      await expect(uploadButton).toBeVisible();
-    });
+    await page.goto(`/phones/${phoneId}/edit`);
+    await waitForForm(page);
 
-    test('최대 2개까지만 첨부 가능', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
+    await expect(page.locator('[data-testid="input-phone-name"]')).toHaveValue('기존 중고폰');
+    await expect(page.locator('[data-testid="btn-submit"]')).toHaveText('수정하기');
 
-      // 이미지 업로드 버튼 확인
-      const uploadButton = page.locator('[data-testid="btn-upload-image"]');
-      await expect(uploadButton).toBeVisible();
+    await page.locator('[data-testid="input-phone-summary"]').fill('수정된 요약');
+    await page.locator('[data-testid="editor-content"]').fill('수정된 설명');
+    await page.locator('[data-testid="input-phone-price"]').fill('95000');
 
-      // 실제 파일 업로드는 복잡하므로, UI 표시만 확인
-    });
+    const submitButton = page.locator('[data-testid="btn-submit"]');
+    await expect(submitButton).toBeEnabled();
 
-    test('사진 없이 제출 불가', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
+    const dialogPromise = page.waitForEvent('dialog');
+    await submitButton.click();
+    const dialog = await dialogPromise;
+    await dialog.accept();
+    await page.waitForTimeout(200);
 
-      // 모든 필드 입력 (이미지 제외)
-      await page.locator('[data-testid="input-phone-name"]').fill('테스트');
-      await page.locator('[data-testid="input-phone-summary"]').fill('요약');
-      await page.locator('[data-testid="editor-content"]').fill('설명');
-      await page.locator('[data-testid="input-phone-price"]').fill('10000');
-      await page.locator('[data-testid="input-postcode"]').fill('12345');
-      await page.locator('[data-testid="input-detailed-address"]').fill('주소');
+    const updated = await page.evaluate(({ key }) => {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    }, { key: `phone-${phoneId}` });
 
-      // 제출 버튼은 여전히 disabled
-      const submitButton = page.locator('[data-testid="btn-submit"]');
-      await expect(submitButton).toBeDisabled();
-    });
+    expect(updated.summary).toBe('수정된 요약');
+    expect(updated.price).toBe(95000);
   });
 
-  test.describe('주소 관련 기능', () => {
-    test('우편번호 검색 버튼 클릭 시 모달 표시', async ({ page }) => {
-      await page.goto('/phones/new');
-      await waitForPageLoad(page);
+  test('수정 모드 - 취소 버튼으로 원본 값 복구', async ({ page }) => {
+    const phoneId = 'phone-002';
+    await setPhoneData(page, phoneId);
+    await page.goto(`/phones/${phoneId}/edit`);
+    await waitForForm(page);
 
-      // 우편번호 검색 버튼 확인
-      const postcodeButton = page.locator('[data-testid="btn-postcode-search"]');
-      await expect(postcodeButton).toBeVisible();
+    const titleInput = page.locator('[data-testid="input-phone-name"]');
+    await titleInput.fill('임시 변경');
+    await page.locator('[data-testid="btn-cancel"]').click();
+    await expect(titleInput).toHaveValue('기존 중고폰');
+  });
 
-      // 버튼 클릭 (실제 모달은 react-daum-postcode에 의존)
-      // await postcodeButton.click();
+  test('우편번호 검색 모달 토글', async ({ page }) => {
+    const openButton = page.locator('[data-testid="btn-postcode-search"]');
+    await openButton.click();
+    await expect(page.locator('[data-testid="postcode-modal"]')).toBeVisible();
+    await page.locator('[data-testid="btn-close-postcode"]').click();
+    await expect(page.locator('[data-testid="postcode-modal"]')).toHaveCount(0);
+  });
 
-      // 모달이 표시되는 것을 확인할 수 있으나,
-      // react-daum-postcode는 외부 라이브러리이므로 직접 테스트 어려움
-    });
+  test('사진 첨부 - 최대 2장 제한 및 삭제', async ({ page }) => {
+    await fillRequiredFields(page);
+    await uploadImage(page, 'first.png');
+    await uploadImage(page, 'second.png');
+
+    await expect(page.locator('[data-testid^="image-preview-"]')).toHaveCount(2);
+    await page.locator('[data-testid="btn-delete-image-0"]').click();
+    await expect(page.locator('[data-testid^="image-preview-"]')).toHaveCount(1);
   });
 });

@@ -33,6 +33,9 @@
 :root {
   --font-base: 10px;  
   --icon-base: 18px;
+  /* 색상 토큰 */
+  --color-primary-blue: #2974e5;
+  --color-border-light: #e4e4e4;
 }
 
 html {

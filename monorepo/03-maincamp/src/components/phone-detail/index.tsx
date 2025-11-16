@@ -1,7 +1,11 @@
 'use client';
 
+import { useCallback } from 'react';
 import styles from './styles.module.css';
 import { PhoneDetail as PhoneDetailType, PhoneDetailProps } from './types';
+import { useBookmark } from './hooks/index.bookmark.hook';
+import { useDelete } from './hooks/index.delete.hook';
+import Modal from '@commons/ui/src/modal';
 
 /**
  * PhoneDetail - Figma 디자인 기반 프레젠테이션 컴포넌트
@@ -66,8 +70,19 @@ const DUMMY_PHONE_DATA: PhoneDetailType = {
 /**
  * 중고폰 상세 페이지 컴포넌트
  */
-export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneDetailProps) {
+export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId }: PhoneDetailProps) {
   const phoneData = data || DUMMY_PHONE_DATA;
+
+  // 북마크 훅 사용
+  const { isBookmarked, toggleBookmark } = useBookmark(
+    phoneId || phoneData.id,
+    false
+  );
+
+  // 삭제 훅 사용
+  const { isDeleting, deletePhone, showDeleteModal, hideDeleteModal, isModalOpen } = useDelete(
+    phoneId || phoneData.id
+  );
 
   return (
     <div className={styles.body} data-testid="phone-detail-body">
@@ -78,12 +93,14 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
           <div className={styles.titleArea} data-testid="title-area">
             <div className={styles.titleHeader}>
               <div className={styles.titleRow}>
-                <h1 className={styles.title}>{phoneData.title}</h1>
+                <h1 className={styles.title} data-testid="phone-detail-title">{phoneData.title}</h1>
                 <div className={styles.actionButtons} data-testid="action-buttons">
                   {/* 삭제 아이콘 */}
                   <button
                     className={styles.iconButton}
                     title="삭제"
+                    onClick={showDeleteModal}
+                    data-testid="delete-button"
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path
@@ -125,12 +142,13 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
                     <button
                       className={styles.iconButton}
                       title="북마크"
+                      onClick={toggleBookmark}
                     >
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <path
                           d="M17 3H5c-1.11 0-2 .9-2 2v16l7-3 7 3V5c0-1.1.89-2 2-2z"
-                          fill="none"
-                          stroke="#ffffff"
+                          fill={isBookmarked ? '#ff6b6b' : 'none'}
+                          stroke={isBookmarked ? '#ff6b6b' : '#ffffff'}
                           strokeWidth="2"
                         />
                       </svg>
@@ -199,6 +217,20 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare }: PhoneD
           </div>
         </section>
       </div>
+
+      {/* 삭제 확인 모달 */}
+      {isModalOpen && (
+        <Modal
+          variant="danger"
+          actions="dual"
+          title="삭제 확인"
+          description="정말로 이 판매 글을 삭제하시겠습니까?"
+          confirmText="삭제"
+          cancelText="취소"
+          onConfirm={deletePhone}
+          onCancel={hideDeleteModal}
+        />
+      )}
     </div>
   );
 }
