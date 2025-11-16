@@ -1,0 +1,51 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-detail/hooks/index.navigation.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/phone-detail/tests/index.navigation.spec.ts
+
+==============================================
+
+핵심요구사항) playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+            1) 테스트 제외 라이브러리
+                - jest
+                - @testing-library/react
+
+            2) 테스트 조건
+                - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+                - 페이지가 완전히 로드된 후 테스트할 것.
+                    - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+                    - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+핵심요구사항) url.ts의 라우팅 설정을 기반으로 다음의 네비게이션 기능을 구현할 것.
+
+            1) 경로 참고
+                - 파일: commons/constants/url.ts
+                - 라우팅 유틸: getPath() 함수 사용
+
+            2) 상단 카테고리 탭 클릭 시 라우팅
+                - 요소: data-testid="category-tab-button"
+                - 이동 경로: /phones (PHONES_LIST)
+                - CSS: cursor: pointer만 추가할 것.
+
+            3) 뒤로가기 버튼 클릭 시 라우팅
+                - 요소: data-testid="back-button"
+                - 이동 경로: /phones (PHONES_LIST)
+                - 방식: router.push(getPath('PHONES_LIST'))
+                - CSS: cursor: pointer만 추가할 것.
+
+            4) SPA 상태 유지
+                - router.push()를 사용하여 페이지 전체 새로고침하지 말 것.
+                - 라우팅 시 SPA 상태(필터, 검색 등) 유지되도록 구현할 것.
+
+            5) 테스트 시나리오
+                - 카테고리 탭 클릭 시 /phones로 이동
+                - 뒤로가기 버튼 클릭 시 /phones로 이동
+                - URL이 정확히 변경되는지 검증 (await expect(page).toHaveURL('/phones'))

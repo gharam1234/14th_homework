@@ -5,6 +5,7 @@ import styles from "./styles.module.css";
 import { usePhonesListRouting } from "./hooks/index.routing.hook";
 import { usePhoneFilters } from "./hooks/index.filter.hook";
 import { usePhoneSearch } from "./hooks/index.search.hook";
+import { useIconFilter, type Phone } from "./hooks/index.icon-filter.hook";
 import type { IPhoneCard } from "./hooks/index.search.hook";
 
 /**
@@ -207,12 +208,27 @@ interface IPhonesListProps {
   onSearch?: (params: any) => void;
 }
 
+/**
+ * 브랜드 필터 데이터
+ */
+const BRAND_FILTERS = [
+  { id: "apple", label: "Apple" },
+  { id: "samsung", label: "Samsung" },
+  { id: "google", label: "Google" },
+  { id: "xiaomi", label: "Xiaomi" },
+  { id: "nothing", label: "Nothing" },
+  { id: "sony", label: "Sony" },
+  { id: "motorola", label: "Motorola" },
+  { id: "lg", label: "LG" },
+  { id: "others", label: "기타" },
+] as const;
+
 export default function PhonesList({ onSearch }: IPhonesListProps) {
   const [activeTab, setActiveTab] = useState<"selling" | "completed">("selling");
   const [hasSearched, setHasSearched] = useState(false);
   const [isSearchInFlight, setIsSearchInFlight] = useState(false);
   const [selectedDeviceType, setSelectedDeviceType] = useState<DeviceType | null>(null);
-  const [iconFilterError, setIconFilterError] = useState<string | null>(null);
+  const [hasIconFilterInteracted, setHasIconFilterInteracted] = useState(false);
   const { navigateToPhoneDetail, navigateToPhoneCreate } = usePhonesListRouting();
   const {
     availableNow,
@@ -224,22 +240,91 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
     resetFilters,
   } = usePhoneFilters();
   const { searchResults, isLoading, error, handleSearch, isSearchEnabled } = usePhoneSearch();
+  const {
+    selectedCategory,
+    isLoading: isCategoryLoading,
+    error: categoryError,
+    phonesList,
+    toggleCategory,
+  } = useIconFilter();
 
-  /**
-   * 아이콘 필터 선택 토글
-   * - 같은 아이콘을 클릭하면 선택 해제
-   * - 다른 아이콘을 클릭하면 선택 변경
-   * - 한 번에 하나만 선택 가능
-   */
+  const handleBrandFilterClick = (brandId: string) => {
+    setHasIconFilterInteracted(true);
+    toggleCategory(brandId);
+  };
+
   const handleIconFilterToggle = (deviceType: DeviceType) => {
-    try {
-      setIconFilterError(null);
-      setSelectedDeviceType((prev) =>
-        prev === deviceType ? null : deviceType
-      );
-    } catch (err) {
-      setIconFilterError("필터를 불러올 수 없습니다.");
+    setSelectedDeviceType((prev) => (prev === deviceType ? null : deviceType));
+  };
+
+  const shouldRenderPhonesList =
+    selectedCategory !== null ||
+    hasIconFilterInteracted ||
+    (!hasSearched && (phonesList.length > 0 || isCategoryLoading || Boolean(categoryError)));
+
+  const formatPhonePrice = (price: Phone['price']): string => {
+    if (typeof price === "number") {
+      return new Intl.NumberFormat("ko-KR").format(price);
     }
+    if (typeof price === "string") {
+      const parsed = Number(price);
+      return Number.isFinite(parsed) ? new Intl.NumberFormat("ko-KR").format(parsed) : price;
+    }
+    return "0";
+  };
+
+  const renderIconFilteredCards = () => {
+    if (isCategoryLoading && phonesList.length === 0) {
+      return (
+        <div
+          style={{
+            gridColumn: "1 / -1",
+            padding: "40px",
+            textAlign: "center",
+            color: "#999",
+          }}
+        >
+          필터링 중...
+        </div>
+      );
+    }
+
+    if (phonesList.length === 0) {
+      return (
+        <div
+          data-testid="no-results"
+          style={{
+            gridColumn: "1 / -1",
+            padding: "40px",
+            textAlign: "center",
+            color: "#999",
+          }}
+        >
+          필터링된 결과가 없습니다
+        </div>
+      );
+    }
+
+    return phonesList.map((phone, index) => {
+      const formattedPrice = formatPhonePrice(phone.price);
+      const saleStateLabel = phone.sale_state ?? "정보 없음";
+
+      return (
+        <PhoneCard
+          key={phone.id ?? index}
+          phoneId={phone.id}
+          title={phone.title || ""}
+          description={`거래 상태: ${saleStateLabel}`}
+          tags={phone.categories?.join(" ") || ""}
+          price={formattedPrice}
+          sellerLabel="판매자 정보"
+          imageUrl={phone.main_image_url}
+          likeCount={0}
+          modelName=""
+          onCardClick={navigateToPhoneDetail}
+        />
+      );
+    });
   };
 
   // 샘플 카드 데이터
@@ -446,8 +531,24 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
         ))}
       </div>
 
+      {/* 아이콘 필터 로딩 메시지 */}
+      {isCategoryLoading && (
+        <div
+          data-testid="icon-filter-loading"
+          style={{
+            padding: '12px',
+            backgroundColor: '#e7f3ff',
+            color: '#0066cc',
+            borderRadius: '4px',
+            marginBottom: '16px',
+          }}
+        >
+          로딩 중...
+        </div>
+      )}
+
       {/* 아이콘 필터 에러 메시지 */}
-      {!isLoading && iconFilterError && (
+      {categoryError && (
         <div
           data-testid="icon-filter-error"
           role="alert"
@@ -459,7 +560,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
             marginBottom: '16px',
           }}
         >
-          {iconFilterError}
+          {categoryError}
         </div>
       )}
 
@@ -484,47 +585,47 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
       <div className={styles.contentSection}>
         {/* 필터 섹션 */}
         <div className={styles.filterSection} data-testid="filter-section">
-          <div className={styles.filterItem} data-testid="filter-apple">
-            <FilterIconApple />
-            <span className={styles.filterLabel}>Apple</span>
-          </div>
-          <div className={styles.filterItem} data-testid="filter-samsung">
-            <FilterIconSamsung />
-            <span className={styles.filterLabel}>Samsung</span>
-          </div>
-          <div className={styles.filterItem} data-testid="filter-google">
-            <FilterIconGoogle />
-            <span className={styles.filterLabel}>Google</span>
-          </div>
-          <div className={styles.filterItem} data-testid="filter-xiaomi">
-            <FilterIconXiaomi />
-            <span className={styles.filterLabel}>Xiaomi</span>
-          </div>
-          <div className={styles.filterItem} data-testid="filter-nothing">
-            <FilterIconNothing />
-            <span className={styles.filterLabel}>Nothing</span>
-          </div>
-          <div className={styles.filterItem} data-testid="filter-sony">
-            <FilterIconSony />
-            <span className={styles.filterLabel}>Sony</span>
-          </div>
-          <div className={styles.filterItem} data-testid="filter-motorola">
-            <FilterIconMotorola />
-            <span className={styles.filterLabel}>Motorola</span>
-          </div>
-          <div className={styles.filterItem} data-testid="filter-lg">
-            <FilterIconLG />
-            <span className={styles.filterLabel}>LG</span>
-          </div>
-          <div className={styles.filterItem} data-testid="filter-others">
-            <FilterIconOthers />
-            <span className={styles.filterLabel}>기타</span>
-          </div>
+          {BRAND_FILTERS.map((brand) => {
+            const IconComponent = {
+              apple: FilterIconApple,
+              samsung: FilterIconSamsung,
+              google: FilterIconGoogle,
+              xiaomi: FilterIconXiaomi,
+              nothing: FilterIconNothing,
+              sony: FilterIconSony,
+              motorola: FilterIconMotorola,
+              lg: FilterIconLG,
+              others: FilterIconOthers,
+            }[brand.id];
+
+            return (
+              <button
+                key={brand.id}
+                className={`${styles.filterItem} ${
+                  selectedCategory === brand.id ? styles.filterItemSelected : ''
+                }`}
+                onClick={() => handleBrandFilterClick(brand.id)}
+                data-testid={`filter-${brand.id}`}
+                aria-pressed={selectedCategory === brand.id}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              >
+                <IconComponent />
+                <span className={styles.filterLabel}>{brand.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* 카드 영역 */}
         <div className={styles.cardArea} data-testid="card-area">
-          {searchResults.length > 0 ? (
+          {shouldRenderPhonesList ? (
+            renderIconFilteredCards()
+          ) : searchResults.length > 0 ? (
             // 검색 결과 표시
             searchResults.map((card, index) => (
               <PhoneCard

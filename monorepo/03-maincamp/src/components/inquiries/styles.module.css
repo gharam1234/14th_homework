@@ -1,0 +1,446 @@
+/* 문의하기 컴포넌트 스타일 */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  width: 100%;
+}
+
+/* === 제목 영역 === */
+.header {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 2.4rem;
+  color: #000000;
+}
+
+/* === 입력 섹션 === */
+.inputSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  width: 100%;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 14.4rem;
+  padding: 1.2rem 1.6rem;
+  border: 1px solid #d4d3d3;
+  border-radius: 0.8rem;
+  background-color: #ffffff;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 2.4rem;
+  color: #000000;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.textarea::placeholder {
+  color: #ababab;
+}
+
+.textareaContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.charCount {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 2rem;
+  color: #818181;
+  text-align: right;
+}
+
+.submitButton {
+  padding: 1.2rem 1.6rem;
+  border: none;
+  border-radius: 0.8rem;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 2.4rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.submitButton:hover {
+  background-color: #333333;
+}
+
+.submitButton:active {
+  background-color: #000000;
+}
+
+/* === 문의 목록 === */
+.inquiriesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+/* === 문의 아이템 === */
+.inquiryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 0;
+  width: 100%;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.inquiryItem:last-child {
+  border-bottom: none;
+}
+
+.inquiryContent {
+  padding: 2.4rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.inquiryHeader {
+  display: flex;
+  gap: 1.1rem;
+  align-items: center;
+  width: 100%;
+}
+
+.profile {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.profileAvatar {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background-color: #e4e4e4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profileAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileName {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+  line-height: 2rem;
+  color: #5f5f5f;
+}
+
+.inquiryBody {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 2.4rem;
+  color: #000000;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.inquiryFooter {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: flex-end;
+  height: 2.4rem;
+  width: 100%;
+}
+
+.inquiryDate {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 2rem;
+  color: #818181;
+}
+
+.replyButton {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+  line-height: 2rem;
+  color: #333333;
+  transition: color 0.2s ease;
+}
+
+.replyButton:hover {
+  color: #000000;
+}
+
+.replyIcon {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === 답변 (들여쓰기) === */
+.replyWrapper {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.replyBorder {
+  width: 2.4rem;
+  height: auto;
+  min-height: 12rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.replyIcon2 {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.replyContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  min-width: 0;
+}
+
+.replyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+}
+
+.replyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.replyProfile {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.replyActions {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.actionButton {
+  width: 2rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.actionButton:hover {
+  opacity: 0.7;
+}
+
+.replyBody {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 2.4rem;
+  color: #000000;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.replyFooter {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: flex-end;
+  height: 2.4rem;
+  width: 100%;
+}
+
+.replyDate {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 2rem;
+  color: #818181;
+}
+
+/* === 답변 입력 섹션 === */
+.replyInputSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+}
+
+.replyInputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.replyTextarea {
+  width: 100%;
+  min-height: 14.4rem;
+  padding: 1.2rem 1.6rem;
+  border: 1px solid #d4d3d3;
+  border-radius: 0.8rem;
+  background-color: #ffffff;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 2.4rem;
+  color: #000000;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.replyTextarea::placeholder {
+  color: #ababab;
+}
+
+.replyButtonGroup {
+  display: flex;
+  gap: 1.6rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.cancelButton {
+  padding: 1.2rem 1.6rem;
+  border: 1px solid #000000;
+  border-radius: 0.8rem;
+  background-color: #ffffff;
+  color: #000000;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 2.4rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.cancelButton:hover {
+  background-color: #f5f5f5;
+}
+
+.submitReplyButton {
+  padding: 1.2rem 1.6rem;
+  border: none;
+  border-radius: 0.8rem;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 2.4rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.submitReplyButton:hover {
+  background-color: #333333;
+}
+
+.submitReplyButton:active {
+  background-color: #000000;
+}
+
+/* === 반응형 === */
+@media (max-width: 768px) {
+  .container {
+    gap: 2.4rem;
+  }
+
+  .headerTitle {
+    font-size: 1.4rem;
+  }
+
+  .replyButtonGroup {
+    gap: 0.8rem;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cancelButton,
+  .submitReplyButton {
+    width: 100%;
+  }
+}
