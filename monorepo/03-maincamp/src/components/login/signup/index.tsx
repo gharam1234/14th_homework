@@ -3,12 +3,10 @@ import { gql, useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChangeEvent } from 'react'
-import { set } from 'lodash'
 
 import React from 'react';
-import { ExclamationCircleFilled } from '@ant-design/icons';
-import { Button, Modal, Space } from 'antd';
-import { on } from 'events'
+import { Modal, message } from 'antd';
+import { supabase } from '@/commons/libraries/supabaseClient'
 
 
 
@@ -79,19 +77,44 @@ export default function SignUp(){
         setErrors(newErrors)
         if (Object.values(newErrors).some((error)=> error !== "")) return
         
-        try{
+        try {
             const { data } = await createUser({
-         variables: { createUserInput: { email, name, password } }
-            }
-        )
-        console.log({email, name, password})
-        openModal()
+                variables: { createUserInput: { email, name, password } }
+            })
 
-        }catch(error:unknown){
-            if(error instanceof Error){
-                alert(error.message)
-            }else{
-                alert("알 수 없는 에러가 발생했습니다.")
+            if (!data?.createUser?._id) {
+                throw new Error('회원가입에 실패했습니다. 다시 시도해 주세요.');
+            }
+
+            const { error: supabaseError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { name },
+                },
+            });
+
+            if (supabaseError) {
+                if (supabaseError.message?.toLowerCase().includes('already registered')) {
+                    const { error: signInError } = await supabase.auth.signInWithPassword({
+                        email,
+                        password,
+                    });
+                    if (signInError) {
+                        throw new Error('이미 가입된 이메일입니다. 다른 계정을 사용해 주세요.');
+                    }
+                    await supabase.auth.signOut();
+                } else {
+                    throw new Error(supabaseError.message || 'Supabase 회원가입에 실패했습니다.');
+                }
+            }
+
+            openModal()
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                message.error(error.message)
+            } else {
+                message.error('알 수 없는 에러가 발생했습니다.')
             }
         }
         

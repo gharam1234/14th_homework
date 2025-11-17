@@ -1,9 +1,34 @@
 'use client';
 
+import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import PhoneDetail from '@/components/phone-detail';
 import Inquiries from '@/components/inquiries';
+import { useInquirySubmit } from '@/components/inquiries/hooks/index.submit.hook';
 
-export default function PhoneDetailTestPage() {
+interface PhoneDetailPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function PhoneDetailTestPage({ params }: PhoneDetailPageProps) {
+  const phoneId = params.id;
+  const router = useRouter();
+  const { submitInquiry } = useInquirySubmit({
+    phoneId,
+    onSuccess: () => {
+      router.refresh();
+    },
+  });
+
+  const handleSubmitInquiry = useCallback(
+    (content: string) => {
+      return submitInquiry(content);
+    },
+    [submitInquiry]
+  );
+
   return (
     <main style={{ padding: '40px' }}>
       <PhoneDetail />
@@ -17,9 +42,7 @@ export default function PhoneDetailTestPage() {
             maxLength: 100,
           }}
           inquiries={[]}
-          onSubmitInquiry={(content) => {
-            console.log('문의 제출:', content);
-          }}
+          onSubmitInquiry={handleSubmitInquiry}
           onSubmitReply={(inquiryId, content) => {
             console.log('답변 제출:', inquiryId, content);
           }}

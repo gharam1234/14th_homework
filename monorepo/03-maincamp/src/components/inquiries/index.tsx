@@ -32,10 +32,18 @@ export default function Inquiries({
   /**
    * 문의 제출 핸들러
    */
-  const handleSubmitInquiry = () => {
-    if (inquiryText.trim() && onSubmitInquiry) {
-      onSubmitInquiry(inquiryText);
-      setInquiryText('');
+  const handleSubmitInquiry = async () => {
+    if (!onSubmitInquiry) {
+      return;
+    }
+
+    try {
+      const result = await onSubmitInquiry(inquiryText);
+      if (result !== false) {
+        setInquiryText('');
+      }
+    } catch (error) {
+      console.error('문의 제출 실패:', error);
     }
   };
 
@@ -300,12 +308,14 @@ export default function Inquiries({
               placeholder={inputSection.placeholder}
               value={inquiryText}
               onChange={(e) => {
-                const text = e.target.value.slice(0, inputSection.maxLength);
+                const text = e.target.value;
                 setInquiryText(text);
               }}
               data-testid="inquiry-textarea"
             />
-            <div className={styles.charCount}>{inquiryText.length}/{inputSection.maxLength}</div>
+            <div className={styles.charCount} data-testid="inquiry-char-count">
+              {inquiryText.length}/{inputSection.maxLength}
+            </div>
           </div>
           <button className={styles.submitButton} onClick={handleSubmitInquiry} data-testid="submit-inquiry-button">
             {inputSection.submitButtonText}

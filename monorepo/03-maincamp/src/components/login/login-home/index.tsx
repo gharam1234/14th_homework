@@ -3,7 +3,6 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import styles from './styles.module.css'
 import { gql, useMutation } from '@apollo/client'
-import { result, set } from 'lodash'
 import { useRouter } from 'next/navigation'
 import { useAccessTokenStore } from '@/stores/use-access-token'
 import { MyInput } from '@commons/ui'
@@ -11,6 +10,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loginschema } from '@/commons/libraries/loingschema'
 import { ILoginSchema } from '@/commons/libraries/loingschema'
+import { message } from 'antd'
+import { supabase } from '@/commons/libraries/supabaseClient'
 
 
 const LOGIN_USER = gql`
@@ -62,26 +63,36 @@ export default function LoginHome(){
         // setErrors(newErrors)
         // const hasError = Object.values(newErrors).some((error)=> error !== "")
         // if (hasError) return
+        if (!email || !password) {
+            message.error('이메일과 비밀번호를 모두 입력해 주세요.');
+            return;
+        }
 
-        try{
-             const result = await loginUser(
-            { variables: { email, password } }
-        )
-        const AccessTokenByApi = result.data?.loginUser.accessToken;
-        setAccessToken(AccessTokenByApi);
-        localStorage.setItem("accessToken", AccessTokenByApi)
-        
-        router.push('/boards')
-
-        }catch(error:unknown){
-            if(error instanceof Error){
-                alert(error.message)
+        try {
+            const result = await loginUser({ variables: { email, password } });
+            const AccessTokenByApi = result.data?.loginUser.accessToken;
+            if (!AccessTokenByApi) {
+                throw new Error('로그인에 실패했습니다. 다시 시도해 주세요.');
             }
-            else{
-                alert("알 수 없는 에러가 발생했습니다.")
+
+            const { error: supabaseError } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (supabaseError) {
+                throw new Error(supabaseError.message || 'Supabase 로그인에 실패했습니다.');
+            }
+
+            setAccessToken(AccessTokenByApi);
+            router.push('/boards');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                message.error(error.message);
+            } else {
+                message.error('알 수 없는 에러가 발생했습니다.');
             }
         }
-       
     }
     const onClickToSignUp = () => {
         router.push('/signup')

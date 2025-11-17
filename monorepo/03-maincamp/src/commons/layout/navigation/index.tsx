@@ -10,6 +10,7 @@ import { DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/commons/libraries/supabaseClient'
 
 const FETCH_USER_LOGGED_IN = gql`
   query {
@@ -38,8 +39,9 @@ export default function LayoutNavigation(){
     const { data } = useQuery(FETCH_USER_LOGGED_IN);
     const clearAccessToken = useAccessTokenStore((state) => state.clearAccessToken)
 
-    const onClickLogout =() => {
-        clearAccessToken()
+    const onClickLogout = async () => {
+        await supabase.auth.signOut();
+        clearAccessToken();
         router.push("/")
     }
 

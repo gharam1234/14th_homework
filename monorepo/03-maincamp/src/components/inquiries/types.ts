@@ -41,7 +41,7 @@ export interface InqueriesProps {
   /** 문의 목록 데이터 */
   inquiries?: InquiryItem[];
   /** 문의 제출 핸들러 */
-  onSubmitInquiry?: (content: string) => void;
+  onSubmitInquiry?: (content: string) => Promise<boolean | void> | boolean | void;
   /** 답변 제출 핸들러 */
   onSubmitReply?: (inquiryId: string, content: string) => void;
   /** 문의/답변 수정 핸들러 */
