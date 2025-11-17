@@ -24,6 +24,7 @@ export interface PhoneDetail {
   id: string;
   title: string;
   price: number;
+  summary?: string;
   originalPrice?: number;
   description: string;
   category: string;

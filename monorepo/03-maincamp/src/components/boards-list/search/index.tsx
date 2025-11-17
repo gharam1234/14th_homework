@@ -19,9 +19,10 @@ export default function Search(props: ISearchProps) {
     <div className={styles.box}>
     <h1 className={styles.title}>트립토크 게시판</h1>
     <div className={styles.wrapper}>
-        <div className={styles.search}>
-            <img src="/images/search.png" className={styles.searchIcon} /><input placeholder="제목을 검색해 주세요" type="text" onChange={onChangeKeyword} />
-            <button className={styles.searchBtn}>검색</button>
+        <div className={styles.searchInputGroup}>
+            <img src="/images/search.png" className={styles.searchIcon} />
+            <input placeholder="제목을 검색해 주세요" type="text" onChange={onChangeKeyword} />
+            <MyButton variant="outline" className={styles.searchBtn}>검색</MyButton>
         </div>
         {/* <button className={styles.registerBtn} onClick={onClickMove}><img src="/images/registerBtn.png" alt="" />트립토크 등록</button> */}
         <MyButton variant="primary" onClick={onClickMove}><img src="/images/registerBtn.png" alt="" />트립토크 등록</MyButton>

@@ -23,12 +23,66 @@
   padding: 0;
 }
 
+/* === 로딩 및 에러 상태 === */
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+  padding: 40px;
+}
+
+.loadingContainer p,
+.errorContainer p {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--color-medium-gray);
+  margin: 0;
+}
+
+.retryButton {
+  padding: 12px 24px;
+  background-color: var(--color-primary-blue);
+  color: var(--color-white);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retryButton:hover {
+  background-color: #1e5bb8;
+}
+
+.retryButton:active {
+  background-color: #164a92;
+}
+
 /* === 헤더 섹션 === */
 .headerSection {
   display: flex;
   flex-direction: column;
   gap: 40px;
   width: 100%;
+}
+
+.navigationRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.backButton,
+.categoryTabButton {
+  cursor: pointer;
 }
 
 .titleArea {

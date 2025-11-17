@@ -42,6 +42,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "6.0.0",
     "@graphql-codegen/client-preset": "5.0.0",
+    "@playwright/test": "^1.56.1",
     "@types/apollo-upload-client": "^18.0.0",
     "@types/node": "^20",
     "@types/react": "^18",

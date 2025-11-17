@@ -1,10 +1,13 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useParams } from 'next/navigation';
 import styles from './styles.module.css';
 import { PhoneDetail as PhoneDetailType, PhoneDetailProps } from './types';
 import { useBookmark } from './hooks/index.bookmark.hook';
 import { useDelete } from './hooks/index.delete.hook';
+import { usePhoneDetailNavigation } from './hooks/index.navigation.hook';
+import { useFetchDetail, PhoneDetailData } from './hooks/index.fetch-detail.hook';
 import Modal from '@commons/ui/src/modal';
 
 /**
@@ -22,6 +25,7 @@ const DUMMY_PHONE_DATA: PhoneDetailType = {
   id: 'listing-001',
   title: '아이폰 14 Pro 256GB 퍼플 - A급 상태',
   price: 1180000,
+  summary: '하이엔드 퍼플 색상, 생활 스크래치 없는 A급 중고폰',
   originalPrice: 1390000,
   description: `정식 출시 이후 1년간 사용한 아이폰 14 Pro 퍼플 색상 256GB 모델입니다.
 
@@ -70,25 +74,138 @@ const DUMMY_PHONE_DATA: PhoneDetailType = {
 /**
  * 중고폰 상세 페이지 컴포넌트
  */
-export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId }: PhoneDetailProps) {
-  const phoneData = data || DUMMY_PHONE_DATA;
+export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId: propsPhoneId }: PhoneDetailProps) {
+  const params = useParams();
+  const phoneIdFromParams = params?.id as string | undefined;
+  const phoneId = propsPhoneId || phoneIdFromParams;
+
+  // 데이터 조회 훅 사용
+  const { data: fetchedData, isLoading, error, retry } = useFetchDetail(phoneId);
+
+  // Supabase 데이터를 컴포넌트 형식으로 변환
+  const convertedData = useMemo(() => {
+    if (!fetchedData) return null;
+    
+    return {
+      id: fetchedData.id,
+      title: fetchedData.title,
+      price: fetchedData.price,
+      summary: fetchedData.summary ?? '',
+      description: fetchedData.description,
+      category: (fetchedData.categories && fetchedData.categories.length > 0) 
+        ? fetchedData.categories[0] 
+        : '스마트폰',
+      subcategory: (fetchedData.categories && fetchedData.categories.length > 1) 
+        ? fetchedData.categories[1] 
+        : '',
+      hashtags: fetchedData.tags || [],
+      seller: {
+        id: fetchedData.seller_id,
+        name: '판매자',
+        rating: 4.5,
+        totalSales: 0,
+        responseRate: 95,
+        location: fetchedData.address || '',
+        latitude: 37.5665,
+        longitude: 126.9780,
+        profileImage: '/images/프로필아이콘.png',
+      },
+      images: fetchedData.main_image_url ? [fetchedData.main_image_url] : [],
+      mainImage: fetchedData.main_image_url || '',
+      status: fetchedData.sale_state as 'available' | 'sold' | 'reserved',
+      views: 0,
+      likes: 0,
+      createdAt: fetchedData.created_at,
+      updatedAt: fetchedData.created_at,
+    } as PhoneDetailType;
+  }, [fetchedData]);
+
+  // phoneId가 제공되었지만 데이터가 없는 경우 에러로 간주
+  // phoneId가 없는 경우에만 더미 데이터 사용
+  const phoneData = convertedData || (phoneId ? null : (data || DUMMY_PHONE_DATA));
+  const currentPhoneId = phoneId || phoneData?.id;
+  const summaryText = fetchedData?.summary ?? phoneData?.summary ?? '';
 
   // 북마크 훅 사용
   const { isBookmarked, toggleBookmark } = useBookmark(
-    phoneId || phoneData.id,
+    currentPhoneId,
     false
   );
 
   // 삭제 훅 사용
   const { isDeleting, deletePhone, showDeleteModal, hideDeleteModal, isModalOpen } = useDelete(
-    phoneId || phoneData.id
+    currentPhoneId
   );
+  const { handleCategoryTabClick, handleBackButtonClick } = usePhoneDetailNavigation();
+
+  // 로딩 상태 표시
+  if (isLoading) {
+    return (
+      <div className={styles.loadingContainer} data-testid="phone-detail-loading">
+        <p>로딩 중...</p>
+      </div>
+    );
+  }
+
+  // 에러 상태 표시
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <p data-testid="phone-detail-error">{error}</p>
+        <button
+          type="button"
+          className={styles.retryButton}
+          data-testid="phone-detail-retry"
+          onClick={retry}
+        >
+          다시 시도
+        </button>
+      </div>
+    );
+  }
+
+  // phoneData가 없는 경우 (에러는 아니지만 데이터가 없음)
+  if (!phoneData) {
+    return (
+      <div className={styles.errorContainer}>
+        <p data-testid="phone-detail-error">상품 정보를 찾을 수 없습니다.</p>
+        <button
+          type="button"
+          className={styles.retryButton}
+          data-testid="phone-detail-retry"
+          onClick={retry}
+        >
+          다시 시도
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.body} data-testid="phone-detail-body">
       <div className={styles.container} data-testid="phone-detail-container">
         {/* === 헤더 섹션 === */}
         <section className={styles.headerSection} data-testid="header-section">
+          {/* 네비게이션 컨트롤 */}
+          <div className={styles.navigationRow} data-testid="navigation-controls">
+            <button
+              type="button"
+              className={styles.backButton}
+              data-testid="back-button"
+              onClick={handleBackButtonClick}
+            >
+              ← 뒤로가기
+            </button>
+            <button
+              type="button"
+              className={styles.categoryTabButton}
+              data-testid="category-tab-button"
+              onClick={handleCategoryTabClick}
+            >
+              중고폰 카테고리
+            </button>
+          </div>
+
           {/* 제목 및 액션 버튼 */}
           <div className={styles.titleArea} data-testid="title-area">
             <div className={styles.titleHeader}>
@@ -157,8 +274,28 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId 
                   </div>
                 </div>
               </div>
-              <p className={styles.subtitle}>{phoneData.seller.name}의 믿을 수 있는 중고폰 거래</p>
+              <p className={styles.subtitle} data-testid="phone-summary">
+                {summaryText || `${phoneData.seller.name}의 믿을 수 있는 중고폰 거래`}
+              </p>
               <p className={styles.hashtags}>{phoneData.hashtags.join(' ')}</p>
+              
+              {/* 상품 정보 필드들 (테스트용) */}
+              <div style={{ display: 'none' }} data-testid="phone-detail-metadata" aria-hidden="true">
+                <span data-testid="phone-price">{phoneData.price}</span>
+                <span data-testid="phone-model-name">{fetchedData?.model_name || ''}</span>
+                <span data-testid="phone-storage">{fetchedData?.storage_capacity || ''}</span>
+                <span data-testid="phone-condition">{fetchedData?.device_condition || ''}</span>
+                <span data-testid="phone-address">{fetchedData?.address || phoneData.seller.location}</span>
+                <span data-testid="phone-main-image-url">{fetchedData?.main_image_url || phoneData.mainImage}</span>
+                <span data-testid="phone-seller-id">{fetchedData?.seller_id || phoneData.seller.id}</span>
+                <span data-testid="phone-sale-state">{fetchedData?.sale_state || phoneData.status}</span>
+                <span data-testid="phone-sale-type">{fetchedData?.sale_type || 'immediate'}</span>
+                <span data-testid="phone-available-from">{fetchedData?.available_from || ''}</span>
+                <span data-testid="phone-available-until">{fetchedData?.available_until || ''}</span>
+                <span data-testid="phone-tags">{(fetchedData?.tags || phoneData.hashtags || []).join(',')}</span>
+                <span data-testid="phone-categories">{(fetchedData?.categories || []).join(',')}</span>
+                <span data-testid="phone-created-at">{fetchedData?.created_at || phoneData.createdAt}</span>
+              </div>
             </div>
 
             {/* 이미지 갤러리 */}
@@ -169,6 +306,7 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId 
                   src={phoneData.mainImage}
                   alt="메인 이미지"
                   className={styles.mainImage}
+                  data-testid="phone-main-image"
                 />
               </div>
 
@@ -195,7 +333,7 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId 
         {/* === 상세 설명 섹션 === */}
         <section className={styles.descriptionSection} data-testid="description-section">
           <h2 className={styles.sectionTitle}>상세 설명</h2>
-          <div className={styles.descriptionContent}>
+          <div className={styles.descriptionContent} data-testid="phone-description">
             {phoneData.description.split('\n').map((line, index) => (
               <p key={index}>{line}</p>
             ))}

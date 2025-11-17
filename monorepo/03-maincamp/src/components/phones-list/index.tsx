@@ -408,7 +408,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
         <div className={styles.searchInputGroup}>
           <div className={styles.datepickerInput} data-testid="datepicker">
             📅
-            <div style={{ fontSize: "16px", color: "#777777" }}>
+            <div className={styles.dateInputWrapper}>
               <input
                 type="date"
                 value={dateRange.startDate || ''}
@@ -420,7 +420,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
                   backgroundColor: "transparent",
                 }}
               />
-              ~
+              <span>~</span>
               <input
                 type="date"
                 value={dateRange.endDate || ''}
@@ -430,44 +430,45 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
                   outline: "none",
                   padding: "4px",
                   backgroundColor: "transparent",
-                  marginLeft: "8px",
                 }}
               />
             </div>
           </div>
-          <div className={styles.searchBarInput} data-testid="search-bar">
-            🔍
-            <input
-              type="text"
-              placeholder="모델명이나 기기명을 검색해 주세요."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              data-testid="search-input"
-              style={{
-                border: "none",
-                outline: "none",
-                flex: 1,
-                fontSize: "16px",
-                backgroundColor: "transparent",
+          <div className={styles.searchBarGroup}>
+            <div className={styles.searchBarInput} data-testid="search-bar">
+              🔍
+              <input
+                type="text"
+                placeholder="모델명이나 기기명을 검색해 주세요."
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                data-testid="search-input"
+                style={{
+                  border: "none",
+                  outline: "none",
+                  flex: 1,
+                  fontSize: "16px",
+                  backgroundColor: "transparent",
+                }}
+              />
+            </div>
+            <button
+              className={styles.searchButton}
+              data-testid="search-button"
+              onClick={() => {
+                if (isSearchInFlight) return;
+                setIsSearchInFlight(true);
+                handleSearch()
+                  .finally(() => {
+                    setHasSearched(true);
+                    setIsSearchInFlight(false);
+                  });
               }}
-            />
+              disabled={!isSearchEnabled || isLoading || isSearchInFlight}
+            >
+              {isLoading || isSearchInFlight ? '검색 중...' : '검색'}
+            </button>
           </div>
-          <button
-            className={styles.searchButton}
-            data-testid="search-button"
-            onClick={() => {
-              if (isSearchInFlight) return;
-              setIsSearchInFlight(true);
-              handleSearch()
-                .finally(() => {
-                  setHasSearched(true);
-                  setIsSearchInFlight(false);
-                });
-            }}
-            disabled={!isSearchEnabled || isLoading || isSearchInFlight}
-          >
-            {isLoading || isSearchInFlight ? '검색 중...' : '검색'}
-          </button>
         </div>
         <button
           className={styles.sellButton}
