@@ -1,5 +1,4 @@
 import styles from './styles.module.css'
-import { gql, useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChangeEvent } from 'react'
@@ -7,18 +6,6 @@ import { ChangeEvent } from 'react'
 import React from 'react';
 import { Modal, message } from 'antd';
 import { supabase } from '@/commons/libraries/supabaseClient'
-
-
-
-const CREATE_USER = gql`
-    mutation createUser($createUserInput: CreateUserInput!){
-       createUser(createUserInput: $createUserInput){
-        _id
-        email
-        name
-       } 
-    }
-`
 
 export default function SignUp(){
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,8 +30,6 @@ export default function SignUp(){
     const [confirmPassword, setConfirmPassword] = useState("")
     const router = useRouter()
     
-    const [ createUser ]= useMutation(CREATE_USER)
-
     const onChangeEmail = (event: ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value)
     }
@@ -78,15 +63,7 @@ export default function SignUp(){
         if (Object.values(newErrors).some((error)=> error !== "")) return
         
         try {
-            const { data } = await createUser({
-                variables: { createUserInput: { email, name, password } }
-            })
-
-            if (!data?.createUser?._id) {
-                throw new Error('회원가입에 실패했습니다. 다시 시도해 주세요.');
-            }
-
-            const { error: supabaseError } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
@@ -94,21 +71,15 @@ export default function SignUp(){
                 },
             });
 
-            if (supabaseError) {
-                if (supabaseError.message?.toLowerCase().includes('already registered')) {
-                    const { error: signInError } = await supabase.auth.signInWithPassword({
-                        email,
-                        password,
-                    });
-                    if (signInError) {
-                        throw new Error('이미 가입된 이메일입니다. 다른 계정을 사용해 주세요.');
-                    }
-                    await supabase.auth.signOut();
-                } else {
-                    throw new Error(supabaseError.message || 'Supabase 회원가입에 실패했습니다.');
-                }
+            if (error) {
+                throw new Error(error.message || '회원가입에 실패했습니다. 다시 시도해 주세요.');
             }
 
+            if (!data.user) {
+                throw new Error('회원가입에 실패했습니다. 다시 시도해 주세요.');
+            }
+
+            message.success('회원가입이 완료되었습니다. 이메일을 확인해 주세요.');
             openModal()
         } catch (error: unknown) {
             if (error instanceof Error) {

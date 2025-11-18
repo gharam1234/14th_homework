@@ -1,29 +1,46 @@
 "use client"
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useState } from "react";
-import { useRef } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from '@/commons/libraries/supabaseClient'
 
 
 export const withAuthLogin = <P extends object>(Component:React.FC<P>) => (props:P)=> {
  const router = useRouter();
-  const [isAuthChecked, setIsAuthChecked] = useState(true);
-  const hasChecked = useRef(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (hasChecked.current) return; 
+    let isMounted = true;
 
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      
-      router.push("/boards");
-    } else {
-      setIsAuthChecked(false); 
-    }  
-  
-    hasChecked.current = true;
-  }, []);
-  if (isAuthChecked) return <div>로딩중...</div>;
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!isMounted) return;
+
+      if (data.session) {
+        router.push("/boards");
+        return;
+      }
+
+      setIsChecking(false);
+    };
+
+    checkSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
+      if (session) {
+        router.push("/boards");
+      } else {
+        setIsChecking(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, [router]);
+
+  if (isChecking) return <div>로딩중...</div>;
 
   return <Component {...props}/>
 }

@@ -3,7 +3,6 @@ import { test, expect, Page } from '@playwright/test';
 
 const SUPABASE_URL = 'https://fkkztiavgrmmazvdwtdw.supabase.co';
 const SUPABASE_SESSION_KEY = 'sb-fkkztiavgrmmazvdwtdw-auth-token';
-const GRAPHQL_URL = 'http://main-practice.codebootcamp.co.kr/graphql';
 const DRAFT_KEY = 'phone';
 const SAMPLE_IMAGE_BUFFER = Buffer.from(
   '89504e470d0a1a0a0000000d49484452000000010000000108020000009077053d0000000a49444154789c6360000002000154a20af50000000049454e44ae426082',
@@ -49,16 +48,23 @@ async function attachImage(page: Page, name = 'sample.png') {
 
 async function prepareAuth(page: Page) {
   await page.addInitScript((sessionKey) => {
-    localStorage.setItem('accessToken', 'test-access-token');
+    const expiresAt = Math.floor(Date.now() / 1000) + 3600;
+    const sessionPayload = {
+      access_token: 'test-supabase-token',
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: expiresAt,
+      refresh_token: 'test-refresh-token',
+      user: {
+        id: 'test-user-001',
+        email: 'test@example.com',
+      },
+    };
     localStorage.setItem(
       sessionKey,
       JSON.stringify({
-        currentSession: {
-          user: {
-            id: 'test-user-001',
-            email: 'test@example.com',
-          },
-        },
+        currentSession: sessionPayload,
+        currentUser: sessionPayload.user,
       })
     );
     localStorage.removeItem('phone');
@@ -79,6 +85,11 @@ async function mockSupabase(page: Page, options: { failInsert?: boolean } = {}) 
         body: JSON.stringify({
           data: {
             session: {
+              access_token: 'test-supabase-token',
+              token_type: 'bearer',
+              expires_in: 3600,
+              expires_at: Math.floor(Date.now() / 1000) + 3600,
+              refresh_token: 'test-refresh-token',
               user: {
                 id: 'test-user-001',
                 email: 'test@example.com',
@@ -157,29 +168,10 @@ async function mockSupabase(page: Page, options: { failInsert?: boolean } = {}) 
   });
 }
 
-async function mockGraphqlAuth(page: Page) {
-  await page.route(GRAPHQL_URL, async (route) => {
-    await route.fulfill({
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        data: {
-          fetchUserLoggedIn: {
-            _id: 'graphql-user-001',
-            email: 'test@example.com',
-            name: '테스트 사용자',
-          },
-        },
-      }),
-    });
-  });
-}
-
 test.describe('usePhoneSubmit 훅의 임시 저장 및 제출 흐름', () => {
   test.beforeEach(async ({ page }) => {
     await prepareAuth(page);
     await mockSupabase(page);
-    await mockGraphqlAuth(page);
     await page.goto('/phones/new');
     await waitForForm(page);
   });

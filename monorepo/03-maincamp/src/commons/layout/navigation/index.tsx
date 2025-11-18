@@ -2,25 +2,14 @@
 import styles from './styles.module.css'
 import { useAccessTokenStore } from '@/stores/use-access-token'
 import { RightOutlined } from '@ant-design/icons'
-import { gql, useQuery } from '@apollo/client'
-import { use, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import React from 'react';
 import { DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Dropdown, Space } from 'antd';
+import { Dropdown } from 'antd';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/commons/libraries/supabaseClient'
-
-const FETCH_USER_LOGGED_IN = gql`
-  query {
-    fetchUserLoggedIn {
-      _id
-      email
-      name
-    }
-  }
-`;
 
 export default function LayoutNavigation(){
     const router = useRouter()
@@ -28,20 +17,49 @@ export default function LayoutNavigation(){
     router.push("/")
   }
 
-   
-    const { setAccessToken, accessToken } = useAccessTokenStore()
-    useEffect(() => {
-      const accessTokenByLocal =localStorage.getItem("accessToken")
-      if(accessTokenByLocal){
-            setAccessToken(accessTokenByLocal)
-        }
-    }, [])
-    const { data } = useQuery(FETCH_USER_LOGGED_IN);
+    const { setAccessToken } = useAccessTokenStore()
     const clearAccessToken = useAccessTokenStore((state) => state.clearAccessToken)
+    const [userEmail, setUserEmail] = useState<string | null>(null)
+
+    useEffect(() => {
+      let isMounted = true;
+
+      const syncSession = async () => {
+        const { data } = await supabase.auth.getSession();
+        if (!isMounted) return;
+        const session = data.session;
+        if (session?.user) {
+          setUserEmail(session.user.email ?? null);
+          setAccessToken(session.access_token);
+        } else {
+          setUserEmail(null);
+          clearAccessToken();
+        }
+      };
+
+      syncSession();
+
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!isMounted) return;
+        if (session) {
+          setUserEmail(session.user?.email ?? null);
+          setAccessToken(session.access_token);
+        } else {
+          setUserEmail(null);
+          clearAccessToken();
+        }
+      });
+
+      return () => {
+        isMounted = false;
+        listener.subscription.unsubscribe();
+      };
+    }, [setAccessToken, clearAccessToken])
 
     const onClickLogout = async () => {
         await supabase.auth.signOut();
         clearAccessToken();
+        setUserEmail(null);
         router.push("/")
     }
 
@@ -87,9 +105,9 @@ export default function LayoutNavigation(){
                  
                 </div>
                 <div className={styles.login}>
-                    { accessToken ? 
+                    { userEmail ? 
                     <div>
-                  
+
                     <Dropdown menu={{ items }}>
     <a onClick={(e) => e.preventDefault()}>
         <button className={styles.login__profileBtn}>

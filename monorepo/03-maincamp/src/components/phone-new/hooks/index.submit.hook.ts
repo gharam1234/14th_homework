@@ -12,8 +12,6 @@ const DRAFT_KEY = 'phone';
 const MAX_MEDIA_SIZE = 10 * 1024 * 1024;
 const ALLOWED_IMAGE_MIME = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PRICE = 9_999_999_999.99;
-const GRAPHQL_ENDPOINT =
-  process.env.NEXT_PUBLIC_GRAPHQL_URL ?? 'http://main-practice.codebootcamp.co.kr/graphql';
 
 export interface SubmitMediaFile {
   url: string;
@@ -50,12 +48,6 @@ interface DraftPayload extends SubmitProductState {
 }
 
 type ValidationErrors = Record<string, string>;
-
-interface GraphqlUser {
-  _id: string;
-  email?: string;
-  name?: string;
-}
 
 const phoneSubmitSchema = z.object({
   title: z
@@ -116,49 +108,6 @@ const phoneSubmitSchema = z.object({
     )
     .min(1, { message: '사진을 최소 1장 이상 업로드해 주세요.' }),
 });
-
-const getGraphqlAccessToken = () => {
-  if (typeof window === 'undefined') return null;
-  return window.localStorage.getItem('accessToken');
-};
-
-const fetchGraphqlUser = async (): Promise<GraphqlUser | null> => {
-  if (typeof window === 'undefined') return null;
-  const accessToken = getGraphqlAccessToken();
-  if (!accessToken) return null;
-
-  try {
-    const response = await fetch(GRAPHQL_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        query: `
-          query FetchUserLoggedIn {
-            fetchUserLoggedIn {
-              _id
-              email
-              name
-            }
-          }
-        `,
-      }),
-    });
-
-    if (!response.ok) {
-      console.warn('GraphQL 사용자 조회 실패:', response.status, response.statusText);
-      return null;
-    }
-
-    const result = await response.json();
-    return result?.data?.fetchUserLoggedIn ?? null;
-  } catch (error) {
-    console.error('GraphQL 사용자 요청 중 오류:', error);
-    return null;
-  }
-};
 
 const getSupabaseStorageKey = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -294,12 +243,13 @@ export function usePhoneSubmit() {
     window.localStorage.removeItem(DRAFT_KEY);
   }, []);
 
-  const ensureUser = useCallback(async (): Promise<GraphqlUser | null> => {
-    const user = await fetchGraphqlUser();
-    if (user) {
-      return user;
+  const ensureSupabaseUser = useCallback(async (): Promise<string | null> => {
+    const userId = await resolveSupabaseUserId();
+    if (!userId) {
+      message.warning('로그인이 필요합니다.');
+      return null;
     }
-    return null;
+    return userId;
   }, []);
 
   const submitData = useCallback(
@@ -332,16 +282,14 @@ export function usePhoneSubmit() {
         return;
       }
 
-      const graphqlUser = await ensureUser();
-      if (!graphqlUser) {
-        message.warning('로그인이 필요합니다.');
-        return;
-      }
-
       setIsSubmitting(true);
 
       try {
-        const sellerId = await resolveSupabaseUserId();
+        const sellerId = await ensureSupabaseUser();
+        if (!sellerId) {
+          setIsSubmitting(false);
+          return;
+        }
         const { data: phone, error: phoneError } = await supabase
           .from('phones')
           .insert([
@@ -450,7 +398,7 @@ export function usePhoneSubmit() {
         setIsSubmitting(false);
       }
     },
-    [clearDraft, ensureUser, router]
+    [clearDraft, ensureSupabaseUser, router]
   );
 
   return {

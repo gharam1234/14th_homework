@@ -1,8 +1,7 @@
 "use client"
 
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import styles from './styles.module.css'
-import { gql, useMutation } from '@apollo/client'
 import { useRouter } from 'next/navigation'
 import { useAccessTokenStore } from '@/stores/use-access-token'
 import { MyInput } from '@commons/ui'
@@ -14,18 +13,8 @@ import { message } from 'antd'
 import { supabase } from '@/commons/libraries/supabaseClient'
 
 
-const LOGIN_USER = gql`
-    mutation loginUser($email: String!, $password: String!){
-        loginUser(email: $email, password: $password){
-            accessToken
-        }
-    }
-`
-
-
-
 export default function LoginHome(){
-     const {register , handleSubmit ,formState: { errors }, watch, setValue} = useForm<ILoginSchema>({
+     const {register , formState: { errors }, watch, setValue} = useForm<ILoginSchema>({
         resolver:zodResolver(Loginschema),
         mode:"onChange"
       
@@ -33,18 +22,11 @@ export default function LoginHome(){
 
       const email = watch("email")
     const password = watch("password")
-    
-    // const [errors, setErrors] = useState({
-    //     email: "",
-    //     password: ""
-    // })
-    // const [email, setEmail] = useState("")
-    // const [password, setPassword] = useState("")
-    const [loginUser] = useMutation(LOGIN_USER)
+    const [isSubmitting, setIsSubmitting] = useState(false)
     const router = useRouter()
-    const { accessToken, setAccessToken } = useAccessTokenStore()
-    
-    
+    const { setAccessToken } = useAccessTokenStore()
+
+
     const onChangeEmail = (event: ChangeEvent<HTMLInputElement>) => {
         setValue("email", event.target.value)
     }
@@ -54,37 +36,25 @@ export default function LoginHome(){
     }
 
     const onClickLogin = async () => {
-        // let newErrors = {
-        //     email: "",
-        //     password: ""
-        // }
-        // if(!email) newErrors.email = "이메일을 입력해주세요"
-        // if(!password) newErrors.password = "비밀번호를 입력해주세요"
-        // setErrors(newErrors)
-        // const hasError = Object.values(newErrors).some((error)=> error !== "")
-        // if (hasError) return
+        if (isSubmitting) return;
         if (!email || !password) {
             message.error('이메일과 비밀번호를 모두 입력해 주세요.');
             return;
         }
 
+        setIsSubmitting(true);
         try {
-            const result = await loginUser({ variables: { email, password } });
-            const AccessTokenByApi = result.data?.loginUser.accessToken;
-            if (!AccessTokenByApi) {
-                throw new Error('로그인에 실패했습니다. 다시 시도해 주세요.');
-            }
-
-            const { error: supabaseError } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
 
-            if (supabaseError) {
-                throw new Error(supabaseError.message || 'Supabase 로그인에 실패했습니다.');
+            if (error || !data?.session) {
+                throw new Error(error?.message ?? '로그인에 실패했습니다. 다시 시도해 주세요.');
             }
 
-            setAccessToken(AccessTokenByApi);
+            setAccessToken(data.session.access_token);
+            message.success('로그인되었습니다.');
             router.push('/boards');
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -92,6 +62,8 @@ export default function LoginHome(){
             } else {
                 message.error('알 수 없는 에러가 발생했습니다.');
             }
+        } finally {
+            setIsSubmitting(false);
         }
     }
     const onClickToSignUp = () => {
