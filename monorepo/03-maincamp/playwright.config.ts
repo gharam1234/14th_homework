@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright 설정 파일
  * @see https://playwright.dev/docs/test-configuration
  */
-const port = process.env.PORT ? Number(process.env.PORT) : 3001;
+const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 export default defineConfig({
   // 공통 테스트 설정
@@ -26,11 +26,8 @@ export default defineConfig({
     command: `PORT=${port} npm run dev`,
     url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
     env:{
       NEXT_PUBLIC_TEST_ENV:'test',
-      PORT: String(port),
-      HOST: '127.0.0.1',
     }
   },
 });

@@ -45,6 +45,7 @@ export interface RouteConfig {
  */
 export type RouteKey =
   | 'HOME'
+  | 'LOGIN'
   | 'SIGNUP'
   | 'BOARDS_LIST'
   | 'BOARD_DETAIL'
@@ -82,6 +83,15 @@ export const URLS: Record<RouteKey, RouteConfig> = {
       label: '홈',
       order: 1,
     },
+  },
+
+  // 로그인
+  LOGIN: {
+    name: '로그인',
+    pathTemplate: '/',
+    access: 'PUBLIC',
+    showBanner: false,
+    showNavigation: false,
   },
 
   // 회원가입

@@ -5,6 +5,8 @@ import "./globals.css";
 import dynamic from "next/dynamic";
 import Layout from "@/commons/layout";
 import ModalProvider from "@/commons/providers/modal/modal.provider";
+import AuthProvider from "@/commons/providers/auth/auth.provider";
+import AuthGuard from "@/commons/providers/auth/auth.guard";
 
 const ApiHeaderProvider = dynamic(
   () => import("@/commons/setttings/apollo-setting"),
@@ -46,11 +48,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-       <ApiHeaderProvider>
-        <ModalProvider>
-          <Layout>{children}</Layout>
-        </ModalProvider>
-       </ApiHeaderProvider>
+       <AuthProvider>
+        <ApiHeaderProvider>
+          <ModalProvider>
+            <AuthGuard>
+              <Layout>{children}</Layout>
+            </AuthGuard>
+          </ModalProvider>
+        </ApiHeaderProvider>
+       </AuthProvider>
       </body>
     </html>
   );
