@@ -2,12 +2,14 @@
 
 import dynamic from "next/dynamic";
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useSearchParams } from "next/navigation";
 import { message } from "antd";
 import styles from "./styles.module.css";
 import { usePhoneForm, getPhoneFromStorage } from "./hooks/index.form.hook";
 import { usePhoneBinding } from "./hooks/index.binding.hook";
 import { usePhoneSubmit, SubmitProductState } from "./hooks/index.submit.hook";
+import { useAddressGeocoding } from "./hooks/index.address.hook";
 import type { Address } from "react-daum-postcode";
 import type { IPhoneFormInput, IPhoneMediaMetadata } from "./types";
 import { IPhoneNewProps } from "./types";
@@ -86,14 +88,65 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
     trigger,
   } = form;
   const { isSubmitting, submitData, saveDraft, loadDraft, validationErrors } = usePhoneSubmit();
+  const {
+    address: addressData,
+    coordinates: coordinatesData,
+    isLoading: isAddressLoading,
+    error: addressError,
+    openAddressSearch,
+    updateCoordinates,
+    clearAll: clearAddressData,
+  } = useAddressGeocoding();
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
   const [mediaFiles, setMediaFiles] = useState<IPhoneMediaMetadata[]>([]);
+  const [isKakaoMapLoaded, setIsKakaoMapLoaded] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const draftLoadedRef = useRef(false);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const kakaoMapRef = useRef<any>(null);
+  const kakaoMarkerRef = useRef<any>(null);
+
+  // 모달을 Portal로 렌더링하기 위한 마운트 상태
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     form.register("mediaUrls");
   }, [form]);
+
+  // 주소 스토어 데이터가 변경될 때 폼 값 업데이트
+  useEffect(() => {
+    if (addressData) {
+      setValue("zipcode", addressData.zipCode, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue("address", addressData.roadAddress || addressData.address, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    }
+  }, [addressData, setValue]);
+
+  // 좌표 스토어 데이터가 변경될 때 폼 값 업데이트
+  useEffect(() => {
+    if (coordinatesData) {
+      setValue("latitude", coordinatesData.latitude, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue("longitude", coordinatesData.longitude, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    }
+  }, [coordinatesData, setValue]);
 
   const updateMediaState = useCallback(
     (nextFiles: IPhoneMediaMetadata[], options?: { pristine?: boolean }) => {
@@ -237,12 +290,88 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
 
   // 폼 필드 값 모니터링
   const currentValues = watch();
-  const mapSrc = useMemo(() => {
-    if (!currentValues.latitude && !currentValues.longitude) return null;
-    if (currentValues.latitude === 0 && currentValues.longitude === 0) return null;
-    return `https://maps.google.com/maps?q=${currentValues.latitude},${currentValues.longitude}&z=16&output=embed`;
-  }, [currentValues.latitude, currentValues.longitude]);
+  const parsedLatitude = Number(currentValues.latitude);
+  const parsedLongitude = Number(currentValues.longitude);
+  const hasFiniteCoordinates =
+    Number.isFinite(parsedLatitude) && Number.isFinite(parsedLongitude);
+  const canReverseGeocode =
+    hasFiniteCoordinates && (parsedLatitude !== 0 || parsedLongitude !== 0);
+
   const isSubmitEnabled = isValid && mediaFiles.length > 0 && !isSubmitting;
+
+  // 카카오 맵 스크립트 로드
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const KAKAO_APP_KEY = process.env.NEXT_PUBLIC_KAKAO_APP_KEY;
+
+    if (!KAKAO_APP_KEY) {
+      console.error("KAKAO_APP_KEY가 설정되지 않았습니다.");
+      return;
+    }
+
+    // 이미 로드되어 있으면 상태만 업데이트
+    if ((window as any).kakao?.maps) {
+      setIsKakaoMapLoaded(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_APP_KEY}&autoload=false`;
+    script.async = true;
+    script.onload = () => {
+      (window as any).kakao.maps.load(() => {
+        setIsKakaoMapLoaded(true);
+      });
+    };
+    document.head.appendChild(script);
+  }, []);
+
+  // 좌표가 변경될 때마다 지도 업데이트
+  useEffect(() => {
+    if (!isKakaoMapLoaded) return;
+    if (!mapContainerRef.current) return;
+    if (!canReverseGeocode) return;
+    if (!(window as any).kakao?.maps) return;
+
+    const kakao = (window as any).kakao;
+
+    // 지도가 없으면 생성 (약간의 지연을 두고)
+    if (!kakaoMapRef.current) {
+      setTimeout(() => {
+        if (!mapContainerRef.current) return;
+
+        const mapOption = {
+          center: new kakao.maps.LatLng(parsedLatitude, parsedLongitude),
+          level: 3,
+        };
+        kakaoMapRef.current = new kakao.maps.Map(mapContainerRef.current, mapOption);
+
+        // 마커 추가
+        const markerPosition = new kakao.maps.LatLng(parsedLatitude, parsedLongitude);
+        kakaoMarkerRef.current = new kakao.maps.Marker({
+          position: markerPosition,
+        });
+        kakaoMarkerRef.current.setMap(kakaoMapRef.current);
+      }, 100);
+    } else {
+      // 지도가 있으면 중심 좌표만 변경
+      const moveLatLon = new kakao.maps.LatLng(parsedLatitude, parsedLongitude);
+      kakaoMapRef.current.setCenter(moveLatLon);
+
+      // 기존 마커 제거
+      if (kakaoMarkerRef.current) {
+        kakaoMarkerRef.current.setMap(null);
+      }
+
+      // 새 마커 추가
+      const markerPosition = new kakao.maps.LatLng(parsedLatitude, parsedLongitude);
+      kakaoMarkerRef.current = new kakao.maps.Marker({
+        position: markerPosition,
+      });
+      kakaoMarkerRef.current.setMap(kakaoMapRef.current);
+    }
+  }, [isKakaoMapLoaded, parsedLatitude, parsedLongitude, canReverseGeocode]);
   
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -380,26 +509,31 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
     };
   }, [handlePostcodeComplete]);
 
+  // 모달 컴포넌트
+  const postcodeModal = isPostcodeOpen ? (
+    <div className={styles.postcodeModalOverlay} data-testid="postcode-modal">
+      <div className={styles.postcodeModalContent}>
+        <DaumPostcodeEmbed
+          onComplete={handlePostcodeComplete}
+          style={{ width: "100%", height: "420px" }}
+        />
+        <button
+          type="button"
+          className={styles.postcodeCloseButton}
+          data-testid="btn-close-postcode"
+          onClick={() => setIsPostcodeOpen(false)}
+        >
+          닫기
+        </button>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div className={styles.container} data-testid="phone-new-container">
-      {isPostcodeOpen && (
-        <div className={styles.postcodeModalOverlay} data-testid="postcode-modal">
-          <div className={styles.postcodeModalContent}>
-            <DaumPostcodeEmbed
-              onComplete={handlePostcodeComplete}
-              style={{ width: "100%", height: "420px" }}
-            />
-            <button
-              type="button"
-              className={styles.postcodeCloseButton}
-              data-testid="btn-close-postcode"
-              onClick={() => setIsPostcodeOpen(false)}
-            >
-              닫기
-            </button>
-          </div>
-        </div>
-      )}
+      {mounted && typeof window !== "undefined" && postcodeModal
+        ? createPortal(postcodeModal, document.body)
+        : null}
 
       {/* 로딩 표시 */}
       {isBingingLoading && (
@@ -724,7 +858,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                 <input type="hidden" data-testid="input-address" {...register("address")} />
                 <button
                   className={styles.postcodeButton}
-                  data-testid="btn-postcode-search"
+                  data-testid="btn-postcode-search btn-address-search"
                   type="button"
                   onClick={handlePostcodeSearch}
                 >
@@ -732,10 +866,17 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                 </button>
               </div>
 
-              {currentValues.address && (
-                <p className={styles.selectedAddress} data-testid="selected-address">
-                  {currentValues.address}
-                </p>
+              <p className={styles.selectedAddress} data-testid="selected-address">
+                {currentValues.address ?? ''}
+              </p>
+              <p style={{ display: 'none' }} data-testid="address-zipcode">
+                {currentValues.zipcode ?? ''}
+              </p>
+
+              {addressError && (
+                <span className={styles.errorMessage} data-testid="address-error">
+                  {addressError}
+                </span>
               )}
 
               {errors.zipcode && (
@@ -773,9 +914,13 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                     errors.latitude ? styles.inputError : ""
                   }`}
                   data-testid="input-latitude"
-                  readOnly
                   {...register("latitude", { valueAsNumber: true })}
                 />
+                {currentValues.latitude && (
+                  <p style={{ display: 'none' }} data-testid="address-latitude">
+                    {currentValues.latitude}
+                  </p>
+                )}
               </div>
 
               <div className={styles.inputWrapper}>
@@ -790,10 +935,44 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                     errors.longitude ? styles.inputError : ""
                   }`}
                   data-testid="input-longitude"
-                  readOnly
                   {...register("longitude", { valueAsNumber: true })}
                 />
+                {currentValues.longitude && (
+                  <p style={{ display: 'none' }} data-testid="address-longitude">
+                    {currentValues.longitude}
+                  </p>
+                )}
               </div>
+            </div>
+
+            {/* 역지오코딩 및 초기화 버튼 */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+              <button
+                type="button"
+                className={styles.postcodeButton}
+                data-testid="btn-reverse-geocode"
+                disabled={!canReverseGeocode}
+                onClick={() => {
+                  if (!canReverseGeocode) return;
+                  void updateCoordinates(parsedLatitude, parsedLongitude);
+                }}
+              >
+                좌표로 주소 찾기
+              </button>
+              <button
+                type="button"
+                className={styles.postcodeButton}
+                data-testid="btn-clear-address"
+                onClick={() => {
+                  clearAddressData();
+                  setValue("zipcode", "", { shouldDirty: true });
+                  setValue("address", "", { shouldDirty: true });
+                  setValue("latitude", 0, { shouldDirty: true });
+                  setValue("longitude", 0, { shouldDirty: true });
+                }}
+              >
+                주소 초기화
+              </button>
             </div>
           </div>
 
@@ -804,15 +983,16 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
             </h3>
 
             <div className={styles.mapContainer} data-testid="map-container">
-              {mapSrc ? (
-                <iframe
-                  src={mapSrc}
-                  title="거래 위치 지도"
+              {canReverseGeocode ? (
+                <div
+                  ref={mapContainerRef}
                   className={styles.mapFrame}
                   data-testid="map-frame"
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    minHeight: "300px",
+                  }}
                 />
               ) : (
                 <span data-testid="map-placeholder-text">주소를 먼저 선택해 주세요.</span>

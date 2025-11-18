@@ -1,0 +1,107 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 TSX 파일경로: src/components/phones-list/index.tsx
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phones-list/hooks/index.pagination.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/phones-list/tests/index.pagination.spec.ts
+
+조건-스키마문서) 참고할 Supabase 스키마 문서: 03-maincamp/sql/supabase.txt
+                - 테이블: phones
+                - 조인 테이블: phone_reactions (찜 상태 조회용)
+
+==============================================
+
+핵심요구사항) playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+3) 테스트 API 조건
+3-1) 데이터
+    - 실제 Supabase 데이터를 사용할 것.
+    - Mock 데이터를 사용하지 말 것.
+
+3-2) 성공 시나리오
+    - Supabase 응답 데이터를 기반으로 페이징 바인딩 검증
+    - 페이지 번호가 변경되면 새로운 데이터 로드 검증
+
+3-3) 실패 시나리오
+    - API 호출 실패 시 에러 상태 표시 검증
+    - 빈 배열 처리 검증
+
+4) 데이터 조건
+    - 저장소: Supabase
+    - 테이블: phones
+    - 조인: phone_reactions (찜 상태 조회)
+    - 상태관리: Zustand
+    - 페이징: 페이지 번호 기반, 10개/페이지, 최신순 (created_at DESC)
+
+핵심요구사항) 페이징 기능을 포함한 데이터 바인딩 구현을 step-by-step으로 진행할 것.
+
+1) 페이징 상태 관리 (Zustand 스토어에 추가)
+   - 현재 페이지 번호 (currentPage: number, 기본값: 1)
+   - 한 페이지당 항목 수 (pageSize: number = 10)
+   - 전체 데이터 개수 (totalCount: number)
+   - 로딩 상태 (isLoading: boolean)
+   - 에러 상태 (error: string | null)
+   - 데이터 (phones: Phone[])
+   - 다음 페이지 여부 (hasNextPage: boolean)
+   - 이전 페이지 여부 (hasPreviousPage: boolean)
+
+2) 페이징 액션 구현
+   - goToPage(page: number): 특정 페이지로 이동
+   - nextPage(): 다음 페이지로 이동
+   - previousPage(): 이전 페이지로 이동
+   - setPageSize(size: number): 페이지 크기 변경
+
+3) 데이터 바인딩 상세내용
+   - 모델: phones.model_name
+   - 용량: phones.storage_capacity
+   - 상태: phones.device_condition
+   - 해시태그: phones.tags (JSONB 파싱)
+   - 지역: phones.address
+   - 가격: phones.price + phones.currency
+   - 찜 상태: phone_reactions 테이블에서 현재 사용자의 type='favorite' 존재 여부
+   - 대표 이미지: phones.main_image_url
+   - 제목: phones.title
+   - 판매 상태: phones.sale_state (available/reserved/sold)
+
+4) 로딩·에러·빈 상태 통합 처리
+   - 로딩 상태: "데이터 로드 중..."을 표시
+   - 에러 상태: "데이터를 불러올 수 없습니다. 다시 시도해주세요." 메시지 표시
+   - 빈 상태: "상품이 없습니다."를 표시
+   - 각 상태별로 data-testid 추가 (data-testid="loading-state", data-testid="error-state", data-testid="empty-state")
+
+5) 페이징 UI 추가
+   - 페이지 번호 버튼 또는 이전/다음 버튼 추가
+   - 현재 페이지 정보 표시 (예: "1 / 5 페이지")
+   - 페이지 번호 변경 시 자동으로 새로운 데이터 로드
+   - data-testid="pagination-prev-button", data-testid="pagination-next-button" 추가
+
+6) CSS 처리
+   - text-overflow: ellipsis 적용 (제목, 설명 등)
+   - 가격은 통화 기호와 함께 표시 (예: ₩500,000)
+   - 판매 상태에 따라 시각적 구분 (available: 정상, reserved: 예약중, sold: 판매완료)
+   - 페이징 컨트롤 스타일 추가
+
+7) 테스트
+   - 페이지 로드 후 첫 번째 페이지 데이터(10개)가 표시되는지 검증
+   - "다음" 버튼 클릭 시 두 번째 페이지 데이터 로드 검증
+   - "이전" 버튼 클릭 시 이전 페이지 데이터 복구 검증
+   - 첫 페이지에서 "이전" 버튼 비활성화 검증
+   - 마지막 페이지에서 "다음" 버튼 비활성화 검증
+   - 에러 상황에서 에러 메시지 표시 검증
+   - 빈 상태에서 "상품이 없습니다." 메시지 표시 검증

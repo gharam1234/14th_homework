@@ -87,15 +87,15 @@ test.describe("PhoneNew 컴포넌트 UI", () => {
       "상세주소를 입력해 주세요."
     );
 
-    // 위도/경도 입력 (disabled)
+    // 위도/경도 입력 (편집 가능)
     const latitude = page.locator("[data-testid='input-latitude']");
     const longitude = page.locator("[data-testid='input-longitude']");
-    await expect(latitude).toBeDisabled();
-    await expect(longitude).toBeDisabled();
+    await expect(latitude).not.toBeDisabled();
+    await expect(longitude).not.toBeDisabled();
   });
 
   test("지도 영역이 렌더링되어야 함", async ({ page }) => {
-    const mapContainer = page.locator("[data-testid='map-placeholder']");
+    const mapContainer = page.locator("[data-testid='map-placeholder-text']");
     await expect(mapContainer).toBeVisible();
     await expect(mapContainer).toHaveText("주소를 먼저 입력해 주세요.");
   });

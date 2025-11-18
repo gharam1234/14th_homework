@@ -13,7 +13,9 @@ export interface PhoneDetailData {
   model_name: string;
   storage_capacity: string;
   device_condition: string;
-  address: string;
+  address: string | null;
+  address_detail: string | null;
+  zipcode: string | null;
   main_image_url: string;
   seller_id: string;
   sale_state: 'available' | 'reserved' | 'sold';
@@ -89,7 +91,9 @@ export function useFetchDetail(phoneId: string | null | undefined): UseFetchDeta
         model_name: phoneData.model_name ?? '',
         storage_capacity: phoneData.storage_capacity ?? '',
         device_condition: phoneData.device_condition ?? '',
-        address: phoneData.address ?? '',
+        address: phoneData.address ?? null,
+        address_detail: phoneData.address_detail ?? null,
+        zipcode: phoneData.zipcode ?? null,
         main_image_url: phoneData.main_image_url ?? '',
         seller_id: phoneData.seller_id ?? '',
         sale_state: SALE_STATES.includes(phoneData.sale_state)

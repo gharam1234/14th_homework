@@ -9,6 +9,7 @@ import { useDelete } from './hooks/index.delete.hook';
 import { usePhoneDetailNavigation } from './hooks/index.navigation.hook';
 import { useFetchDetail, PhoneDetailData } from './hooks/index.fetch-detail.hook';
 import { useCopyLink } from './hooks/index.copylink.hook';
+import { useLocation } from './hooks/index.location.hook';
 import Modal from '@commons/ui/src/modal';
 
 /**
@@ -138,9 +139,12 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
     currentPhoneId
   );
   const { handleCategoryTabClick, handleBackButtonClick } = usePhoneDetailNavigation();
-  
+
   // 링크 복사 훅 사용
   const { copyLink } = useCopyLink();
+
+  // 위치 훅 사용
+  const { openMap } = useLocation(fetchedData);
 
   // 로딩 상태 표시
   if (isLoading) {
@@ -250,6 +254,8 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
                   <button
                     className={styles.iconButton}
                     title="위치"
+                    onClick={openMap}
+                    data-testid="location-button"
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path
