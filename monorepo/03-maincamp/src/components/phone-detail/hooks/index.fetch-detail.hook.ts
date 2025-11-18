@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/commons/libraries/supabaseClient';
+import { isTestEnv } from '@/commons/utils/is-test-env';
+import type { SupabasePhoneRecord } from '@/tests/fixtures/supabase';
+import { PHONE_RECORDS } from '@/tests/fixtures/supabase';
 
 /**
  * 중고폰 상세 정보 타입
@@ -47,6 +50,29 @@ export interface UseFetchDetailReturn {
 const SALE_STATES: PhoneDetailData['sale_state'][] = ['available', 'reserved', 'sold'];
 const SALE_TYPES: PhoneDetailData['sale_type'][] = ['immediate', 'scheduled'];
 
+const mapFixtureToDetail = (record: SupabasePhoneRecord): PhoneDetailData => ({
+  id: record.id,
+  title: record.title,
+  price: record.price,
+  summary: record.summary,
+  description: record.description,
+  model_name: record.model_name,
+  storage_capacity: record.storage_capacity,
+  device_condition: record.device_condition,
+  address: record.address,
+  address_detail: record.address_detail,
+  zipcode: record.zipcode,
+  main_image_url: record.main_image_url ?? '',
+  seller_id: record.seller_id,
+  sale_state: record.sale_state,
+  sale_type: SALE_TYPES.includes(record.sale_type) ? record.sale_type : 'immediate',
+  available_from: record.available_from,
+  available_until: record.available_until,
+  tags: record.tags,
+  categories: record.categories,
+  created_at: record.created_at,
+});
+
 export function useFetchDetail(phoneId: string | null | undefined): UseFetchDetailReturn {
   const [data, setData] = useState<PhoneDetailData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -68,6 +94,15 @@ export function useFetchDetail(phoneId: string | null | undefined): UseFetchDeta
     setError(null);
 
     try {
+      if (isTestEnv()) {
+        const fallback = PHONE_RECORDS.find((record) => record.id === phoneId);
+        if (fallback) {
+          setData(mapFixtureToDetail(fallback));
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const { data: phoneData, error: fetchError } = await supabase
         .from('phones')
         .select('*')

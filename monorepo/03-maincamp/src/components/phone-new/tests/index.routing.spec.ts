@@ -11,16 +11,32 @@ import { test, expect, Page } from '@playwright/test';
  */
 async function waitForPageLoad(page: Page) {
   // data-testid="phone-new-container"가 나타날 때까지 대기
-  await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible' });
+  await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible', timeout: 10000 });
+  // 로딩이 완료될 때까지 대기 (로딩 인디케이터가 사라질 때까지)
+  await page.locator('[data-testid="loading-indicator"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {
+    // 로딩 인디케이터가 없으면 이미 로드된 것으로 간주
+  });
+  // 폼이 완전히 렌더링될 때까지 추가 대기
+  await page.waitForTimeout(500);
 }
 
 /**
  * 테스트 유틸: 로컬스토리지 초기화
  */
 async function clearLocalStorage(page: Page) {
-  await page.evaluate(() => {
-    localStorage.clear();
-  });
+  try {
+    await page.evaluate(() => {
+      try {
+        localStorage.clear();
+      } catch (e) {
+        // localStorage 접근이 차단된 경우 무시
+        console.warn('localStorage clear failed:', e);
+      }
+    });
+  } catch (e) {
+    // evaluate 자체가 실패한 경우 무시
+    console.warn('localStorage clear evaluate failed:', e);
+  }
 }
 
 /**

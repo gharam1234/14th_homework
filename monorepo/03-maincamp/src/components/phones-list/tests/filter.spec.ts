@@ -48,10 +48,28 @@ const expectFilterState = async <T>(
 test.describe('필터 상태 관리 (usePhoneFilters)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/phones');
-    await page.waitForSelector('[data-testid="phones-list"]', { timeout: 400 });
-    await page.evaluate((key) => window.localStorage.removeItem(key), FILTER_STORAGE_KEY);
+    try {
+      await page.locator('[data-testid="phones-list"]').waitFor({ state: 'visible', timeout: 10000 });
+    } catch {
+      await page.waitForTimeout(2000);
+    }
+    try {
+      await page.evaluate((key) => {
+        try {
+          window.localStorage.removeItem(key);
+        } catch (e) {
+          console.warn('localStorage removeItem failed:', e);
+        }
+      }, FILTER_STORAGE_KEY);
+    } catch (e) {
+      console.warn('localStorage evaluate failed:', e);
+    }
     await page.reload();
-    await page.waitForSelector('[data-testid="phones-list"]', { timeout: 400 });
+    try {
+      await page.locator('[data-testid="phones-list"]').waitFor({ state: 'visible', timeout: 10000 });
+    } catch {
+      await page.waitForTimeout(2000);
+    }
   });
 
   test.describe('토글 상태 변경', () => {

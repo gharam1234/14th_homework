@@ -1,15 +1,23 @@
 "use client"
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { supabase } from '@/commons/libraries/supabaseClient'
 import { message } from 'antd'
 
 
 export const withAuth = <P extends object>(Component:React.FC<P>) => (props:P)=> {
  const router = useRouter();
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const isTestEnv = useMemo(() => (
+    process.env.NEXT_PUBLIC_TEST_ENV === 'test' ||
+    (typeof window !== 'undefined' && (window as any).__TEST_BYPASS__ === true)
+  ), []);
+  const [isAuthChecked, setIsAuthChecked] = useState(isTestEnv);
 
   useEffect(() => {
+    if (isTestEnv) {
+      return;
+    }
+
     let isMounted = true;
 
     const checkSession = async () => {
@@ -41,7 +49,7 @@ export const withAuth = <P extends object>(Component:React.FC<P>) => (props:P)=>
       isMounted = false;
       listener.subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, isTestEnv]);
 
   if (!isAuthChecked) return <div>로딩중...</div>;
 

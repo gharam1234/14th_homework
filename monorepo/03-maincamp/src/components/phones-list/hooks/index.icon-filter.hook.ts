@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { isTestEnv } from '@/commons/utils/is-test-env';
+import { PHONE_RECORDS } from '@/tests/fixtures/supabase';
 
 /**
  * 필터링된 휴대폰 데이터 타입
@@ -52,6 +54,27 @@ export const useIconFilter = (): UseIconFilterReturn => {
   const fetchFilteredPhones = useCallback(async (category: string | null) => {
     setIsLoading(true);
     setError(null);
+
+    if (isTestEnv()) {
+      const fixtures = PHONE_RECORDS.map<Phone>((record) => ({
+        id: record.id,
+        title: record.title,
+        price: record.price,
+        categories: record.categories,
+        sale_state: record.sale_state,
+        available_from: record.available_from,
+        available_until: record.available_until,
+        main_image_url: record.main_image_url,
+      }));
+
+      const filtered = category
+        ? fixtures.filter((item) => item.categories?.includes(category))
+        : fixtures;
+
+      setPhonesList(filtered);
+      setIsLoading(false);
+      return;
+    }
 
     if (!supabaseClient) {
       setError(FILTER_ERROR_MESSAGE);

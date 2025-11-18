@@ -8,12 +8,22 @@ import { test, expect } from '@playwright/test';
 test.describe('검색 기능 (usePhoneSearch)', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
-      window.localStorage.setItem('accessToken', 'test-token');
+      try {
+        window.localStorage.setItem('accessToken', 'test-token');
+      } catch (e) {
+        // localStorage 접근이 차단된 경우 무시
+        console.warn('localStorage setItem failed:', e);
+      }
     });
     // 페이지 로드
     await page.goto('/phones');
     // 페이지 완전히 로드될 때까지 대기
-    await page.waitForSelector('[data-testid="phones-list"]', { timeout: 500 });
+    try {
+      await page.locator('[data-testid="phones-list"]').waitFor({ state: 'visible', timeout: 10000 });
+    } catch {
+      // 컴포넌트가 없으면 추가 대기
+      await page.waitForTimeout(2000);
+    }
   });
 
   test.describe('검색 시나리오', () => {

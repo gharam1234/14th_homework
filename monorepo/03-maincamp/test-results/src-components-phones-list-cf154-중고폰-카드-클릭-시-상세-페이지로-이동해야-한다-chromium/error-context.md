@@ -1,0 +1,72 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e4]:
+    - list [ref=e6]:
+      - listitem [ref=e7]: 트립토크
+      - listitem [ref=e8]: 숙박권 구매
+      - listitem [ref=e9]: 마이 페이지
+    - button "로그인 right" [ref=e11] [cursor=pointer]:
+      - text: 로그인
+      - img "right" [ref=e12]:
+        - img [ref=e13]
+  - generic [ref=e16]:
+    - button "← Previous" [ref=e17] [cursor=pointer]
+    - generic [ref=e19]:
+      - img [ref=e23]
+      - img "배너1" [ref=e27]
+      - img [ref=e31]
+      - img [ref=e35]
+      - img [ref=e39]
+    - button "→ Next" [ref=e40] [cursor=pointer]
+    - list [ref=e41]:
+      - listitem [ref=e42] [cursor=pointer]:
+        - button "• 1" [ref=e43]
+      - listitem [ref=e44] [cursor=pointer]:
+        - button "• 2" [ref=e45]
+      - listitem [ref=e46] [cursor=pointer]:
+        - button "• 3" [ref=e47]
+  - main [ref=e49]:
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - button "← 뒤로가기" [ref=e54] [cursor=pointer]
+          - button "중고폰 카테고리" [ref=e55] [cursor=pointer]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - heading "아이폰 14 Pro 256GB" [level=1] [ref=e59]
+              - generic [ref=e60]:
+                - button "삭제" [ref=e61] [cursor=pointer]:
+                  - img [ref=e62]
+                - button "공유" [ref=e64] [cursor=pointer]:
+                  - img [ref=e65]
+                - button "위치" [ref=e67] [cursor=pointer]:
+                  - img [ref=e68]
+                - generic [ref=e70]:
+                  - button "북마크" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                  - paragraph [ref=e74]: "0"
+            - paragraph [ref=e75]: A급 상태, 생활 스크래치 거의 없음
+            - paragraph [ref=e76]: apple a급 직거래
+          - img "메인 이미지" [ref=e79]
+      - generic [ref=e81]:
+        - heading "상세 설명" [level=2] [ref=e82]
+        - paragraph [ref=e84]: 테스트용 중고폰 데이터입니다. Playwright 전용 더미 설명입니다.
+      - generic [ref=e86]:
+        - heading "상세 위치" [level=2] [ref=e87]
+        - img "판매자 위치" [ref=e89]
+    - generic [ref=e91]:
+      - generic [ref=e93]:
+        - img [ref=e95]
+        - heading "문의하기" [level=2] [ref=e97]
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - textbox "문의사항을 입력해 주세요." [ref=e101]
+          - generic [ref=e102]: 0/100
+        - button "문의 하기" [ref=e103] [cursor=pointer]
+      - separator [ref=e104]
+      - generic [ref=e106]: 문의가 없습니다.
+```

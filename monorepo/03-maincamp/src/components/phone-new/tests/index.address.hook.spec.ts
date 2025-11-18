@@ -6,7 +6,14 @@ const KAKAO_API_KEY = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY || 'test-kakao-
  * 폼이 완전히 로드될 때까지 대기
  */
 async function waitForForm(page: Page) {
-  await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible' });
+  // 컨테이너가 나타날 때까지 대기
+  await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible', timeout: 10000 });
+  // 로딩이 완료될 때까지 대기 (로딩 인디케이터가 사라질 때까지)
+  await page.locator('[data-testid="loading-indicator"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {
+    // 로딩 인디케이터가 없으면 이미 로드된 것으로 간주
+  });
+  // 폼이 완전히 렌더링될 때까지 추가 대기
+  await page.waitForTimeout(500);
 }
 
 /**

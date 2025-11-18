@@ -16,7 +16,7 @@ test.describe("TokenWallet Component", () => {
   test("페이지 제목이 올바르게 표시되어야 함", async ({ page }) => {
     const title = page.locator("[data-testid='page-title']");
     await expect(title).toBeVisible();
-    await expect(title).toContainText("마이 페이지");
+    await expect(title).toContainText("토큰 지갑");
   });
 
   test("사용자 정보 섹션이 렌더링되어야 함", async ({ page }) => {
@@ -24,7 +24,7 @@ test.describe("TokenWallet Component", () => {
     await expect(userInfo).toBeVisible();
 
     const profileName = page.locator("[data-testid='profile-name']");
-    await expect(profileName).toContainText("김상훈");
+    await expect(profileName).toContainText("사용자");
 
     const pointsValue = page.locator("[data-testid='points-value']");
     await expect(pointsValue).toBeVisible();

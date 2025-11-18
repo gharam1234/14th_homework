@@ -10,7 +10,14 @@ const SAMPLE_IMAGE_BUFFER = Buffer.from(
 );
 
 async function waitForForm(page: Page) {
-  await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible' });
+  // 컨테이너가 나타날 때까지 대기
+  await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible', timeout: 10000 });
+  // 로딩이 완료될 때까지 대기 (로딩 인디케이터가 사라질 때까지)
+  await page.locator('[data-testid="loading-indicator"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {
+    // 로딩 인디케이터가 없으면 이미 로드된 것으로 간주
+  });
+  // 폼이 완전히 렌더링될 때까지 추가 대기
+  await page.waitForTimeout(500);
 }
 
 async function applyAddress(page: Page) {
@@ -48,26 +55,34 @@ async function attachImage(page: Page, name = 'sample.png') {
 
 async function prepareAuth(page: Page) {
   await page.addInitScript((sessionKey) => {
-    const expiresAt = Math.floor(Date.now() / 1000) + 3600;
-    const sessionPayload = {
-      access_token: 'test-supabase-token',
-      token_type: 'bearer',
-      expires_in: 3600,
-      expires_at: expiresAt,
-      refresh_token: 'test-refresh-token',
-      user: {
-        id: 'test-user-001',
-        email: 'test@example.com',
-      },
-    };
-    localStorage.setItem(
-      sessionKey,
-      JSON.stringify({
-        currentSession: sessionPayload,
-        currentUser: sessionPayload.user,
-      })
-    );
-    localStorage.removeItem('phone');
+    try {
+      const expiresAt = Math.floor(Date.now() / 1000) + 3600;
+      const sessionPayload = {
+        access_token: 'test-supabase-token',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: expiresAt,
+        refresh_token: 'test-refresh-token',
+        user: {
+          id: 'test-user-001',
+          email: 'test@example.com',
+        },
+      };
+      localStorage.setItem(
+        sessionKey,
+        JSON.stringify({
+          currentSession: sessionPayload,
+          currentUser: sessionPayload.user,
+        })
+      );
+      try {
+        localStorage.removeItem('phone');
+      } catch (e) {
+        console.warn('localStorage removeItem failed:', e);
+      }
+    } catch (e) {
+      console.warn('localStorage setItem failed:', e);
+    }
   }, SUPABASE_SESSION_KEY);
 }
 

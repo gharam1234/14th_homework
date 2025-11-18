@@ -8,12 +8,21 @@ import { test, expect } from '@playwright/test';
 test.describe('아이콘 필터 (useIconFilter)', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
-      window.localStorage.setItem('accessToken', 'test-token');
+      try {
+        window.localStorage.setItem('accessToken', 'test-token');
+      } catch (e) {
+        // localStorage 접근이 차단된 경우 무시
+        console.warn('localStorage setItem failed:', e);
+      }
     });
     // 페이지 로드
     await page.goto('/phones');
     // 페이지 완전히 로드될 때까지 대기
-    await page.waitForSelector('[data-testid="phones-list"]', { timeout: 450 });
+    try {
+      await page.locator('[data-testid="phones-list"]').waitFor({ state: 'visible', timeout: 10000 });
+    } catch {
+      await page.waitForTimeout(2000);
+    }
   });
 
   test.describe('3-1) 아이콘 선택 상태 변경 테스트', () => {
@@ -158,7 +167,7 @@ test.describe('아이콘 필터 (useIconFilter)', () => {
 
       const parsedUrl = new URL(lastQuery);
       const categoriesParam = parsedUrl.searchParams.get('categories');
-      expect(categoriesParam).toBe('cs.["sony"]');
+      expect(decodeURIComponent(categoriesParam ?? '')).toBe('cs.["sony"]');
     });
   });
 

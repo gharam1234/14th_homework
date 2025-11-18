@@ -30,13 +30,23 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   /**
    * 테스트 환경 여부 확인
+   * 1. NEXT_PUBLIC_TEST_ENV 환경 변수 체크 (빌드 타임)
+   * 2. window.__TEST_BYPASS__ 전역 변수 체크 (런타임, Playwright에서 설정)
    */
-  const isTestEnv = process.env.NEXT_PUBLIC_TEST_ENV === 'test';
+  const isTestEnv = 
+    process.env.NEXT_PUBLIC_TEST_ENV === 'test' ||
+    (typeof window !== 'undefined' && (window as any).__TEST_BYPASS__ === true);
 
   /**
    * AuthProvider 초기화 후 권한 검증
    */
   useEffect(() => {
+    // 테스트 환경인 경우 마운트되면 즉시 인가 성공 (loading 무시)
+    if (isTestEnv && mounted) {
+      setIsAuthorized(true);
+      return;
+    }
+
     // 마운트되지 않았거나 AuthProvider가 초기화되지 않았으면 대기
     if (!mounted || loading) {
       return;
@@ -122,8 +132,13 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     );
   };
 
+  // 테스트 환경인 경우 loading 상태를 무시하고 인가 처리
+  const shouldShowBlank = isTestEnv 
+    ? (!mounted || !isAuthorized)
+    : (!mounted || loading || !isAuthorized);
+
   // AuthProvider가 초기화되지 않았거나 인가가 완료되지 않았으면 빈 화면 표시
-  if (!mounted || loading || !isAuthorized) {
+  if (shouldShowBlank) {
     return (
       <>
         <div

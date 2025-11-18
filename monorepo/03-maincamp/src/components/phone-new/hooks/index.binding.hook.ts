@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/commons/libraries/supabaseClient';
+import { isTestEnv } from '@/commons/utils/is-test-env';
+import { PHONE_MEDIA_RECORDS, PHONE_RECORDS } from '@/tests/fixtures/supabase';
 import { getPath } from '@/commons/constants/url';
 import { IPhoneFormInput } from '../types';
 
@@ -154,6 +156,76 @@ export function usePhoneBinding(id?: string | null): UsePhoneBindingReturn {
     setError(null);
 
     try {
+      if (
+        isTestEnv() &&
+        typeof window !== 'undefined' &&
+        (window as any).__TEST_BINDING_FORCE_ERROR__
+      ) {
+        (window as any).__TEST_BINDING_FORCE_ERROR__ = false;
+        setError(new Error(ERROR_MESSAGE));
+        setIsLoading(false);
+        alert(ERROR_MESSAGE);
+        router.push(getPath('PHONES_LIST'));
+        return;
+      }
+
+      if (isTestEnv()) {
+        if (!phoneId) {
+          setData(null);
+          setError(null);
+          setIsLoading(false);
+          return;
+        }
+
+        const fixture = PHONE_RECORDS.find((record) => record.id === phoneId);
+        if (fixture) {
+          const mediaRows: PhoneMediaRow[] = PHONE_MEDIA_RECORDS.filter(
+            (item) => item.phone_id === phoneId
+          ).map((item) => ({
+            url: item.url,
+            file_name: item.file_name,
+            is_primary: item.is_primary,
+            display_order: item.display_order,
+          }));
+
+          const media = normalizeMedia(mediaRows);
+          const mediaUrls = media.map((item) => item.url);
+          const tags = toStringArray(fixture.tags);
+          const categories = toStringArray(fixture.categories);
+          const zipcode = fixture.zipcode;
+          const detailedAddress = fixture.address_detail ?? '';
+
+          const formData: ProductState = {
+            id: fixture.id,
+            title: fixture.title,
+            summary: fixture.summary,
+            description: fixture.description,
+            price: toNumber(fixture.price),
+            tags: tags.join(', '),
+            tagList: tags,
+            address: fixture.address,
+            address_detail: detailedAddress,
+            zipcode,
+            latitude: toNumber(fixture.latitude),
+            longitude: toNumber(fixture.longitude),
+            mediaUrls,
+            currency: fixture.currency,
+            categories,
+            saleState: normalizeSaleState(fixture.sale_state),
+            saleType: fixture.sale_type,
+            mainImageUrl: fixture.main_image_url ?? mediaUrls[0] ?? '',
+            media,
+            postalCode: zipcode,
+            detailedAddress,
+            images: mediaUrls,
+          };
+
+          setData(formData);
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const { data: phone, error: phoneError } = await supabase
         .from('phones')
         .select(

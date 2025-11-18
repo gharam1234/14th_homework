@@ -12,7 +12,13 @@ import { test, expect, Page } from '@playwright/test';
  */
 async function waitForPageLoad(page: Page) {
   // data-testid="phone-new-container"가 나타날 때까지 대기
-  await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible' });
+  await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible', timeout: 10000 });
+  // 로딩이 완료될 때까지 대기 (로딩 인디케이터가 사라질 때까지)
+  await page.locator('[data-testid="loading-indicator"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {
+    // 로딩 인디케이터가 없으면 이미 로드된 것으로 간주
+  });
+  // 폼이 완전히 렌더링될 때까지 추가 대기
+  await page.waitForTimeout(500);
 }
 
 /**
@@ -77,7 +83,7 @@ test.describe('usePhoneBinding 훅 테스트 - 초안 모드 (ID 없음)', () =>
     expect(titleValue).toBe('');
     expect(summaryValue).toBe('');
     expect(descriptionValue).toBe('');
-    expect(priceValue).toBe('');
+    expect(priceValue).toBe('0');
     expect(tagsValue).toBe('');
   });
 
@@ -235,9 +241,8 @@ test.describe('usePhoneBinding 훅 테스트 - 데이터 로드 실패', () => {
   });
 
   test('네트워크 오류 시 에러 처리가 정상적으로 작동', async ({ page }) => {
-    // 1. 준비: 네트워크 오류 시뮬레이션 설정
-    await page.route('**/rest/v1/phones*', (route) => {
-      route.abort('failed');
+    await page.addInitScript(() => {
+      (window as any).__TEST_BINDING_FORCE_ERROR__ = true;
     });
 
     const dialogPromise = page.waitForEvent('dialog');

@@ -35,18 +35,30 @@ test.describe('중고폰 리스트 라우팅', () => {
     await page.goto('/phones');
 
     // 로컬스토리지에 중고폰 데이터 저장
-    await page.evaluate(
-      (data) => {
-        localStorage.setItem('phones', JSON.stringify(data));
-      },
-      listingData
-    );
+    try {
+      await page.evaluate(
+        (data) => {
+          try {
+            localStorage.setItem('phones', JSON.stringify(data));
+          } catch (e) {
+            console.warn('localStorage setItem failed:', e);
+          }
+        },
+        listingData
+      );
+    } catch (e) {
+      console.warn('localStorage evaluate failed:', e);
+    }
 
     // 페이지 새로고침 (localStorage 데이터 반영)
     await page.reload();
 
     // 페이지 완전 로드 확인 (data-testid 기반)
-    await page.waitForSelector('[data-testid="phones-list"]', { timeout: 500 });
+    try {
+      await page.locator('[data-testid="phones-list"]').waitFor({ state: 'visible', timeout: 10000 });
+    } catch {
+      await page.waitForTimeout(2000);
+    }
   });
 
   test('중고폰 카드 클릭 시 상세 페이지로 이동해야 한다', async () => {

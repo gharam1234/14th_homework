@@ -39,6 +39,8 @@ const TEST_USER_ID = TEST_SESSION.user.id;
 async function mockLogin(context: BrowserContext) {
   await context.addInitScript(({ key, session }) => {
     window.localStorage.setItem(key, JSON.stringify(session));
+    (window as any).__TEST_SUPABASE_USER__ = session.user;
+    (window as any).__TEST_SUPABASE_LOGIN__ = true;
   }, { key: SUPABASE_STORAGE_KEY, session: TEST_SESSION });
 }
 

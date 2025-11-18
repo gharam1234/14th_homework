@@ -34,20 +34,28 @@ const defaultPhoneResponse = {
 async function prepareAccessToken(page: Page, options?: { includeSupabaseSession?: boolean }) {
   await page.addInitScript(
     ({ key, user, includeSession }) => {
-      window.localStorage.setItem('accessToken', 'test-access-token');
-      if (includeSession) {
-        const sessionValue = JSON.stringify({
-          currentSession: {
-            access_token: 'test-token',
-            token_type: 'bearer',
-            user,
-          },
-        });
-        window.localStorage.setItem(key, sessionValue);
-        window.sessionStorage.setItem(key, sessionValue);
-      } else {
-        window.localStorage.removeItem(key);
-        window.sessionStorage.removeItem(key);
+      try {
+        window.localStorage.setItem('accessToken', 'test-access-token');
+        if (includeSession) {
+          const sessionValue = JSON.stringify({
+            currentSession: {
+              access_token: 'test-token',
+              token_type: 'bearer',
+              user,
+            },
+          });
+          window.localStorage.setItem(key, sessionValue);
+          window.sessionStorage.setItem(key, sessionValue);
+        } else {
+          try {
+            window.localStorage.removeItem(key);
+            window.sessionStorage.removeItem(key);
+          } catch (e) {
+            console.warn('localStorage removeItem failed:', e);
+          }
+        }
+      } catch (e) {
+        console.warn('localStorage setItem failed:', e);
       }
     },
     {

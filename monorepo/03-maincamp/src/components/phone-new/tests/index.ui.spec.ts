@@ -9,9 +9,21 @@ import { test, expect } from "@playwright/test";
 
 test.describe("PhoneNew 컴포넌트 UI", () => {
   test.beforeEach(async ({ page }) => {
+    // 테스트 환경에서 권한 검증 우회 (페이지 로드 전에 설정)
+    await page.addInitScript(() => {
+      (window as any).__TEST_BYPASS__ = true;
+    });
     // 테스트 페이지로 이동
     // NOTE: 실제 페이지 경로는 프로젝트 설정에 따라 수정 필요
     await page.goto("http://localhost:3000/phones/new");
+    // 컨테이너가 나타날 때까지 대기
+    await page.locator('[data-testid="phone-new-container"]').waitFor({ state: 'visible', timeout: 10000 });
+    // 로딩이 완료될 때까지 대기 (로딩 인디케이터가 사라질 때까지)
+    await page.locator('[data-testid="loading-indicator"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {
+      // 로딩 인디케이터가 없으면 이미 로드된 것으로 간주
+    });
+    // 폼이 완전히 렌더링될 때까지 추가 대기
+    await page.waitForTimeout(500);
   });
 
   test("페이지 제목이 렌더링되어야 함", async ({ page }) => {

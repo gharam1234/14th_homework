@@ -1,0 +1,86 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-detail/hooks/useImageError.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/phone-detail/tests/index.image-error.spec.ts
+
+==============================================
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+    - jest
+    - @testing-library/react
+
+2) 테스트 조건
+    - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+    - 페이지가 완전히 로드된 후 테스트할 것.
+        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+3) 테스트 시나리오
+    3-1) 정상 이미지 로드
+        - 이미지가 정상적으로 로드되는지 확인
+        - 기본 이미지로 대체되지 않는지 확인
+
+    3-2) 이미지 로드 실패
+        - 잘못된 URL의 이미지가 기본 이미지로 대체되는지 확인
+        - 콘솔에 에러 로그가 기록되는지 확인
+
+핵심요구사항) useImageError 커스텀 훅을 구현할 것.
+
+1) 훅 기능
+    - 이미지 로드 실패를 감지하는 onError 핸들러 제공
+    - 에러 발생 시 기본 이미지 경로로 대체
+    - 에러 로그를 console.error로 기록
+
+2) 훅 인터페이스
+    - 입력: defaultImagePath: string (기본 이미지 경로)
+    - 반환: handleImageError: (event: React.SyntheticEvent<HTMLImageElement>) => void
+
+3) 구현 로직
+    3-1) onError 이벤트 핸들러
+        - 이미지 로드 실패 시 호출됨
+        - event.currentTarget.src를 기본 이미지 경로로 변경
+        - 무한 루프 방지: 이미 기본 이미지인 경우 재시도 안 함
+
+    3-2) 에러 로그 기록
+        - console.error()를 사용하여 에러 로그 기록
+        - 로그 형식: "이미지 로드 실패: [원본 이미지 URL]"
+        - 기본 이미지로 대체되었음을 명시
+
+4) 사용 예시
+    ```tsx
+    const { handleImageError } = useImageError('/images/phone_sample.png');
+
+    <img
+      src={imageUrl}
+      onError={handleImageError}
+      alt="중고폰 이미지"
+    />
+    ```
+
+핵심요구사항) phone-detail 컴포넌트에서 useImageError 훅을 적용할 것.
+
+1) 기본 이미지 경로
+    - /images/phone_sample.png
+
+2) 적용 위치
+    - 모든 갤러리 이미지에 onError 핸들러 적용
+    - handleImageError를 각 <img> 태그의 onError 속성에 연결
+
+3) data-testid 적용
+    - 각 이미지: data-testid="gallery-image-{index}"
+    - 에러 처리 확인용
+
+4) 무한 루프 방지
+    - 기본 이미지 로드 실패 시 재시도 방지
+    - 이미 기본 이미지인 경우 더 이상 onError 실행 안 함

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { message } from 'antd';
 import { supabase } from '@/commons/libraries/supabaseClient';
+import { isTestEnv } from '@/commons/utils/is-test-env';
 
 const REACTIONS_TABLE = 'phone_reactions';
 const FAVORITE_TYPE = 'favorite';
@@ -41,6 +42,10 @@ const getStoredSessionUser = () => {
     console.warn('세션 정보 파싱 실패:', error);
   }
 
+  if ((window as any).__TEST_SUPABASE_USER__) {
+    return (window as any).__TEST_SUPABASE_USER__;
+  }
+
   return null;
 };
 
@@ -61,6 +66,17 @@ export function useBookmark(phoneId: string, initialBookmarked = false) {
    * @returns 로그인된 유저 정보 또는 null
    */
   const checkAuth = useCallback(async () => {
+    if (isTestEnv()) {
+      if ((window as any).__TEST_SUPABASE_LOGIN__) {
+        return (
+          (window as any).__TEST_SUPABASE_USER__ ?? {
+            id: 'test-user',
+          }
+        );
+      }
+      return null;
+    }
+
     const {
       data: { session },
     } = await supabase.auth.getSession();

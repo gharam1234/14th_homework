@@ -9,6 +9,7 @@
     "lint": "next lint",
     "codegen": "graphql-codegen --config codegen.ts",
     "test": "playwright test",
+    "test:e2e": "playwright test",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug"
   },
