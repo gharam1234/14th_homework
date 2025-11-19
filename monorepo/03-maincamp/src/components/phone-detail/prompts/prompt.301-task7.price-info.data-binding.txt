@@ -1,0 +1,38 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 HOOK 파일: src/components/phone-detail/hooks/index.price-info.hook.ts (신규 생성)
+조건-파일경로) 수정될 컴포넌트 파일: src/components/phone-detail/index.tsx (basicInfo 가격 블록 분리)
+조건-파일경로) 스타일 파일: src/components/phone-detail/styles.module.css (price-info 관련 클래스 추가)
+조건-파일경로) 테스트 파일: src/components/phone-detail/tests/price-info.spec.ts
+
+==============================================
+
+핵심요구사항) 가격/거래 정보 블록을 독립적으로 구성하고 Supabase 데이터와 동기화할 것.
+
+            1) usePriceInfo 훅
+                - 입력: { price?: number; originalPrice?: number; condition?: string; tradeType?: 'DIRECT' | 'DELIVERY' | 'BOTH'; shippingFee?: 'INCLUDED' | 'EXCLUDED'; safeTradeAvailable?: boolean; stockCount?: number; wishCount?: number }
+                - 출력: 통화 포맷된 priceText, originalPriceText, discountRate(정수%), discountAmount, tradeBadges, 안내 문구
+                - originalPrice가 없거나 price >= originalPrice면 할인율/할인금액 숨김
+
+            2) PriceInfo UI
+                - data-testid="price-info-section" 추가
+                - 레이아웃: 판매가, 정가+할인, 거래 방식, 안전거래 배지, 재고/관심수 표기, 최근 거래/안전 가이드 링크 버튼
+                - 색상 규칙: 판매가=var(--gray-900), 할인율=var(--red-500), 안전거래 배지=var(--green-500)
+                - 모바일 환경에서는 세로 스택
+
+            3) 거래 정보
+                - tradeType 텍스트: DIRECT → "직거래만", DELIVERY → "배송만", BOTH → "직거래/배송"
+                - shippingFee 텍스트: INCLUDED → "배송료 포함", EXCLUDED → "배송료 별도"
+                - safeTradeAvailable true면 "안전거래 지원" 배지 노출 + `중고거래 안전도 가이드` 링크 연결 (URL: https://goorm.com/safety-guide 등 설명 텍스트로 대체 가능)
+
+            4) 테스트 (Playwright)
+                - page.waitForSelector('[data-testid="price-info-section"]', { timeout: 500 })
+                - 시나리오: 할인율 계산, 원가 없을 때 숨김, tradeType별 텍스트, 안전거래 배지 토글, 재고/관심수 표기
+                - jest / @testing-library/react 금지, networkidle 금지

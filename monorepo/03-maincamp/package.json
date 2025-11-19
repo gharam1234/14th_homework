@@ -17,6 +17,7 @@
     "generate:local-test-data": "tsx scripts/generate-local-test-data.ts"
   },
   "dependencies": {
+    "@commons/ui": "workspace:*" ,
     "@ant-design/icons": "~5.6.1",
     "@apollo/client": "~3.11.10",
     "@commons/ui": "workspace:*",

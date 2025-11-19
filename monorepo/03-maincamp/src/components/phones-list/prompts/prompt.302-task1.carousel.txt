@@ -1,0 +1,132 @@
+# 프롬프트 302 - Task1: HOT 거래 상품 캐러셀 (리스트 UI)
+
+**타입**: List UI
+**컴포넌트**: phones-carousel
+**목표**: 중고폰 상품을 가로로 스크롤하는 캐러셀 구현 (페이지네이션 포함)
+
+==================================================
+
+## 조건
+
+### Cursor Rules
+@01-common.mdc
+@02-wireframe.mdc
+@03-ui.mdc
+
+### 파일 경로
+- TSX: `src/components/phones-list/index.carousel.tsx` (없다면 생성)
+- CSS: `src/components/phones-list/styles.carousel.module.css`
+- 훅: `src/components/phones-list/hooks/use-carousel.hook.ts`
+
+### 통합 가이드
+- 새로 만든 캐러셀 컴포넌트는 `src/components/phones-list/index.tsx` 상단(HOT 거래 영역)에 import하여 렌더링한다.
+- 데이터는 `samplePhones` 또는 `CarouselItem[]` 임시 배열에서 공급하며, 이후 API 연동 시 동일한 필드를 유지한다.
+
+### 캐러셀 데이터 구조
+```typescript
+interface CarouselItem {
+  id: string;
+  model: string;              // "iPhone 14 Pro"
+  condition: "미개봉" | "새것" | "중고";
+  price: number;
+  imageUrl: string;
+  description: string;        // "당장 가고 싶은 숙소" 같은 설명
+  sellerName: string;
+}
+
+interface CarouselState {
+  currentIndex: number;
+  items: CarouselItem[];
+  totalItems: number;
+}
+```
+
+### 캐러셀 크기
+- 데스크톱: 628px 높이, 각 카드 너비 자동 (flex)
+- 태블릿: 500px 높이
+- 모바일: 350px 높이
+
+### 스크롤 방식
+- 한 번에 1개 카드씩 이동 (완전 가시 카드 기준)
+- 또는 한 번에 2개 카드씩 이동 (데스크톱에서 2개 카드 가시)
+
+==================================================
+
+## 핵심요구사항
+
+1) 캐러셀 컨테이너 및 스크롤 영역
+   1-1) 컨테이너: overflow: hidden으로 카드 일부만 노출
+   1-2) 내부 스크롤 영역: transform translate로 이동 (transition 포함)
+   1-3) 전환 속도: 300ms ease-out
+
+2) 카드 배치
+   2-1) display: flex로 가로 배치
+   2-2) 각 카드: flex-shrink: 0 (크기 고정)
+   2-3) 카드 간 갭: 24px
+   2-4) 패딩: 좌우 20px (모바일), 40px (데스크톱)
+
+3) 페이지네이션 (화살표 버튼)
+   3-1) 좌측 화살표: 현재 인덱스 > 0일 때만 활성화
+   3-2) 우측 화살표: 현재 인덱스 < (totalItems - 1)일 때만 활성화
+   3-3) 비활성 상태: opacity 0.5, cursor: not-allowed
+   3-4) 버튼 크기: 40px x 40px (데스크톱), 30px (모바일)
+   3-5) 버튼 위치: 캐러셀 좌우 외부 또는 내부 (오버레이)
+
+4) 자동 슬라이드 (선택사항)
+   4-1) 5초마다 자동으로 다음 카드로 이동
+   4-2) 마우스 호버 또는 사용자 상호작용 시 자동 슬라이드 일시 중지
+   4-3) 설정: enableAutoSlide?: boolean
+
+5) 터치 제스처 (모바일)
+   5-1) 터치 시작 시 현재 x 위치 기록
+   5-2) 터치 이동 시 드래그 거리 계산
+   5-3) 터치 종료 시 최소 100px 이상 드래그면 다음/이전 카드로 이동
+   5-4) 터치 도중 자동 슬라이드 일시 중지
+
+6) 캐러셀 훅 구현
+   6-1) useCarousel() 훅 생성
+        - state: currentIndex, items, totalItems
+        - 함수: next(), prev(), goToIndex(index)
+   6-2) 상태 관리: useState 또는 useReducer
+   6-3) 효과: useEffect로 자동 슬라이드 및 터치 리스너 설정
+
+7) 페이지네이션 인디케이터 (선택사항)
+   7-1) 도트 표시: 총 아이템 개수만큼 도트 생성
+   7-2) 활성 도트: 현재 인덱스에 해당하는 도트 강조
+   7-3) 클릭 가능: 도트 클릭 시 해당 인덱스로 이동
+   7-4) 위치: 카레넬 하단 가운데
+
+8) Props & Types
+```typescript
+interface CarouselProps {
+  items: CarouselItem[];
+  autoSlide?: boolean;
+  autoSlideInterval?: number;  // 기본 5000ms
+  showPagination?: boolean;
+  showDots?: boolean;
+  onItemClick?: (item: CarouselItem) => void;
+  className?: string;
+}
+
+interface UseCarouselReturn {
+  currentIndex: number;
+  totalItems: number;
+  next: () => void;
+  prev: () => void;
+  goToIndex: (index: number) => void;
+  canGoPrev: boolean;
+  canGoNext: boolean;
+}
+```
+
+9) 반응형 처리
+   9-1) 모바일: 카드 크기 줄임, 갭 감소, 터치 제스처 활성화
+   9-2) 태블릿: 중간 크기
+   9-3) 데스크톱: 전체 크기 활용
+
+10) 접근성
+    10-1) 화살표 버튼: ARIA label 추가
+    10-2) 도트 버튼: role="button", tabindex="0"
+    10-3) 키보드 네비게이션: 좌우 화살표 키로 이동 (선택)
+
+==================================================

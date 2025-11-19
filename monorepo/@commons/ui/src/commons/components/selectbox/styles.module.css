@@ -1,0 +1,238 @@
+.container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.container.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.trigger {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #D4D3D3;
+  border-radius: 0.8rem;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 1.4rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: #999;
+}
+
+.trigger:disabled {
+  background-color: #C7C7C7;
+  cursor: not-allowed;
+  color: #E4E4E4;
+}
+
+.selectedText {
+  flex: 1;
+  text-align: left;
+  color: inherit;
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  margin-left: 0.8rem;
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.container.open .arrow {
+  transform: rotate(180deg);
+}
+
+/* Variant & Size Combinations */
+
+/* Primary Variant */
+.primary-small {
+  height: 3.2rem;
+}
+
+.primary-small .trigger {
+  padding: 0.8rem 1.2rem;
+  background-color: #2974E5;
+  color: white;
+  border-color: #2974E5;
+}
+
+.primary-small .trigger:hover:not(:disabled) {
+  background-color: #1e57b8;
+  border-color: #1e57b8;
+}
+
+.primary-medium {
+  height: 4rem;
+}
+
+.primary-medium .trigger {
+  padding: 1rem 1.6rem;
+  background-color: #2974E5;
+  color: white;
+  border-color: #2974E5;
+}
+
+.primary-medium .trigger:hover:not(:disabled) {
+  background-color: #1e57b8;
+  border-color: #1e57b8;
+}
+
+.primary-large {
+  height: 4.8rem;
+}
+
+.primary-large .trigger {
+  padding: 1.2rem 1.6rem;
+  background-color: #2974E5;
+  color: white;
+  border-color: #2974E5;
+}
+
+.primary-large .trigger:hover:not(:disabled) {
+  background-color: #1e57b8;
+  border-color: #1e57b8;
+}
+
+/* Secondary Variant */
+.secondary-small {
+  height: 3.2rem;
+}
+
+.secondary-small .trigger {
+  padding: 0.8rem 1.2rem;
+  background-color: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+.secondary-small .trigger:hover:not(:disabled) {
+  background-color: #f5f5f5;
+}
+
+.secondary-medium {
+  height: 4rem;
+}
+
+.secondary-medium .trigger {
+  padding: 1rem 1.6rem;
+  background-color: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+.secondary-medium .trigger:hover:not(:disabled) {
+  background-color: #f5f5f5;
+}
+
+.secondary-large {
+  height: 4.8rem;
+}
+
+.secondary-large .trigger {
+  padding: 1.2rem 1.6rem;
+  background-color: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+.secondary-large .trigger:hover:not(:disabled) {
+  background-color: #f5f5f5;
+}
+
+/* Tertiary Variant */
+.tertiary-small {
+  height: 3.2rem;
+}
+
+.tertiary-small .trigger {
+  padding: 0.8rem 1.2rem;
+  background-color: #f0f0f0;
+  color: #333;
+  border-color: #D4D3D3;
+}
+
+.tertiary-small .trigger:hover:not(:disabled) {
+  background-color: #e8e8e8;
+}
+
+.tertiary-medium {
+  height: 4rem;
+}
+
+.tertiary-medium .trigger {
+  padding: 1rem 1.6rem;
+  background-color: #f0f0f0;
+  color: #333;
+  border-color: #D4D3D3;
+}
+
+.tertiary-medium .trigger:hover:not(:disabled) {
+  background-color: #e8e8e8;
+}
+
+.tertiary-large {
+  height: 4.8rem;
+}
+
+.tertiary-large .trigger {
+  padding: 1.2rem 1.6rem;
+  background-color: #f0f0f0;
+  color: #333;
+  border-color: #D4D3D3;
+}
+
+.tertiary-large .trigger:hover:not(:disabled) {
+  background-color: #e8e8e8;
+}
+
+/* Dropdown Menu */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #D4D3D3;
+  border-top: none;
+  border-radius: 0 0 0.8rem 0.8rem;
+  margin-top: -1px;
+  max-height: 20rem;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.option {
+  padding: 1rem 1.6rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #333;
+  font-size: 1.4rem;
+}
+
+.option:hover {
+  background-color: #f5f5f5;
+}
+
+.option.selected {
+  background-color: #e8f0ff;
+  color: #2974E5;
+  font-weight: 500;
+}
+
+.option:first-child {
+  border-radius: 0 0 0 0.8rem;
+}
+
+.option:last-child {
+  border-radius: 0 0 0.8rem 0;
+}

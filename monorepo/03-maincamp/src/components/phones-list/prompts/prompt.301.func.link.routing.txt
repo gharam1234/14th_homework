@@ -1,0 +1,45 @@
+중고폰 리스트 라우팅 훅
+
+## 요구사항
+- 각 중고폰 카드 클릭 시 기기 상세 페이지로 이동
+- 중고폰 판매 등록 버튼 클릭 시 새 등록 페이지로 이동
+- url.ts의 페이지URL에 정의된 경로로 이동
+- 동적 라우팅: phoneId를 사용하여 상세 페이지 이동
+
+## url.ts 라우트 키
+- PHONE_DETAIL: /phones/[id] - 중고폰 상세 페이지 (동적 라우팅)
+- PHONE_CREATE: /phones/new - 새 중고폰 등록 페이지
+
+## 구현 기준
+- 라우팅 로직은 `src/components/phones-list/hooks/index.routing.hook.ts`에서 관리한다. 파일이 이미 존재하면 동일 파일을 확장하고, 없다면 새로 생성할 때 `'use client'` 지시문을 최상단에 선언한다.
+- url.ts의 getPath() 함수 사용
+- 하드코딩 금지 (경로를 직접 문자열로 입력하지 말 것)
+- 각 핸들러마다 JSDoc 주석 작성
+- useRouter 훅 사용
+- 반환 타입 인터페이스 정의 (UsePhonesListRoutingReturn)
+
+## 테스트 데이터
+- 저장소: 로컬스토리지
+- key: phones
+- value: [
+    {
+      id: String,
+      title: String!,
+      description: String!,
+      tags: String,
+      price: String!,
+      sellerName: String!,
+      likeCount: Number
+    }
+  ]
+
+## 테스트 기준
+- Playwright 기반 TDD (환경이 없다면 `03-maincamp/playwright.config.ts`를 생성하고 `@playwright/test`를 설치)
+- jest, @testing-library/react 제외
+- 로컬스토리지 실제 데이터 사용 (Mock 금지)
+- timeout 500ms 미만 설정
+- data-testid 기반 요소 선택 (cssModule 충돌 방지)
+- 페이지 로드 확인: data-testid="phones-list" 요소 대기
+- 테스트 시나리오:
+  1. 중고폰 카드 클릭 -> /phones/[id] 이동 확인
+  2. 중고폰 판매 등록 버튼 클릭 -> /phones/new 이동 확인

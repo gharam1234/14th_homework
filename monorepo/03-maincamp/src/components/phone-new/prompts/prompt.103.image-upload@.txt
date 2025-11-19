@@ -1,0 +1,104 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 참고할 PAGE 경로: src/app/(protected)/phones/new/page.tsx
+조건-파일경로) 구현될 HOOK 경로: src/components/phone-new/hooks/index.image.hook.ts
+조건-파일경로) 구현될 TSX 파일경로: src/components/phone-new/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/phone-new/styles.module.css
+
+==============================================
+
+참고할 PAGE 경로: src/app/(protected)/phones/new/page.tsx
+구현될 HOOK 경로: src/components/phone-new/hooks/index.image.hook.ts
+
+핵심요구사항) 이미지 업로드 기능을 다음과 같이 구현할 것.
+                1) 파일 선택 및 미리보기
+                    - 버튼 클릭 시 파일 선택 다이얼로그 열기
+                    - 이미지 파일만 선택 가능 (accept="image/*")
+                    - 최대 2개까지만 업로드 가능
+
+                2) 미리보기 표시
+                    - 선택된 이미지를 160x160px 크기의 썸네일로 표시
+                    - 각 이미지 우측 상단에 X 버튼(삭제 버튼) 표시
+                    - 이미지 없을 때는 업로드 버튼만 표시
+
+                3) 이미지 삭제
+                    - X 버튼 클릭 시 해당 이미지 제거
+                    - 남은 이미지 개수만큼 업로드 버튼 표시
+                    - 예: 1개 업로드 시 → 1개 미리보기 + 1개 업로드 버튼
+
+                4) 파일 크기 제한
+                    - 각 파일 최대 5MB
+                    - 초과 시 alert: "파일 크기는 5MB 이하여야 합니다."
+
+                5) 파일 타입 검증
+                    - jpg, jpeg, png, gif, webp만 허용
+                    - 불허용 파일: alert "지원하지 않는 파일 형식입니다."
+
+핵심요구사항) 로컬 상태 관리를 다음과 같이 구현할 것.
+                1) imageFiles state (File[])
+                    - 선택된 파일 배열 관리
+                    - 최대 2개까지만 저장
+
+                2) handleImageChange 함수
+                    - 파일 선택 시 호출
+                    - 파일 유효성 검사 수행
+                    - imageFiles에 추가
+
+                3) handleImageDelete 함수
+                    - 이미지 삭제 시 호출
+                    - index 매개변수로 특정 이미지만 제거
+
+                4) form validation과의 연동
+                    - images 필드와 imageFiles를 동기화
+                    - 제출 시 images에 파일명 또는 Data URL 저장
+
+핵심요구사항) 다음의 UI 요소를 구현할 것.
+                1) 업로드 버튼 (imageUploadBox)
+                    - 배경: 연한 회색 (#f5f5f5)
+                    - 테두리: 점선 (#ddd)
+                    - 내용: + 아이콘 + "클릭해서 사진 업로드" 텍스트
+                    - hover 상태: 배경 변경 및 cursor: pointer
+
+                2) 이미지 미리보기 (160x160px)
+                    - 테두리: 1px solid #e4e4e4
+                    - border-radius: 8px
+                    - overflow: hidden
+                    - background: #f2f2f2
+
+                3) 삭제 버튼 (X 버튼)
+                    - 위치: 우측 상단 (top: 4px, right: 4px)
+                    - 크기: 24x24px, border-radius: 50%
+                    - 배경: rgba(0,0,0,0.5) (반투명 검은색)
+                    - 텍스트 색상: white
+                    - cursor: pointer
+                    - hover: background-color 밝혀지기
+
+핵심요구사항) 폼 제출 시 이미지 처리를 다음과 같이 할 것.
+                1) 로컬스토리지 저장
+                    - 이미지 파일명을 images 배열에 저장
+                    - 형식: ["filename1.jpg", "filename2.png"]
+
+                2) 실제 구현 (향후)
+                    - Supabase 또는 S3에 업로드
+                    - URL 배열로 변환: ["https://...", "https://..."]
+
+핵심요구사항) Playwright 테스트를 TDD 기반으로 작성할 것.
+                1) 테스트 파일경로: src/components/phone-new/tests/index.image.spec.ts
+                2) 테스트 케이스
+                    - 업로드 버튼 클릭: 파일 선택 다이얼로그 열림
+                    - 이미지 선택 시: 미리보기 표시
+                    - 2개 이미지 선택 후 3번째 선택: 경고 메시지 표시
+                    - 삭제 버튼 클릭: 이미지 제거 및 업로드 버튼 다시 표시
+                    - 5MB 초과 파일: alert 메시지 표시
+                    - 지원하지 않는 파일 형식: alert 메시지 표시
+
+                3) 테스트 조건
+                    - timeout: 500ms 미만
+                    - 페이지 로드 식별: data-testid 대기

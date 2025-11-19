@@ -1,0 +1,193 @@
+/**
+ * Modal 컴포넌트 스타일
+ * CSS Modules 사용, Flexbox 레이아웃
+ */
+
+/* 모달 배경 (backdrop) */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 모달 컨테이너 - 숨김 상태 */
+.container {
+  display: none;
+}
+
+/* 모달 컨테이너 - 표시 상태 */
+.container.open {
+  display: flex;
+}
+
+/* 모달 콘텐츠 (카드) */
+.content {
+  background-color: #ffffff;
+  border-radius: 2.4rem;
+  padding: 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  align-items: center;
+  max-width: 50rem;
+  width: 90%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목과 설명 영역 */
+.textSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+  text-align: center;
+}
+
+/* 모달 제목 */
+.title {
+  font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 2.4rem;
+  color: #000000;
+  margin: 0;
+  padding: 0;
+}
+
+/* 모달 설명 */
+.description {
+  font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 2rem;
+  color: #333333;
+  margin: 0;
+  padding: 0;
+}
+
+/* 액션 버튼 영역 */
+.actionSection {
+  display: flex;
+  gap: 1.2rem;
+  width: 100%;
+  justify-content: center;
+}
+
+/* 단일 버튼 (actions: 'single') */
+.single {
+  flex-direction: column;
+}
+
+.single > div {
+  width: 100%;
+  min-width: 12rem;
+}
+
+/* 이중 버튼 (actions: 'dual') */
+.dual {
+  flex-direction: row;
+}
+
+.dual > div {
+  flex: 1;
+  min-width: 9.6rem;
+  max-width: 12rem;
+}
+
+/* 버튼 래퍼 (스타일 오버라이드용) */
+.buttonWrapper {
+  display: flex;
+  width: 100%;
+}
+
+.buttonWrapper > button {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.8rem;
+  font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 2rem;
+  cursor: pointer;
+  border: none;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* Secondary 버튼 스타일 오버라이드 */
+.secondary > button {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+}
+
+.secondary > button:hover {
+  background-color: #f5f5f5;
+}
+
+.secondary > button:active {
+  background-color: #e8e8e8;
+}
+
+/* Primary (Info) 버튼 스타일 오버라이드 */
+.buttonPrimary > button {
+  background-color: #2974e5;
+  color: #ffffff;
+}
+
+.buttonPrimary > button:hover {
+  background-color: #1f52b8;
+}
+
+.buttonPrimary > button:active {
+  background-color: #174399;
+}
+
+/* Danger 버튼 스타일 오버라이드 */
+.buttonDanger > button {
+  background-color: #ff4757;
+  color: #ffffff;
+}
+
+.buttonDanger > button:hover {
+  background-color: #ff3838;
+}
+
+.buttonDanger > button:active {
+  background-color: #e63946;
+}
+
+/* Warning 버튼 스타일 오버라이드 */
+.buttonWarning > button {
+  background-color: #ffa502;
+  color: #ffffff;
+}
+
+.buttonWarning > button:hover {
+  background-color: #ff8c00;
+}
+
+.buttonWarning > button:active {
+  background-color: #e68900;
+}
+
+/* 버튼 비활성화 상태 */
+.buttonWrapper > button:disabled {
+  background-color: #c7c7c7;
+  color: #e4e4e4;
+  cursor: not-allowed;
+}
+
+.secondary > button:disabled {
+  border-color: #000000;
+}

@@ -1,0 +1,142 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 Zustand Store 파일경로: src/components/phone-new/store/phoneNewStore.ts
+조건-파일경로) 구현될 Hook 파일경로: src/components/phone-new/hooks/usePhoneNewForm.hook.ts
+조건-파일경로) 구현될 타입 정의 파일경로: src/components/phone-new/types.ts
+
+조건-상태관리) Zustand 라이브러리
+            - 라이브러리: zustand
+            - 설치: npm install zustand
+            - 저장소: 로컬스토리지 미들웨어 (persist 플러그인)
+
+조건-백엔드) Supabase 데이터베이스
+            - 테이블: phones
+            - 기능: 기존 전화 정보 조회 (수정 모드)
+
+==============================================
+
+핵심요구사항) 폼 상태 관리 및 저장 기능(Task 7)을 구현할 것. Zustand를 사용하여 전체 폼 상태를 중앙 집중식으로 관리한다.
+
+1) 폼 상태 정의
+                - phoneNewStore (Zustand Store)를 생성하고, 다음 상태를 포함할 것:
+
+                [Supabase phones 테이블에 저장되는 필드]
+                - basicInfo: { modelName: string; condition: string; color: string; manufacturer?: string; storage?: string; ram?: string; releaseYear?: number; }
+                - pricing: { price: number; originalPrice?: number; }
+                - conditionText: { functionalStatus: string; additionalDescription: string }
+                - conditionData: { batteryHealth: number; } (phones.battery_health로 저장)
+                - location: { tradeAddress: string; latitude?: number; longitude?: number; }
+                - tradeMethod: { tradeMethod: "direct" | "delivery" | "parcel" | ""; reservationAvailable: boolean; }
+
+                [로컬스토리지에만 저장되는 필드 (Supabase에 저장 안 함)]
+                - pricing: { includesShipping: boolean; }
+                - conditionDetails: { screenGood: boolean; bodyGood: boolean; batteryGood: boolean; buttonsGood: boolean; cameraGood: boolean; audioGood: boolean; }
+
+                [이미지 상태 관리]
+                - images: { file: File | null; imagePreview: string | null; }
+                - file 속성은 브라우저 메모리에서만 유지하고, Zustand persist `partialize` 또는 `merge` 옵션으로 제외할 것 (localStorage에 File 직렬화 금지)
+                - imagePreview 문자열만 로컬스토리지에 저장하여 새로고침 시 UI 복원
+
+                [전체 폼 관리 필드]
+                - formStatus: "initial" | "editing" | "loading" | "submitted"
+                - editingPhoneId?: string (수정 모드 시)
+
+2) Zustand Store 메서드 구현
+                - setBasicInfo(data: basicInfo)
+                - setPricing(data: pricing)
+                - setConditionDetails(data: conditionDetails)
+                - setConditionText(data: conditionText)
+                - setLocation(data: location)
+                - setImages(data: images)
+                - setTradeMethod(data: tradeMethod)
+                - setFormStatus(status: formStatus)
+                - setEditingPhoneId(phoneId?: string)
+                - loadPhoneData(phoneId: string): Promise<void> (수정 모드: Supabase에서 데이터 로드)
+                - saveFormDraft(): void (로컬스토리지에 현재 상태 저장)
+                - loadFormDraft(): void (로컬스토리지에서 드래프트 복원)
+                - resetForm(): void (모든 상태 초기화)
+                - getFormData(): { all combined form data } (전체 폼 데이터 조회)
+
+3) 로컬스토리지 미들웨어
+                - key: "phone-new-form-draft"
+                - 자동 저장: 상태 변경 시 자동으로 로컬스토리지에 저장
+                - 페이지 로드 시: 자동으로 로컬스토리지에서 복원
+                - 폼 제출 후: 드래프트 삭제
+
+핵심요구사항) usePhoneNewForm Hook을 구현할 것.
+            1) 역할: Zustand Store의 상태와 메서드를 React Hook으로 래핑
+            2) 반환 값:
+                - formData: 현재 폼 전체 데이터
+                - updateBasicInfo(data: basicInfo): void
+                - updatePricing(data: pricing): void
+                - updateConditionDetails(data: conditionDetails): void
+                - updateConditionText(data: conditionText): void
+                - updateLocation(data: location): void
+                - updateImages(data: images): void
+                - updateTradeMethod(data: tradeMethod): void
+                - saveDraft(): void
+                - loadEditingPhone(phoneId: string): Promise<void>
+                - getFormData(): all data
+                - reset(): void
+                - isEditing(): boolean
+                - isDirty(): boolean
+
+핵심요구사항) 수정 모드 지원 (/phones/[id]/edit)
+            1) 페이지 로드 시:
+                - URL 파라미터에서 phoneId 추출
+                - Supabase phones 테이블에서 해당 전화 정보 조회
+                - Zustand Store에 기존 데이터 로드
+                - formStatus = "editing"으로 설정
+            2) 조회할 필드:
+                - phones 테이블의 모든 필드 (Task 7에서는 기존 데이터 로드만)
+            3) 에러 처리:
+                - 전화 정보 조회 실패 시: 에러 메시지 표시 및 목록 페이지로 이동
+
+핵심요구사항) 임시 저장 기능
+            1) 자동 저장: 폼 필드 변경 시 자동으로 로컬스토리지에 저장 (debounce 1초, 이미지 File 제외)
+            2) 수동 저장: "임시 저장" 버튼 클릭 시 명시적으로 저장
+            3) 복원 기능: 페이지 새로고침 후 이전 작성 내용 자동 복원
+            4) 저장소 키: "phone-new-form-draft"
+            5) 로컬스토리지 데이터 구조:
+                ```
+                {
+                  timestamp: number,
+                  formData: {
+                    basicInfo: { modelName, condition, color, manufacturer, storage, ram, releaseYear },
+                    pricing: { price, originalPrice, includesShipping },
+                    condition: {
+                      details: conditionDetails,
+                      text: { functionalStatus, additionalDescription }
+                    },
+                    location: { tradeAddress, latitude, longitude },
+                    images: { file: null, imagePreview },
+                    tradeMethod: { tradeMethod, reservationAvailable },
+                    conditionData: { batteryHealth }
+                  },
+                  editingPhoneId?: string
+                }
+                ```
+            6) 주의: File 객체는 직렬화 불가하므로 이미지는 로컬스토리지에 저장 안 함
+               → imagePreview (data URL)만 저장하여 UI 복원
+
+핵심요구사항) 폼 초기 상태
+            1) 새로운 등록 (/phones/new):
+                - 모든 필드 빈 값으로 초기화
+                - formStatus: "initial"
+            2) 기존 데이터 수정 (/phones/[id]/edit):
+                - Supabase에서 데이터 로드
+                - 각 필드에 기존 값 표시
+                - formStatus: "editing"
+                - editingPhoneId: [id]
+
+핵심요구사항) 타입 정의
+            - PhoneNewFormState: 전체 폼 상태 타입
+            - PhoneNewStore: Zustand Store 타입
+            - src/components/phone-new/types.ts에 모든 타입 정의
