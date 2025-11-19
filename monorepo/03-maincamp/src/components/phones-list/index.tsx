@@ -1,4 +1,4 @@
-"use client";
+     "use client";
 
 import React, { useState } from "react";
 import styles from "./styles.module.css";
@@ -7,26 +7,9 @@ import { usePhoneFilters } from "./hooks/index.filter.hook";
 import { usePhoneSearch } from "./hooks/index.search.hook";
 import { useIconFilter, type Phone } from "./hooks/index.icon-filter.hook";
 import type { IPhoneCard } from "./hooks/index.search.hook";
+import { usePagination } from "./hooks/index.pagination.hook";
+import { useFavorite } from "./hooks/index.favorite.hook";
 
-/**
- * 디바이스 타입 필터 아이콘 데이터
- */
-const DEVICE_TYPE_FILTERS = ["phone", "tablet", "laptop", "watch"] as const;
-
-type DeviceType = typeof DEVICE_TYPE_FILTERS[number];
-
-/**
- * 디바이스 타입 아이콘 렌더링 함수
- */
-function getDeviceTypeIcon(type: DeviceType) {
-  const iconMap: Record<DeviceType, string> = {
-    phone: "📱",
-    tablet: "📱",
-    laptop: "💻",
-    watch: "⌚",
-  };
-  return iconMap[type];
-}
 
 /**
  * 중고폰 브랜드 필터 아이콘 컴포넌트
@@ -50,61 +33,6 @@ function FilterIconSamsung() {
       alt="Samsung"
       className={styles.filterIcon}
       data-testid="icon-samsung"
-    />
-  );
-}
-
-function FilterIconGoogle() {
-  return (
-    <img
-      src="https://cdn.simpleicons.org/google/4285F4?view=light"
-      alt="Google"
-      className={styles.filterIcon}
-      data-testid="icon-google"
-    />
-  );
-}
-
-function FilterIconXiaomi() {
-  return (
-    <img
-      src="https://cdn.simpleicons.org/xiaomi/FF6900?view=light"
-      alt="Xiaomi"
-      className={styles.filterIcon}
-      data-testid="icon-xiaomi"
-    />
-  );
-}
-
-function FilterIconNothing() {
-  return (
-    <img
-      src="https://cdn.simpleicons.org/nothing/000000?view=light"
-      alt="Nothing"
-      className={styles.filterIcon}
-      data-testid="icon-nothing"
-    />
-  );
-}
-
-function FilterIconSony() {
-  return (
-    <img
-      src="https://cdn.simpleicons.org/sony/000000?view=light"
-      alt="Sony"
-      className={styles.filterIcon}
-      data-testid="icon-sony"
-    />
-  );
-}
-
-function FilterIconMotorola() {
-  return (
-    <img
-      src="https://cdn.simpleicons.org/motorola/5C51A3?view=light"
-      alt="Motorola"
-      className={styles.filterIcon}
-      data-testid="icon-motorola"
     />
   );
 }
@@ -135,6 +63,17 @@ interface IPhoneCardWithRouting extends IPhoneCard {
   onCardClick?: (phoneId: string | number) => void;
 }
 
+interface PhoneCardProps extends IPhoneCardWithRouting {
+  storageCapacity?: string | null;
+  deviceCondition?: string | null;
+  address?: string | null;
+  saleState?: 'available' | 'reserved' | 'sold' | null;
+  isFavorite?: boolean;
+  currency?: string | null;
+  onFavoriteClick?: (e: React.MouseEvent) => void;
+  isFavoriteLoading?: boolean;
+}
+
 function PhoneCard({
   title,
   description,
@@ -146,40 +85,118 @@ function PhoneCard({
   modelName,
   phoneId,
   onCardClick,
-}: IPhoneCardWithRouting) {
+  storageCapacity,
+  deviceCondition,
+  address,
+  saleState,
+  isFavorite = false,
+  currency,
+  onFavoriteClick,
+  isFavoriteLoading = false,
+}: PhoneCardProps) {
+  const DEFAULT_IMAGE_PATH = '/images/phone_sample.png';
+  
   const handleClick = () => {
     if (phoneId && onCardClick) {
       onCardClick(phoneId);
     }
   };
 
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+    if (onFavoriteClick) {
+      onFavoriteClick(e);
+    }
+  };
+
+  // 이미지 에러 핸들러
+  const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const imgElement = event.currentTarget;
+    const originalSrc = imgElement.src;
+
+    // 무한 루프 방지: 이미 기본 이미지인 경우 재시도하지 않음
+    if (originalSrc.includes(DEFAULT_IMAGE_PATH)) {
+      return;
+    }
+
+    // 기본 이미지로 대체
+    imgElement.src = DEFAULT_IMAGE_PATH;
+  };
+
+  const saleStateLabel = saleState === 'available' ? '판매중' : saleState === 'reserved' ? '예약중' : saleState === 'sold' ? '판매완료' : '정보 없음';
+  
+  const getSaleStateClassName = () => {
+    switch (saleState) {
+      case 'available':
+        return styles.saleStateAvailable;
+      case 'reserved':
+        return styles.saleStateReserved;
+      case 'sold':
+        return styles.saleStateSold;
+      default:
+        return styles.saleStateDefault;
+    }
+  };
+
+  // 이미지 URL이 없으면 기본 이미지 사용
+  const displayImageUrl = imageUrl || DEFAULT_IMAGE_PATH;
+
   return (
     <div
-      className={styles.card}
+      className={`${styles.card} ${phoneId ? styles.cardPointer : styles.cardDefault}`}
       data-testid="phone-card"
       onClick={handleClick}
-      style={{ cursor: phoneId ? "pointer" : "default" }}
     >
       <div className={styles.cardImage}>
-        {imageUrl ? (
-          <img src={imageUrl} alt={title} />
-        ) : (
-          <div style={{ backgroundColor: "#e0e0e0", width: "100%", height: "100%" }} />
-        )}
-        <div className={styles.bookmark} data-testid="bookmark">
-          <span>❤️</span>
-          <span>{likeCount}</span>
+        <div className={styles.cardImageWrapper}>
+          <img src={displayImageUrl} alt={title} onError={handleImageError} />
         </div>
       </div>
       <div className={styles.cardContent}>
         <div className={styles.cardHeader}>
-          <h3 className={styles.cardTitle}>{title}</h3>
+          <h3 className={styles.cardTitle} data-testid="card-title">{title}</h3>
           {modelName && (
             <p className={styles.cardModel} data-testid="card-model-name">
               모델명: {modelName}
             </p>
           )}
+          {storageCapacity && (
+            <p className={styles.cardModel} data-testid="card-storage-capacity">
+              용량: {storageCapacity}
+            </p>
+          )}
+          {deviceCondition && (
+            <p className={styles.cardModel} data-testid="card-device-condition">
+              상태: {deviceCondition}
+            </p>
+          )}
+          {address && (
+            <p className={styles.cardModel} data-testid="card-address">
+              지역: {address}
+            </p>
+          )}
           <p className={styles.cardDescription}>{description}</p>
+          <div className={styles.cardHeaderActions}>
+            {saleState && (
+              <span
+                className={`${styles.saleStateBadge} ${getSaleStateClassName()}`}
+                data-testid="card-sale-state"
+              >
+                {saleStateLabel}
+              </span>
+            )}
+            <button
+              className={styles.favoriteButton}
+              onClick={handleFavoriteClick}
+              disabled={isFavoriteLoading}
+              data-testid={`favorite-button-${phoneId}`}
+              aria-label={isFavorite ? '관심상품 제거' : '관심상품 저장'}
+              aria-pressed={isFavorite}
+            >
+              <span>{isFavorite ? '❤️' : '🤍'}</span>
+              <span>{likeCount}</span>
+            </button>
+          </div>
         </div>
         <div className={styles.cardTags}>
           <p className={styles.tags}>{tags}</p>
@@ -190,7 +207,9 @@ function PhoneCard({
           </span>
           <div className={styles.priceArea}>
             <span className={styles.price}>{price}</span>
-            <span className={styles.currency}>원</span>
+            <span className={styles.currency}>
+              {currency === 'KRW' || !currency ? '원' : currency}
+            </span>
           </div>
         </div>
       </div>
@@ -205,7 +224,7 @@ function PhoneCard({
  * 검색 필터, 브랜드 분류, 거래 카드 그리드를 포함합니다.
  */
 interface IPhonesListProps {
-  onSearch?: (params: any) => void;
+  onSearch?: (params: unknown) => void;
 }
 
 /**
@@ -214,11 +233,6 @@ interface IPhonesListProps {
 const BRAND_FILTERS = [
   { id: "apple", label: "Apple" },
   { id: "samsung", label: "Samsung" },
-  { id: "google", label: "Google" },
-  { id: "xiaomi", label: "Xiaomi" },
-  { id: "nothing", label: "Nothing" },
-  { id: "sony", label: "Sony" },
-  { id: "motorola", label: "Motorola" },
   { id: "lg", label: "LG" },
   { id: "others", label: "기타" },
 ] as const;
@@ -227,14 +241,11 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
   const [activeTab, setActiveTab] = useState<"selling" | "completed">("selling");
   const [hasSearched, setHasSearched] = useState(false);
   const [isSearchInFlight, setIsSearchInFlight] = useState(false);
-  const [selectedDeviceType, setSelectedDeviceType] = useState<DeviceType | null>(null);
   const [hasIconFilterInteracted, setHasIconFilterInteracted] = useState(false);
   const { navigateToPhoneDetail, navigateToPhoneCreate } = usePhonesListRouting();
   const {
-    availableNow,
     dateRange,
     keyword,
-    setAvailableNow,
     setDateRange,
     setKeyword,
     resetFilters,
@@ -248,13 +259,31 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
     toggleCategory,
   } = useIconFilter();
 
+  // 찜 기능 훅
+  const { 
+    toggleFavorite, 
+    isFavorite: checkIsFavorite, 
+    toastMessage, 
+    isLoading: isFavoriteLoading,
+    closeToast 
+  } = useFavorite();
+
+  // 페이징 훅
+  const {
+    phones: paginatedPhones,
+    currentPage,
+    totalCount,
+    isLoading: isPaginationLoading,
+    error: paginationError,
+    hasNextPage,
+    hasPreviousPage,
+    nextPage,
+    previousPage,
+  } = usePagination();
+
   const handleBrandFilterClick = (brandId: string) => {
     setHasIconFilterInteracted(true);
     toggleCategory(brandId);
-  };
-
-  const handleIconFilterToggle = (deviceType: DeviceType) => {
-    setSelectedDeviceType((prev) => (prev === deviceType ? null : deviceType));
   };
 
   const shouldRenderPhonesList =
@@ -276,14 +305,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
   const renderIconFilteredCards = () => {
     if (isCategoryLoading && phonesList.length === 0) {
       return (
-        <div
-          style={{
-            gridColumn: "1 / -1",
-            padding: "40px",
-            textAlign: "center",
-            color: "#999",
-          }}
-        >
+        <div className={styles.filteringMessage}>
           필터링 중...
         </div>
       );
@@ -293,12 +315,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
       return (
         <div
           data-testid="no-results"
-          style={{
-            gridColumn: "1 / -1",
-            padding: "40px",
-            textAlign: "center",
-            color: "#999",
-          }}
+          className={styles.noResultsMessage}
         >
           필터링된 결과가 없습니다
         </div>
@@ -307,21 +324,93 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
 
     return phonesList.map((phone, index) => {
       const formattedPrice = formatPhonePrice(phone.price);
-      const saleStateLabel = phone.sale_state ?? "정보 없음";
+      const categoriesString = phone.categories?.join(' ') || '';
+      const phoneIdStr = String(phone.id);
 
       return (
         <PhoneCard
           key={phone.id ?? index}
           phoneId={phone.id}
           title={phone.title || ""}
-          description={`거래 상태: ${saleStateLabel}`}
-          tags={phone.categories?.join(" ") || ""}
+          description=""
+          tags={categoriesString}
           price={formattedPrice}
           sellerLabel="판매자 정보"
           imageUrl={phone.main_image_url}
           likeCount={0}
           modelName=""
+          saleState={phone.sale_state}
+          isFavorite={checkIsFavorite(phoneIdStr)}
           onCardClick={navigateToPhoneDetail}
+          onFavoriteClick={() => toggleFavorite(phoneIdStr)}
+          isFavoriteLoading={isFavoriteLoading}
+        />
+      );
+    });
+  };
+
+  /**
+   * 페이징된 카드 렌더링
+   */
+  const renderPaginatedCards = () => {
+    // 로딩 상태
+    if (isPaginationLoading && paginatedPhones.length === 0) {
+      return (
+        <div className={styles.loadingState} data-testid="loading-state">
+          데이터 로드 중...
+        </div>
+      );
+    }
+
+    // 에러 상태
+    if (paginationError) {
+      return (
+        <div className={styles.errorState} data-testid="error-state">
+          데이터를 불러올 수 없습니다. 다시 시도해주세요.
+        </div>
+      );
+    }
+
+    // 빈 상태
+    if (paginatedPhones.length === 0) {
+      return (
+        <div className={styles.emptyState} data-testid="empty-state">
+          상품이 없습니다.
+        </div>
+      );
+    }
+
+    return paginatedPhones.map((phone, index) => {
+      const formattedPrice = formatPhonePrice(phone.price);
+      // tags 파싱 (JSONB 배열)
+      const tagsArray = Array.isArray(phone.tags) ? phone.tags : [];
+      const tagsString = tagsArray.length > 0 ? tagsArray.map(tag => `#${tag}`).join(' ') : '';
+      // categories도 함께 표시
+      const categoriesString = phone.categories?.join(' ') || '';
+      const allTags = [tagsString, categoriesString].filter(Boolean).join(' ');
+      const phoneIdStr = String(phone.id);
+
+      return (
+        <PhoneCard
+          key={phone.id ?? index}
+          phoneId={phone.id}
+          title={phone.title || "제목 없음"}
+          description=""
+          tags={allTags}
+          price={formattedPrice}
+          sellerLabel="판매자 정보"
+          imageUrl={phone.main_image_url || undefined}
+          likeCount={0}
+          modelName={phone.model_name || ""}
+          storageCapacity={phone.storage_capacity}
+          deviceCondition={phone.device_condition}
+          address={phone.address}
+          saleState={phone.sale_state}
+          isFavorite={checkIsFavorite(phoneIdStr)}
+          currency={phone.currency}
+          onCardClick={navigateToPhoneDetail}
+          onFavoriteClick={() => toggleFavorite(phoneIdStr)}
+          isFavoriteLoading={isFavoriteLoading}
         />
       );
     });
@@ -380,6 +469,17 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
 
   return (
     <div className={styles.container} data-testid="phones-list">
+      {/* 토스트 메시지 */}
+      {toastMessage && (
+        <div 
+          className={`${styles.toast} ${toastMessage.type === 'error' ? styles.toastError : styles.toastSuccess}`}
+          data-testid="favorite-toast"
+          onClick={closeToast}
+        >
+          {toastMessage.message}
+        </div>
+      )}
+
       {/* 제목 */}
       <h1 className={styles.title} data-testid="title">
         여기에서만 만날 수 있는 중고폰
@@ -413,24 +513,14 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
                 type="date"
                 value={dateRange.startDate || ''}
                 onChange={(e) => setDateRange(e.target.value || null, dateRange.endDate)}
-                style={{
-                  border: "none",
-                  outline: "none",
-                  padding: "4px",
-                  backgroundColor: "transparent",
-                }}
+                className={styles.dateInput}
               />
               <span>~</span>
               <input
                 type="date"
                 value={dateRange.endDate || ''}
                 onChange={(e) => setDateRange(dateRange.startDate, e.target.value || null)}
-                style={{
-                  border: "none",
-                  outline: "none",
-                  padding: "4px",
-                  backgroundColor: "transparent",
-                }}
+                className={styles.dateInput}
               />
             </div>
           </div>
@@ -443,13 +533,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 data-testid="search-input"
-                style={{
-                  border: "none",
-                  outline: "none",
-                  flex: 1,
-                  fontSize: "16px",
-                  backgroundColor: "transparent",
-                }}
+                className={styles.searchInput}
               />
             </div>
             <button
@@ -468,6 +552,13 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
             >
               {isLoading || isSearchInFlight ? '검색 중...' : '검색'}
             </button>
+            <button
+              className={styles.resetButton}
+              data-testid="reset-button"
+              onClick={resetFilters}
+            >
+              초기화
+            </button>
           </div>
         </div>
         <button
@@ -478,71 +569,13 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
           <div className={styles.sellButtonIcon}>📝</div>
           <span>중고폰 판매 등록</span>
         </button>
-        <button
-          className={styles.resetButton}
-          data-testid="reset-button"
-          onClick={resetFilters}
-          style={{
-            marginLeft: '8px',
-            padding: '8px 16px',
-            backgroundColor: '#f0f0f0',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
-        >
-          초기화
-        </button>
-      </div>
-
-      {/* 토글 필터 */}
-      <div style={{ marginBottom: '16px' }}>
-        <label data-testid="toggle-available" style={{ marginRight: '16px' }}>
-          <input
-            type="checkbox"
-            checked={availableNow}
-            onChange={(e) => setAvailableNow(e.target.checked)}
-          />
-          {' '}즉시 구매 가능
-        </label>
-      </div>
-
-      {/* 아이콘 필터 */}
-      <div
-        className={styles.iconFilterContainer}
-        data-testid="icon-filter"
-      >
-        {DEVICE_TYPE_FILTERS.map((deviceType) => (
-          <button
-            key={deviceType}
-            className={`${styles.iconFilterItem} ${
-              selectedDeviceType === deviceType ? styles.iconFilterItemSelected : ''
-            }`}
-            onClick={() => handleIconFilterToggle(deviceType)}
-            data-testid={`icon-${deviceType}`}
-            aria-pressed={selectedDeviceType === deviceType}
-          >
-            <span className={styles.iconFilterIcon}>
-              {getDeviceTypeIcon(deviceType)}
-            </span>
-            <span className={styles.iconFilterLabel}>
-              {deviceType.charAt(0).toUpperCase() + deviceType.slice(1)}
-            </span>
-          </button>
-        ))}
       </div>
 
       {/* 아이콘 필터 로딩 메시지 */}
       {isCategoryLoading && (
         <div
           data-testid="icon-filter-loading"
-          style={{
-            padding: '12px',
-            backgroundColor: '#e7f3ff',
-            color: '#0066cc',
-            borderRadius: '4px',
-            marginBottom: '16px',
-          }}
+          className={styles.iconFilterLoading}
         >
           로딩 중...
         </div>
@@ -553,13 +586,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
         <div
           data-testid="icon-filter-error"
           role="alert"
-          style={{
-            padding: '12px',
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            borderRadius: '4px',
-            marginBottom: '16px',
-          }}
+          className={styles.iconFilterError}
         >
           {categoryError}
         </div>
@@ -570,13 +597,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
         <div
           role="alert"
           data-testid="error-alert"
-          style={{
-            padding: '12px',
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            borderRadius: '4px',
-            marginBottom: '16px',
-          }}
+          className={styles.errorAlert}
         >
           {error}
         </div>
@@ -590,14 +611,9 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
           const IconComponent = {
             apple: FilterIconApple,
             samsung: FilterIconSamsung,
-            google: FilterIconGoogle,
-              xiaomi: FilterIconXiaomi,
-              nothing: FilterIconNothing,
-              sony: FilterIconSony,
-              motorola: FilterIconMotorola,
-              lg: FilterIconLG,
-              others: FilterIconOthers,
-            }[brand.id];
+            lg: FilterIconLG,
+            others: FilterIconOthers,
+          }[brand.id];
 
             const isSelected = selectedCategory === brand.id;
 
@@ -606,6 +622,7 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
                 key={brand.id}
                 className={[
                   styles.filterItem,
+                  styles.filterButton,
                   isSelected ? styles.filterItemSelected : '',
                   isSelected ? 'selected' : '',
                 ]
@@ -614,12 +631,6 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
                 onClick={() => handleBrandFilterClick(brand.id)}
                 data-testid={`filter-${brand.id}`}
                 aria-pressed={isSelected}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                }}
               >
                 <IconComponent />
                 <span className={styles.filterLabel}>{brand.label}</span>
@@ -646,26 +657,42 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
             // 검색 결과가 없을 때
             <div
               data-testid="no-results"
-              style={{
-                gridColumn: '1 / -1',
-                padding: '40px',
-                textAlign: 'center',
-                color: '#999',
-              }}
+              className={styles.noResultsMessage}
             >
               검색 결과가 없습니다
             </div>
           ) : (
-            // 검색을 하지 않았을 때 샘플 데이터 표시
-            sampleCards.map((card, index) => (
-              <PhoneCard
-                key={index}
-                {...card}
-                onCardClick={navigateToPhoneDetail}
-              />
-            ))
+            // 페이징된 데이터 표시
+            renderPaginatedCards()
           )}
         </div>
+
+        {/* 페이징 컨트롤 */}
+        {!shouldRenderPhonesList && !hasSearched && paginatedPhones.length > 0 && (
+          <div className={styles.paginationContainer} data-testid="pagination-container">
+            <button
+              className={styles.paginationButton}
+              onClick={previousPage}
+              disabled={!hasPreviousPage}
+              data-testid="pagination-prev-button"
+            >
+              이전
+            </button>
+
+            <div className={styles.pageInfo} data-testid="page-info">
+              {currentPage} / {Math.ceil(totalCount / 10)}
+            </div>
+
+            <button
+              className={styles.paginationButton}
+              onClick={nextPage}
+              disabled={!hasNextPage}
+              data-testid="pagination-next-button"
+            >
+              다음
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

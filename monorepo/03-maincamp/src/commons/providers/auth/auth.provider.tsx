@@ -196,6 +196,12 @@ export default function AuthProvider({ children }: AuthProviderProps) {
           setUser(localUser);
         }
 
+        // 테스트 환경에서는 localStorage만으로 인증 완료
+        if (process.env.NEXT_PUBLIC_TEST_ENV === 'test') {
+          setLoading(false);
+          return;
+        }
+
         // Supabase 세션으로 2차 확인
         const { data, error } = await supabase.auth.getSession();
 
@@ -286,4 +292,5 @@ export function useAuth(): AuthContextType {
   }
   return context;
 }
+
 

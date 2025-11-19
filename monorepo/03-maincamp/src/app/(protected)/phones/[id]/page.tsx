@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import PhoneDetail from '@/components/phone-detail';
 import Inquiries from '@/components/inquiries';
 import { useInquirySubmit } from '@/components/inquiries/hooks/index.submit.hook';
+import { useInquiryDataBinding } from '@/components/inquiries/hooks/index.data-binding.hook';
 
 interface PhoneDetailPageProps {
   params: {
@@ -15,9 +16,17 @@ interface PhoneDetailPageProps {
 export default function PhoneDetailTestPage({ params }: PhoneDetailPageProps) {
   const phoneId = params.id;
   const router = useRouter();
+  
+  // 문의 데이터 조회
+  const { inquiries, refetch } = useInquiryDataBinding({
+    phoneId,
+  });
+  
+  // 문의 제출
   const { submitInquiry } = useInquirySubmit({
     phoneId,
     onSuccess: () => {
+      refetch(); // 제출 성공 시 데이터 새로고침
       router.refresh();
     },
   });
@@ -41,7 +50,7 @@ export default function PhoneDetailTestPage({ params }: PhoneDetailPageProps) {
             submitButtonText: '문의 하기',
             maxLength: 100,
           }}
-          inquiries={[]}
+          inquiries={inquiries}
           onSubmitInquiry={handleSubmitInquiry}
           onSubmitReply={(inquiryId, content) => {
             console.log('답변 제출:', inquiryId, content);

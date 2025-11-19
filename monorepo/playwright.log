@@ -1,0 +1,806 @@
+
+Running 181 tests using 5 workers
+
+[1A[2K[1/181] [chromium] › src/components/phone-detail/tests/index.copylink.hook.spec.ts:70:7 › 링크 복사 기능 (prompt.403.copylink) › 공유 아이콘이 존재하는지 확인
+[1A[2K[2/181] [chromium] › src/commons/utils/tests/validation.spec.ts:5:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateRequired - 필수 필드 검증 성공
+[1A[2K[3/181] [chromium] › src/components/inquiries/tests/index.submit.spec.ts:197:7 › 문의 제출 흐름 (prompt.402) › 성공: 문의 제출 시 Supabase로 데이터가 저장되고 입력창 초기화
+[1A[2K[4/181] [chromium] › src/components/phone-detail/tests/index.bookmark.hook.spec.ts:98:5 › 미로그인 상태에서 북마크 버튼 클릭 시 경고 메시지 표시
+[1A[2K[5/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:11:7 › TokenWallet Component › 컴포넌트가 렌더링되어야 함
+[1A[2K[6/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:16:7 › TokenWallet Component › 페이지 제목이 올바르게 표시되어야 함
+[1A[2K[chromium] › src/components/inquiries/tests/index.submit.spec.ts:197:7 › 문의 제출 흐름 (prompt.402) › 성공: 문의 제출 시 Supabase로 데이터가 저장되고 입력창 초기화
+[browser] info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+
+[1A[2K[7/181] [chromium] › src/commons/utils/tests/validation.spec.ts:18:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateRequired - 빈값 검증 실패
+[1A[2K[8/181] [chromium] › src/components/phone-detail/tests/index.copylink.hook.spec.ts:75:7 › 링크 복사 기능 (prompt.403.copylink) › 링크 복사 성공 시 클립보드에 현재 URL이 복사됨
+[1A[2K[9/181] [chromium] › src/components/phone-detail/tests/index.bookmark.hook.spec.ts:119:5 › 로그인 후 북마크 추가 시 성공 메시지 표시 및 UI 업데이트
+[1A[2K[playwright] localStorage keys []
+
+[1A[2K[browser] log [useInquirySubmit] submit invoked 테스트 문의 내용입니다.
+
+[1A[2K[browser] log [useInquirySubmit] stored session user {id: 8d159ce6-5a84-46f4-95d7-dd0d7a37b6a9}
+
+[1A[2K[browser] log [useInquirySubmit] validation passed
+
+[1A[2K[playwright] observed phone_inquiries request: https://fkkztiavgrmmazvdwtdw.supabase.co/rest/v1/phone_inquiries?columns=%22content%22%2C%22phone_id%22%2C%22author_id%22%2C%22parent_id%22%2C%22status%22%2C%22is_answer%22
+
+[1A[2K[playwright] phone_inquiries request: https://fkkztiavgrmmazvdwtdw.supabase.co/rest/v1/phone_inquiries?columns=%22content%22%2C%22phone_id%22%2C%22author_id%22%2C%22parent_id%22%2C%22status%22%2C%22is_answer%22
+
+[1A[2K[browser] log [useInquirySubmit] insert succeeded
+
+[1A[2K[10/181] [chromium] › src/components/inquiries/tests/index.submit.spec.ts:250:7 › 문의 제출 흐름 (prompt.402) › 실패: Supabase 세션 없이 GraphQL 로그인만 있으면 경고 메시지가 표시된다
+[1A[2K[11/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:22:7 › TokenWallet Component › 사용자 정보 섹션이 렌더링되어야 함
+[1A[2K[12/181] [chromium] › src/commons/utils/tests/validation.spec.ts:31:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateRequired - null 검증 실패
+[1A[2K[chromium] › src/components/inquiries/tests/index.submit.spec.ts:250:7 › 문의 제출 흐름 (prompt.402) › 실패: Supabase 세션 없이 GraphQL 로그인만 있으면 경고 메시지가 표시된다
+[browser] info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+
+[1A[2K[13/181] [chromium] › src/components/phone-detail/tests/index.bookmark.hook.spec.ts:170:5 › 북마크 제거 시 성공 메시지 표시 및 UI 업데이트
+[1A[2K[14/181] [chromium] › src/components/phone-detail/tests/index.copylink.hook.spec.ts:91:7 › 링크 복사 기능 (prompt.403.copylink) › 링크 복사 성공 시 "링크가 복사되었습니다." 메시지 표시
+[1A[2K[browser] log [useInquirySubmit] submit invoked 그래프 로그인 문의
+
+[1A[2K[browser] log [useInquirySubmit] stored session user null
+
+[1A[2K[15/181] [chromium] › src/components/inquiries/tests/index.submit.spec.ts:271:7 › 문의 제출 흐름 (prompt.402) › 실패: 빈 내용 제출 시 에러 메시지 노출 및 요청 차단
+[1A[2K[16/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:33:7 › TokenWallet Component › 사용자 프로필이 올바르게 표시되어야 함
+[1A[2K[17/181] [chromium] › src/commons/utils/tests/validation.spec.ts:44:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateRequired - undefined 검증 실패
+[1A[2K[chromium] › src/components/inquiries/tests/index.submit.spec.ts:271:7 › 문의 제출 흐름 (prompt.402) › 실패: 빈 내용 제출 시 에러 메시지 노출 및 요청 차단
+[browser] info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+
+[1A[2K[browser] log [useInquirySubmit] submit invoked 
+
+[1A[2K[18/181] [chromium] › src/components/inquiries/tests/index.submit.spec.ts:291:7 › 문의 제출 흐름 (prompt.402) › 실패: 100자 초과 입력 시 에러 메시지 노출 및 입력 유지
+[1A[2K[19/181] [chromium] › src/components/phone-detail/tests/index.copylink.hook.spec.ts:104:7 › 링크 복사 기능 (prompt.403.copylink) › 클립보드 API 미지원 시 "링크 복사에 실패했습니다." 메시지 표시
+[1A[2K[20/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:41:7 › TokenWallet Component › 포인트 정보가 올바르게 표시되어야 함
+[1A[2K[21/181] [chromium] › src/commons/utils/tests/validation.spec.ts:57:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validatePrice - 유효한 가격 검증 성공
+[1A[2K[chromium] › src/components/inquiries/tests/index.submit.spec.ts:291:7 › 문의 제출 흐름 (prompt.402) › 실패: 100자 초과 입력 시 에러 메시지 노출 및 입력 유지
+[browser] info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+
+[1A[2K[browser] log [useInquirySubmit] submit invoked aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+[1A[2K[22/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:49:7 › TokenWallet Component › 메뉴 아이템들이 렌더링되어야 함
+[1A[2K[23/181] [chromium] › src/components/inquiries/tests/index.submit.spec.ts:317:7 › 문의 제출 흐름 (prompt.402) › 실패: Supabase 저장 실패 시 에러 메시지 노출 및 입력 유지
+[1A[2K[24/181] [chromium] › src/commons/utils/tests/validation.spec.ts:70:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validatePrice - 문자열 가격 변환 성공
+[1A[2K[chromium] › src/components/inquiries/tests/index.submit.spec.ts:317:7 › 문의 제출 흐름 (prompt.402) › 실패: Supabase 저장 실패 시 에러 메시지 노출 및 입력 유지
+[browser] info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+
+[1A[2K[25/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:62:7 › TokenWallet Component › 메뉴 클릭 시 활성 상태가 변경되어야 함
+[1A[2K[26/181] [chromium] › src/components/phone-detail/tests/index.copylink.hook.spec.ts:128:7 › 링크 복사 기능 (prompt.403.copylink) › 클립보드 writeText 실패 시 "링크 복사에 실패했습니다." 메시지 표시
+[1A[2K[27/181] [chromium] › src/commons/utils/tests/validation.spec.ts:83:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validatePrice - 음수 검증 실패
+[1A[2K[browser] log [useInquirySubmit] submit invoked 저장 실패 케이스
+
+[1A[2K[browser] log [useInquirySubmit] stored session user {id: 8d159ce6-5a84-46f4-95d7-dd0d7a37b6a9}
+
+[1A[2K[browser] log [useInquirySubmit] validation passed
+
+[1A[2K[playwright] phone_inquiries request (error test): https://fkkztiavgrmmazvdwtdw.supabase.co/rest/v1/phone_inquiries?columns=%22content%22%2C%22phone_id%22%2C%22author_id%22%2C%22parent_id%22%2C%22status%22%2C%22is_answer%22
+
+[1A[2K[browser][response] https://fkkztiavgrmmazvdwtdw.supabase.co/rest/v1/phone_inquiries?columns=%22content%22%2C%22phone_id%22%2C%22author_id%22%2C%22parent_id%22%2C%22status%22%2C%22is_answer%22 [33m500[39m
+
+[1A[2K[browser] error Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+
+[1A[2K[browser] error 문의 등록 실패: {message: error}
+
+[1A[2K[28/181] [chromium] › src/components/inquiries/tests/index.submit.spec.ts:339:7 › 문의 제출 흐름 (prompt.402) › 실패: 로그인하지 않은 경우 경고 메시지 노출
+[1A[2K[29/181] [chromium] › src/commons/utils/tests/validation.spec.ts:96:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validatePrice - 최대값 초과 검증 실패
+[1A[2K[30/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:76:7 › TokenWallet Component › 탭이 렌더링되어야 함
+[1A[2K[chromium] › src/components/inquiries/tests/index.submit.spec.ts:339:7 › 문의 제출 흐름 (prompt.402) › 실패: 로그인하지 않은 경우 경고 메시지 노출
+[browser] info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+
+[1A[2K[31/181] [chromium] › src/components/phone-detail/tests/index.bookmark.hook.spec.ts:239:5 › 북마크 업데이트 실패 시 에러 메시지 표시 및 상태 롤백
+[1A[2K[browser] log [useInquirySubmit] submit invoked 로그인 필요 테스트
+
+[1A[2K[browser] log [useInquirySubmit] stored session user null
+
+[1A[2K[32/181] [chromium] › src/components/inquiries/tests/index.submit.spec.ts:359:7 › 문의 제출 흐름 (prompt.402) › 글자 수 카운터는 입력 길이에 맞춰 실시간으로 업데이트된다
+[1A[2K[33/181] [chromium] › src/commons/utils/tests/validation.spec.ts:109:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validatePrice - 숫자가 아닌 값 검증 실패
+[1A[2K[34/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:87:7 › TokenWallet Component › 탭 클릭 시 활성 상태가 변경되어야 함
+[1A[2K[35/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:61:7 › 삭제 기능 테스트 › 삭제 아이콘 클릭 시 확인 모달이 표시되어야 함
+[1A[2K[chromium] › src/components/inquiries/tests/index.submit.spec.ts:359:7 › 문의 제출 흐름 (prompt.402) › 글자 수 카운터는 입력 길이에 맞춰 실시간으로 업데이트된다
+[browser] info %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+
+[1A[2K[36/181] [chromium] › src/components/phone-detail/tests/index.bookmark.hook.spec.ts:278:5 › 북마크 배지에 좋아요 수가 올바르게 표시됨
+[1A[2K[37/181] [chromium] › src/components/phone-detail/tests/index.fetch-detail.spec.ts:103:7 › PhoneDetail 데이터 조회 › 정상적인 phoneId로 상세 정보 조회 성공 시 모든 필드가 표시됨
+[1A[2K[38/181] [chromium] › src/components/phone-detail/tests/index.fetch-detail.spec.ts:119:7 › PhoneDetail 데이터 조회 › 존재하지 않는 phoneId로 조회 시 에러 메시지 표시됨
+[1A[2K[39/181] [chromium] › src/components/phone-detail/tests/index.fetch-detail.spec.ts:129:7 › PhoneDetail 데이터 조회 › 조회 실패 후 재시도 버튼 클릭 시 다시 조회 실행됨
+[1A[2K[40/181] [chromium] › src/components/phone-detail/tests/index.fetch-detail.spec.ts:146:7 › PhoneDetail 데이터 조회 › 모든 필수 필드가 올바르게 바인딩됨
+[1A[2K[41/181] [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:25:5 › 거래 지역 정보가 있는 경우 위치 아이콘 클릭 시 외부 지도 서비스로 새 창 열기
+[1A[2K[42/181] [chromium] › src/commons/utils/tests/validation.spec.ts:122:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateCoordinate - 유효한 좌표 검증 성공
+[1A[2K[43/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:102:7 › TokenWallet Component › 검색 섹션이 렌더링되어야 함
+[1A[2K[44/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:69:7 › 삭제 기능 테스트 › 모달에 올바른 메시지가 표시되어야 함
+[1A[2K[45/181] [chromium] › src/components/phone-detail/tests/index.bookmark.hook.spec.ts:293:5 › 액션 버튼 섹션(삭제, 공유, 위치, 북마크)이 렌더링됨
+[1A[2K[46/181] [chromium] › src/commons/utils/tests/validation.spec.ts:134:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateCoordinate - latitude 범위 초과 검증 실패
+[1A[2K[47/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:115:7 › TokenWallet Component › 검색 입력이 작동해야 함
+[1A[2K[48/181] [chromium] › src/components/phone-detail/tests/index.navigation.spec.ts:16:7 › 폰 상세 네비게이션 기능 › 카테고리 탭을 클릭하면 /phones 로 이동해야 함
+[1A[2K[49/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:77:7 › 삭제 기능 테스트 › 모달에 취소와 삭제 버튼이 있어야 함
+[1A[2K[50/181] [chromium] › src/commons/utils/tests/validation.spec.ts:147:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateCoordinate - longitude 범위 초과 검증 실패
+[1A[2K[51/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:123:7 › TokenWallet Component › 거래 내역 테이블이 렌더링되어야 함
+[1A[2K[52/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:88:7 › 삭제 기능 테스트 › 취소 버튼 클릭 시 모달이 닫혀야 함
+[1A[2K[53/181] [chromium] › src/commons/utils/tests/validation.spec.ts:160:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateTags - 유효한 태그 검증 성공
+[1A[2K[54/181] [chromium] › src/commons/utils/tests/validation.spec.ts:172:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateTags - 중복 태그 검증 실패
+[1A[2K[55/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:131:7 › TokenWallet Component › 테이블 헤더가 올바르게 표시되어야 함
+[1A[2K[56/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:98:7 › 삭제 기능 테스트 › 취소 버튼 클릭 후 페이지에 데이터가 유지되어야 함
+[1A[2K[57/181] [chromium] › src/components/phone-detail/tests/index.navigation.spec.ts:21:7 › 폰 상세 네비게이션 기능 › 뒤로가기 버튼을 클릭하면 /phones 로 이동해야 함
+[1A[2K[58/181] [chromium] › src/commons/utils/tests/validation.spec.ts:185:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateTags - 문자열 중복 태그 검증 실패
+[1A[2K[59/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:143:7 › TokenWallet Component › 테이블 행들이 렌더링되어야 함
+[1A[2K[60/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:109:7 › 삭제 기능 테스트 › 삭제 버튼 클릭 시 로딩 상태를 표시해야 함
+[1A[2K[61/181] [chromium] › src/commons/utils/tests/validation.spec.ts:198:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateTags - 최대 개수 초과 검증 실패
+[1A[2K[62/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:152:7 › TokenWallet Component › 레이아웃이 반응형이어야 함
+[1A[2K[63/181] [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:80:7 › 주소 검색 및 지오코딩 통합 테스트 › 주소 검색 성공 시나리오 - 주소 선택 후 자동 지오코딩
+[1A[2K[64/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:121:7 › 삭제 기능 테스트 › 삭제 성공 시 성공 메시지를 표시하고 /phones로 이동해야 함
+[1A[2K[65/181] [chromium] › src/commons/utils/tests/validation.spec.ts:211:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateLength - 유효한 길이 검증 성공
+[1A[2K[66/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:163:7 › TokenWallet Component › 사이드바가 올바르게 배치되어야 함
+[1A[2K[67/181] [chromium] › src/components/mypage/tests/index.ui.spec.ts:171:7 › TokenWallet Component › 검색 버튼이 클릭 가능해야 함
+[1A[2K[68/181] [chromium] › src/commons/utils/tests/validation.spec.ts:223:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateLength - 최대 길이 초과 검증 실패
+[1A[2K[69/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:70:7 › usePhoneBinding 훅 테스트 - 초안 모드 (ID 없음) › ID가 없을 때 데이터를 로드하지 않고 빈 폼으로 시작
+[1A[2K[70/181] [chromium] › src/commons/utils/tests/validation.spec.ts:236:9 › Validation Utility Tests › 동기 유효성 검사 함수 테스트 › validateLength - 최소 길이 미달 검증 실패
+[1A[2K[71/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:137:7 › 삭제 기능 테스트 › 삭제 실패 시 에러 메시지를 표시해야 함
+[1A[2K[72/181] [chromium] › src/commons/utils/tests/validation.spec.ts:251:9 › Validation Utility Tests › 비동기 유효성 검사 함수 테스트 › validateAsync - 비동기 검증 성공
+[1A[2K[73/181] [chromium] › src/commons/utils/tests/validation.spec.ts:263:9 › Validation Utility Tests › 비동기 유효성 검사 함수 테스트 › validateAsync - 비동기 검증 실패
+[1A[2K[74/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:90:7 › usePhoneBinding 훅 테스트 - 초안 모드 (ID 없음) › 초안 모드에서는 폼을 자유롭게 수정할 수 있어야 함
+[1A[2K[75/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:149:7 › 삭제 기능 테스트 › 삭제 실패 시 모달이 닫혀야 함
+[1A[2K[76/181] [chromium] › src/commons/utils/tests/validation.spec.ts:278:9 › Validation Utility Tests › 병렬 검증 테스트 › validateAllFields - 모든 필드 검증 성공
+[1A[2K[77/181] [chromium] › src/commons/utils/tests/validation.spec.ts:314:9 › Validation Utility Tests › 병렬 검증 테스트 › validateAllFields - 실패한 필드만 에러 반환
+[1A[2K[78/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:101:7 › usePhoneBinding 훅 테스트 - 수정 모드 데이터 로드 (ID 있음) › URL의 쿼리 파라미터에서 ID를 추출하여 데이터를 로드
+[1A[2K[79/181] [chromium] › src/components/phone-detail/tests/index.delete.hook.spec.ts:161:7 › 삭제 기능 테스트 › 삭제 실패 시 페이지가 이동하지 않아야 함
+[1A[2K[80/181] [chromium] › src/commons/utils/tests/validation.spec.ts:343:9 › Validation Utility Tests › 병렬 검증 테스트 › validateAllFields - 태그 정규화 테스트
+[1A[2K[81/181] [chromium] › src/commons/utils/tests/validation.spec.ts:368:9 › Validation Utility Tests › 병렬 검증 테스트 › validateAllFields - 숫자 문자열 정규화
+[1A[2K[82/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:123:7 › usePhoneBinding 훅 테스트 - 수정 모드 데이터 로드 (ID 있음) › 로드된 데이터가 모든 폼 필드에 정상 바인딩되어야 함
+[1A[2K[83/181] [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:113:7 › PhoneNew Form 컴포넌트 테스트 › 신규등록 모드 - 기본 상태 확인
+[1A[2K[84/181] [chromium] › src/components/phone-new/tests/index.routing.spec.ts:121:7 › PhoneNew 라우팅 테스트 - 신규등록 모드 (isEdit=false) › 취소 버튼 클릭 시 목록 페이지(/phones)로 이동
+[1A[2K[85/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:166:7 › usePhoneBinding 훅 테스트 - 수정 모드 데이터 로드 (ID 있음) › 로드된 데이터의 위도/경도가 정상적으로 바인딩되어야 함
+[1A[2K  1) [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:80:7 › 주소 검색 및 지오코딩 통합 테스트 › 주소 검색 성공 시나리오 - 주소 선택 후 자동 지오코딩 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="btn-address-search"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="btn-address-search"]')[22m
+
+
+      81 |     // 주소 검색 버튼 클릭
+      82 |     const searchButton = page.locator('[data-testid="btn-address-search"]');
+    > 83 |     await expect(searchButton).toBeVisible();
+         |                                ^
+      84 |     await searchButton.click();
+      85 |
+      86 |     // Daum 팝업에서 주소 선택이 완료될 때까지 대기
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.address.hook.spec.ts:83:32
+
+    Error Context: test-results/src-components-phone-new-t-3a6f2-색-성공-시나리오---주소-선택-후-자동-지오코딩-chromium/error-context.md
+
+
+[1A[2K[86/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:187:7 › usePhoneBinding 훅 테스트 - 로딩 상태 › 데이터 로드 중 로딩 표시가 나타나야 함
+[1A[2K[87/181] [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:105:7 › 주소 검색 및 지오코딩 통합 테스트 › 좌표 수정 시 역지오코딩 시나리오
+[1A[2K[88/181] [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:120:7 › PhoneNew Form 컴포넌트 테스트 › 신규등록 모드 - 필수값 입력 후 저장
+[1A[2K[89/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:206:7 › usePhoneBinding 훅 테스트 - 로딩 상태 › 데이터 로드 완료 후 로딩 표시가 사라져야 함
+[1A[2K[90/181] [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:129:7 › 주소 검색 및 지오코딩 통합 테스트 › 상태 공유 시나리오 - Zustand 스토어 업데이트
+[1A[2K[91/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:224:7 › usePhoneBinding 훅 테스트 - 데이터 로드 실패 › 존재하지 않는 ID로 조회 시 에러 메시지를 표시하고 리다이렉트
+[1A[2K[92/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:243:7 › usePhoneBinding 훅 테스트 - 데이터 로드 실패 › 네트워크 오류 시 에러 처리가 정상적으로 작동
+[1A[2K[93/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:267:7 › usePhoneBinding 훅 테스트 - 이미지 배열 바인딩 › 여러 이미지 URL이 배열로 정상 바인딩되어야 함
+[1A[2K[94/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:286:7 › usePhoneBinding 훅 테스트 - 이미지 배열 바인딩 › 이미지가 없는 상품이 로드될 때도 정상 처리
+[1A[2K  2) [chromium] › src/components/phone-new/tests/index.routing.spec.ts:121:7 › PhoneNew 라우팅 테스트 - 신규등록 모드 (isEdit=false) › 취소 버튼 클릭 시 목록 페이지(/phones)로 이동 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected: [32m"http://localhost:3000/phones"[39m
+    Received: [31m"http://localhost:3000/phones[7m/new[27m"[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3000/phones/new"[22m
+
+
+      131 |     // 3. 검증: URL이 /phones로 변경되었는지 확인
+      132 |     const expectedUrl = 'http://localhost:3000/phones';
+    > 133 |     await expect(page).toHaveURL(expectedUrl);
+          |                        ^
+      134 |   });
+      135 |
+      136 |   test('등록 완료 후 목록 페이지(/phones)로 이동', async ({ page }) => {
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.routing.spec.ts:133:24
+
+    Error Context: test-results/src-components-phone-new-t-6db2a--버튼-클릭-시-목록-페이지-phones-로-이동-chromium/error-context.md
+
+
+[1A[2K[95/181] [chromium] › src/components/phone-new/tests/index.routing.spec.ts:136:7 › PhoneNew 라우팅 테스트 - 신규등록 모드 (isEdit=false) › 등록 완료 후 목록 페이지(/phones)로 이동
+[1A[2K[96/181] [chromium] › src/components/phone-new/tests/index.binding.hook.spec.ts:305:7 › usePhoneBinding 훅 테스트 - 이미지 배열 바인딩 › 이미지 미리보기가 올바른 이미지를 표시
+[1A[2K[97/181] [chromium] › src/components/phone-new/tests/index.state.hook.spec.ts:17:7 › usePhoneState 훅 테스트 › 1. 초안 모드 초기화 테스트 - 모든 필드가 빈 값으로 초기화되는지 검증
+[1A[2K[98/181] [chromium] › src/components/phone-new/tests/index.state.hook.spec.ts:54:7 › usePhoneState 훅 테스트 › 2. 필드 업데이트 테스트 - updateField로 각 필드 값 변경 시 정상 업데이트되는지 검증
+[1A[2K[99/181] [chromium] › src/components/phone-new/tests/index.state.hook.spec.ts:83:7 › usePhoneState 훅 테스트 › 3. 리셋 테스트 - resetState 호출 시 현재 모드의 초기값으로 돌아가는지 검증
+[1A[2K[100/181] [chromium] › src/components/phone-new/tests/index.state.hook.spec.ts:106:7 › usePhoneState 훅 테스트 › 4. 모드 전환 테스트 - draft → edit → completed 모드 전환 시 상태 변화 검증
+[1A[2K[101/181] [chromium] › src/components/phone-new/tests/index.state.hook.spec.ts:145:7 › usePhoneState 훅 테스트 › 5. 수정 모드 데이터 로드 테스트 - edit 모드로 전환하면서 기존 데이터가 정상 로드되는지 검증
+[1A[2K[102/181] [chromium] › src/components/phone-new/tests/index.state.hook.spec.ts:178:7 › usePhoneState 훅 테스트 › 6. edit 모드에서 리셋 테스트 - edit 모드의 초기값으로 리셋되는지 검증
+[1A[2K[103/181] [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:63:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 입력 후 자동으로 로컬스토리지에 임시 저장되고 새로고침 시 복원됨
+[1A[2K  3) [chromium] › src/components/phone-new/tests/index.routing.spec.ts:136:7 › PhoneNew 라우팅 테스트 - 신규등록 모드 (isEdit=false) › 등록 완료 후 목록 페이지(/phones)로 이동 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected: [32m"http://localhost:3000/phones"[39m
+    Received: [31m"http://localhost:3000/phones[7m/new[27m"[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://localhost:3000/phones/new"[22m
+
+
+      160 |     // 3. 검증: URL이 /phones로 변경되었는지 확인
+      161 |     const expectedUrl = 'http://localhost:3000/phones';
+    > 162 |     await expect(page).toHaveURL(expectedUrl);
+          |                        ^
+      163 |   });
+      164 | });
+      165 |
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.routing.spec.ts:162:24
+
+    Error Context: test-results/src-components-phone-new-t-98591--등록-완료-후-목록-페이지-phones-로-이동-chromium/error-context.md
+
+
+[1A[2K[104/181] [chromium] › src/components/phone-new/tests/index.routing.spec.ts:193:7 › PhoneNew 라우팅 테스트 - 수정 모드 (isEdit=true) › 취소 버튼 클릭 시 상세 페이지(/phones/[id])로 이동
+[1A[2K  4) [chromium] › src/components/phone-new/tests/index.routing.spec.ts:193:7 › PhoneNew 라우팅 테스트 - 수정 모드 (isEdit=true) › 취소 버튼 클릭 시 상세 페이지(/phones/[id])로 이동 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at setPhoneData (/Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.routing.spec.ts:46:14)
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.routing.spec.ts:186:11
+
+
+[1A[2K[105/181] [chromium] › src/components/phone-new/tests/index.routing.spec.ts:208:7 › PhoneNew 라우팅 테스트 - 수정 모드 (isEdit=true) › 수정 완료 후 상세 페이지(/phones/[id])로 이동
+[1A[2K  5) [chromium] › src/components/phone-new/tests/index.routing.spec.ts:208:7 › PhoneNew 라우팅 테스트 - 수정 모드 (isEdit=true) › 수정 완료 후 상세 페이지(/phones/[id])로 이동 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:292:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at setPhoneData (/Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.routing.spec.ts:46:14)
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.routing.spec.ts:186:11
+
+
+[1A[2K[106/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:29:7 › PhoneNew 컴포넌트 UI › 페이지 제목이 렌더링되어야 함
+[1A[2K[107/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:35:7 › PhoneNew 컴포넌트 UI › 모든 입력 필드가 렌더링되어야 함
+[1A[2K  6) [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:25:5 › 거래 지역 정보가 있는 경우 위치 아이콘 클릭 시 외부 지도 서비스로 새 창 열기 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="phone-detail-body"]') to be visible[22m
+
+
+      30 |
+      31 |   // 페이지가 완전히 로드될 때까지 대기 (data-testid)
+    > 32 |   await page.waitForSelector('[data-testid="phone-detail-body"]');
+         |              ^
+      33 |
+      34 |   // 새 창이 열리는 것을 감지
+      35 |   const [newPage] = await Promise.all([
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-detail/tests/index.location.hook.spec.ts:32:14
+
+    Error Context: test-results/src-components-phone-detai-aafba--아이콘-클릭-시-외부-지도-서비스로-새-창-열기-chromium/error-context.md
+
+
+[1A[2K[108/181] [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:56:5 › 거래 지역 정보가 없는 경우 위치 아이콘 클릭 시 경고 메시지 표시 및 지도 창 열지 않기
+[1A[2K[109/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:69:7 › PhoneNew 컴포넌트 UI › 에디터가 렌더링되어야 함
+[1A[2K  7) [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:63:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 입력 후 자동으로 로컬스토리지에 임시 저장되고 새로고침 시 복원됨 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveValue[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('[data-testid="input-phone-name"]')
+    Expected: [32m"자동 저장 폰"[39m
+    Received: [31m""[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveValue" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="input-phone-name"]')[22m
+    [2m    9 × locator resolved to <input type="text" name="title" id="phone-name" placeholder="모델명을 입력해 주세요." data-testid="input-phone-name" class="styles_inputField__daBtE "/>[22m
+    [2m      - unexpected value ""[22m
+
+
+      77 |     await waitForForm(page);
+      78 |
+    > 79 |     await expect(page.locator('[data-testid="input-phone-name"]')).toHaveValue('자동 저장 폰');
+         |                                                                    ^
+      80 |     await expect(page.locator('[data-testid="input-phone-summary"]')).toHaveValue('자동 저장 요약');
+      81 |   });
+      82 |
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.submit.hook.spec.ts:79:68
+
+    Error Context: test-results/src-components-phone-new-t-c7365--로컬스토리지에-임시-저장되고-새로고침-시-복원됨-chromium/error-context.md
+
+
+[1A[2K[110/181] [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:83:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 유효성 검증 실패 시 에러 메시지가 나타나야 함
+[1A[2K  8) [chromium] › src/components/phone-new/tests/index.ui.spec.ts:69:7 › PhoneNew 컴포넌트 UI › 에디터가 렌더링되어야 함 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('[data-testid=\'editor-content\']')
+    Expected: [32m"내용을 입력해 주세요."[39m
+    Received: [31m""[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid=\'editor-content\']')[22m
+    [2m    9 × locator resolved to <textarea name="description" placeholder="내용을 입력해 주세요." data-testid="editor-content" class="styles_editorContent__KunfH "></textarea>[22m
+    [2m      - unexpected value ""[22m
+
+
+      78 |     const content = page.locator("[data-testid='editor-content']");
+      79 |     await expect(content).toBeVisible();
+    > 80 |     await expect(content).toHaveText("내용을 입력해 주세요.");
+         |                           ^
+      81 |   });
+      82 |
+      83 |   test("주소 입력 필드가 렌더링되어야 함", async ({ page }) => {
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.ui.spec.ts:80:27
+
+    Error Context: test-results/src-components-phone-new-t-dad84-neNew-컴포넌트-UI-에디터가-렌더링되어야-함-chromium/error-context.md
+
+
+[1A[2K[111/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:83:7 › PhoneNew 컴포넌트 UI › 주소 입력 필드가 렌더링되어야 함
+[1A[2K  9) [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:83:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 유효성 검증 실패 시 에러 메시지가 나타나야 함 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeEnabled[2m([22m[2m)[22m failed
+
+    Locator:  locator('[data-testid="btn-submit"]')
+    Expected: enabled
+    Received: disabled
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toBeEnabled" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="btn-submit"]')[22m
+    [2m    9 × locator resolved to <button disabled type="submit" data-testid="btn-submit" class="styles_submitButton__u7tMN ">등록하기</button>[22m
+    [2m      - unexpected value "disabled"[22m
+
+
+      87 |
+      88 |     const submitButton = page.locator('[data-testid="btn-submit"]');
+    > 89 |     await expect(submitButton).toBeEnabled();
+         |                                ^
+      90 |     await submitButton.click();
+      91 |
+      92 |     await expect(page.locator('[data-testid="submit-validation-errors"]')).toContainText(
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.submit.hook.spec.ts:89:32
+
+    Error Context: test-results/src-components-phone-new-t-1671d--유효성-검증-실패-시-에러-메시지가-나타나야-함-chromium/error-context.md
+
+
+[1A[2K[112/181] [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:98:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 등록 성공 시 상세 페이지로 이동하고 임시 저장이 삭제됨
+[1A[2K[113/181] [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:110:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 등록 실패 시 데이터가 남아있고 페이지에서 벗어나지 않음
+[1A[2K  10) [chromium] › src/components/phone-new/tests/index.ui.spec.ts:83:7 › PhoneNew 컴포넌트 UI › 주소 입력 필드가 렌더링되어야 함 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeDisabled[2m([22m[2m)[22m failed
+
+    Locator:  locator('[data-testid=\'input-postcode\']')
+    Expected: disabled
+    Received: enabled
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toBeDisabled" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid=\'input-postcode\']')[22m
+    [2m    9 × locator resolved to <input readonly type="text" name="zipcode" placeholder="01234" data-testid="input-postcode" class="styles_addressInput__fkrqD "/>[22m
+    [2m      - unexpected value "enabled"[22m
+
+
+      85 |     const postcode = page.locator("[data-testid='input-postcode']");
+      86 |     await expect(postcode).toBeVisible();
+    > 87 |     await expect(postcode).toBeDisabled();
+         |                            ^
+      88 |
+      89 |     // 우편번호 검색 버튼
+      90 |     const postcodeBtn = page.locator("[data-testid='btn-postcode-search']");
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.ui.spec.ts:87:28
+
+    Error Context: test-results/src-components-phone-new-t-eba3f--컴포넌트-UI-주소-입력-필드가-렌더링되어야-함-chromium/error-context.md
+
+
+[1A[2K  11) [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:110:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 등록 실패 시 데이터가 남아있고 페이지에서 벗어나지 않음 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeTruthy[2m()[22m
+
+    Received: [31mnull[39m
+
+      121 |     await expect(page).toHaveURL(/\/phones\/new$/);
+      122 |     const storedAfter = await page.evaluate(() => localStorage.getItem('phone'));
+    > 123 |     expect(storedAfter).toBeTruthy();
+          |                         ^
+      124 |   });
+      125 | });
+      126 |
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.submit.hook.spec.ts:123:25
+
+    Error Context: test-results/src-components-phone-new-t-ad7c3-패-시-데이터가-남아있고-페이지에서-벗어나지-않음-chromium/error-context.md
+
+
+[1A[2K[114/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:109:7 › PhoneNew 컴포넌트 UI › 지도 영역이 렌더링되어야 함
+[1A[2K[115/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:76:9 › 필터 상태 관리 (usePhoneFilters) › 토글 상태 변경 › 토글 클릭 시 availableNow 상태가 true ↔ false 전환되는지 검증
+[1A[2K[116/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:90:9 › 필터 상태 관리 (usePhoneFilters) › 토글 상태 변경 › Zustand 스토어에 상태가 올바르게 저장되는지 검증
+[1A[2K[117/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:100:9 › 필터 상태 관리 (usePhoneFilters) › 날짜 범위 선택 › 시작 날짜 선택 시 dateRange.startDate 업데이트 검증
+[1A[2K  12) [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:120:7 › PhoneNew Form 컴포넌트 테스트 › 신규등록 모드 - 필수값 입력 후 저장 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForEvent: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for event "dialog"
+    ============================================================
+
+      125 |     await expect(submitButton).toBeEnabled();
+      126 |
+    > 127 |     const dialogPromise = page.waitForEvent('dialog');
+          |                                ^
+      128 |     await submitButton.click();
+      129 |     const dialog = await dialogPromise;
+      130 |     await dialog.accept();
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.form.hook.spec.ts:127:32
+
+    Error Context: test-results/src-components-phone-new-t-f70b3-트-테스트-신규등록-모드---필수값-입력-후-저장-chromium/error-context.md
+
+
+[1A[2K[118/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:109:9 › 필터 상태 관리 (usePhoneFilters) › 날짜 범위 선택 › 종료 날짜 선택 시 dateRange.endDate 업데이트 검증
+[1A[2K[119/181] [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:144:7 › PhoneNew Form 컴포넌트 테스트 › 신규등록 모드 - 가격 검증 실패 시 에러 메시지
+[1A[2K  13) [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:129:7 › 주소 검색 및 지오코딩 통합 테스트 › 상태 공유 시나리오 - Zustand 스토어 업데이트 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="btn-address-search"]')[22m
+
+
+      130 |     // 주소 검색
+      131 |     const searchButton = page.locator('[data-testid="btn-address-search"]');
+    > 132 |     await searchButton.click();
+          |                        ^
+      133 |     await page.waitForTimeout(200);
+      134 |
+      135 |     // 스토어에 주소와 좌표가 저장되었는지 확인
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.address.hook.spec.ts:132:24
+
+    Error Context: test-results/src-components-phone-new-t-946a7--공유-시나리오---Zustand-스토어-업데이트-chromium/error-context.md
+
+
+[1A[2K[120/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:118:9 › 필터 상태 관리 (usePhoneFilters) › 날짜 범위 선택 › 날짜 초기화 시 null로 리셋되는지 검증
+[1A[2K[121/181] [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:148:7 › 주소 검색 및 지오코딩 통합 테스트 › 주소 초기화 기능
+[1A[2K  14) [chromium] › src/components/phone-new/tests/index.ui.spec.ts:109:7 › PhoneNew 컴포넌트 UI › 지도 영역이 렌더링되어야 함 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('[data-testid=\'map-placeholder-text\']')
+    Expected: [32m"주소를 먼저 [7m입력[27m해 주세요."[39m
+    Received: [31m"주소를 먼저 [7m선택[27m해 주세요."[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid=\'map-placeholder-text\']')[22m
+    [2m    9 × locator resolved to <span data-testid="map-placeholder-text">주소를 먼저 선택해 주세요.</span>[22m
+    [2m      - unexpected value "주소를 먼저 선택해 주세요."[22m
+
+
+      110 |     const mapContainer = page.locator("[data-testid='map-placeholder-text']");
+      111 |     await expect(mapContainer).toBeVisible();
+    > 112 |     await expect(mapContainer).toHaveText("주소를 먼저 입력해 주세요.");
+          |                                ^
+      113 |   });
+      114 |
+      115 |   test("이미지 업로드 버튼이 렌더링되어야 함", async ({ page }) => {
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.ui.spec.ts:112:32
+
+    Error Context: test-results/src-components-phone-new-t-4b41d-New-컴포넌트-UI-지도-영역이-렌더링되어야-함-chromium/error-context.md
+
+
+[1A[2K[122/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:137:9 › 필터 상태 관리 (usePhoneFilters) › 키워드 입력 › 키워드 입력 시 keyword 상태 업데이트 검증
+[1A[2K[123/181] [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:151:7 › PhoneNew Form 컴포넌트 테스트 › 수정 모드 - 기존 데이터 로드 및 저장
+[1A[2K[124/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:115:7 › PhoneNew 컴포넌트 UI › 이미지 업로드 버튼이 렌더링되어야 함
+[1A[2K[125/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:146:9 › 필터 상태 관리 (usePhoneFilters) › 키워드 입력 › 2자 미만 입력 시 검색 버튼 비활성화 검증
+[1A[2K[126/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:121:7 › PhoneNew 컴포넌트 UI › 버튼이 렌더링되어야 함
+[1A[2K[127/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:157:9 › 필터 상태 관리 (usePhoneFilters) › 키워드 입력 › 2자 이상 입력 시 검색 버튼 활성화 검증
+[1A[2K[128/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:134:7 › PhoneNew 컴포넌트 UI › 모든 필드 라벨이 렌더링되어야 함
+[1A[2K[129/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:139:7 › PhoneNew 컴포넌트 UI › 구분선이 렌더링되어야 함
+[1A[2K[130/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:170:9 › 필터 상태 관리 (usePhoneFilters) › 필터 조합 시나리오 › availableNow + dateRange 조합 가능
+[1A[2K[131/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:184:9 › 필터 상태 관리 (usePhoneFilters) › 필터 조합 시나리오 › 모든 필터 동시 적용 가능
+[1A[2K[132/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:144:7 › PhoneNew 컴포넌트 UI › 에디터 툴바 버튼이 렌더링되어야 함
+[1A[2K  15) [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:56:5 › 거래 지역 정보가 없는 경우 위치 아이콘 클릭 시 경고 메시지 표시 및 지도 창 열지 않기 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="phone-detail-body"]') to be visible[22m
+
+
+      61 |
+      62 |   // 페이지가 완전히 로드될 때까지 대기 (data-testid)
+    > 63 |   await page.waitForSelector('[data-testid="phone-detail-body"]');
+         |              ^
+      64 |
+      65 |   // 새 창이 열리지 않는지 확인하기 위한 리스너 설정
+      66 |   let newPageOpened = false;
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-detail/tests/index.location.hook.spec.ts:63:14
+
+    Error Context: test-results/src-components-phone-detai-16a50-클릭-시-경고-메시지-표시-및-지도-창-열지-않기-chromium/error-context.md
+
+
+[1A[2K[133/181] [chromium] › src/components/phones-list/tests/filter.spec.ts:206:9 › 필터 상태 관리 (usePhoneFilters) › 필터 초기화 동작 › resetFilters 호출 시 모든 필터가 초기값으로 리셋
+[1A[2K[134/181] [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:87:5 › 거래 지역 정보가 빈 문자열인 경우 위치 아이콘 클릭 시 경고 메시지 표시
+[1A[2K[135/181] [chromium] › src/components/phone-new/tests/index.ui.spec.ts:154:7 › PhoneNew 컴포넌트 UI › 컨테이너가 올바른 크기를 가져야 함
+[1A[2K[136/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:29:9 › 아이콘 필터 (useIconFilter) › 3-1) 아이콘 선택 상태 변경 테스트 › 아이콘 클릭 시 selectedCategory 상태가 변경되는지 검증
+[1A[2K[137/181] [chromium] › src/components/phones-list/tests/index.link.routing.hook.spec.ts:64:7 › 중고폰 리스트 라우팅 › 중고폰 카드 클릭 시 상세 페이지로 이동해야 한다
+[1A[2K[138/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:52:9 › 아이콘 필터 (useIconFilter) › 3-1) 아이콘 선택 상태 변경 테스트 › 이미 선택된 아이콘 재클릭 시 선택 해제되는지 검증
+[1A[2K  16) [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:151:7 › PhoneNew Form 컴포넌트 테스트 › 수정 모드 - 기존 데이터 로드 및 저장 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveValue[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="input-phone-name"]')
+    Expected: [32m"기존 중고폰"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveValue" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="input-phone-name"]')[22m
+
+
+      156 |     await waitForForm(page);
+      157 |
+    > 158 |     await expect(page.locator('[data-testid="input-phone-name"]')).toHaveValue('기존 중고폰');
+          |                                                                    ^
+      159 |     await expect(page.locator('[data-testid="btn-submit"]')).toHaveText('수정하기');
+      160 |
+      161 |     await page.locator('[data-testid="input-phone-summary"]').fill('수정된 요약');
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.form.hook.spec.ts:158:68
+
+    Error Context: test-results/src-components-phone-new-t-e70a7--테스트-수정-모드---기존-데이터-로드-및-저장-chromium/error-context.md
+
+
+[1A[2K[139/181] [chromium] › src/components/phones-list/tests/index.link.routing.hook.spec.ts:75:7 › 중고폰 리스트 라우팅 › 중고폰 판매 등록 버튼 클릭 시 새 등록 페이지로 이동해야 한다
+[1A[2K[140/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:74:9 › 아이콘 필터 (useIconFilter) › 3-1) 아이콘 선택 상태 변경 테스트 › 다른 아이콘 클릭 시 이전 선택이 해제되는지 검증
+[1A[2K[141/181] [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:183:7 › PhoneNew Form 컴포넌트 테스트 › 수정 모드 - 취소 버튼으로 원본 값 복구
+[1A[2K[142/181] [chromium] › src/components/phones-list/tests/index.link.routing.hook.spec.ts:85:7 › 중고폰 리스트 라우팅 › 여러 카드 중 특정 기기를 클릭하면 해당 상세 페이지로 이동해야 한다
+[1A[2K[143/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:100:9 › 아이콘 필터 (useIconFilter) › 3-2) API 호출 테스트 › 아이콘 선택 시 해당 카테고리로 필터링된 데이터를 API에서 가져오는지 검증
+[1A[2K  17) [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:100:9 › 아이콘 필터 (useIconFilter) › 3-2) API 호출 테스트 › 아이콘 선택 시 해당 카테고리로 필터링된 데이터를 API에서 가져오는지 검증 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeTruthy[2m()[22m
+
+    Received: [31mfalse[39m
+
+      118 |       const isLoading = await loadingText.isVisible().catch(() => false);
+      119 |
+    > 120 |       expect(cardCount > 0 || isLoading).toBeTruthy();
+          |                                          ^
+      121 |     });
+      122 |
+      123 |     test('선택 해제 시 전체 데이터를 가져오는지 검증', async ({ page }) => {
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phones-list/tests/icon-filter.spec.ts:120:42
+
+    Error Context: test-results/src-components-phones-list-39abc-리로-필터링된-데이터를-API에서-가져오는지-검증-chromium/error-context.md
+
+
+[1A[2K[144/181] [chromium] › src/components/phones-list/tests/index.routing.spec.ts:29:7 › PhonesList 라우팅 테스트 › PhoneCard 클릭 시 중고폰 상세 페이지(/phones/[id])로 이동
+[1A[2K[145/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:123:9 › 아이콘 필터 (useIconFilter) › 3-2) API 호출 테스트 › 선택 해제 시 전체 데이터를 가져오는지 검증
+[1A[2K[146/181] [chromium] › src/components/phones-list/tests/index.routing.spec.ts:43:7 › PhonesList 라우팅 테스트 › 중고폰 판매 등록 버튼 클릭 시 등록 페이지(/phones/new)로 이동
+[1A[2K[147/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:145:9 › 아이콘 필터 (useIconFilter) › 3-2) API 호출 테스트 › API 호출 파라미터(categories)가 올바른지 검증
+[1A[2K[148/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:20:7 › PhonesList Component › 컴포넌트가 렌더링되어야 함
+[1A[2K[149/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:25:7 › PhonesList Component › 제목이 올바르게 표시되어야 함
+[1A[2K[150/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:175:9 › 아이콘 필터 (useIconFilter) › 3-3) 로딩 상태 테스트 › API 호출 중일 때 "로딩 중..." 텍스트가 표시되는지 검증
+[1A[2K[151/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:31:7 › PhonesList Component › 탭 섹션이 렌더링되어야 함
+[1A[2K[152/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:42:7 › PhonesList Component › 탭 클릭 시 활성 상태가 변경되어야 함
+[1A[2K[153/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:206:9 › 아이콘 필터 (useIconFilter) › 3-3) 로딩 상태 테스트 › 데이터 로드 완료 후 로딩 메시지가 사라지는지 검증
+[1A[2K[154/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:54:7 › PhonesList Component › 검색 섹션이 렌더링되어야 함
+[1A[2K[155/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:225:9 › 아이콘 필터 (useIconFilter) › 3-4) 에러 상태 테스트 › API 호출 실패 시 에러 메시지가 표시되는지 검증
+[1A[2K[156/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:69:7 › PhonesList Component › 필터 섹션에 9개의 필터 아이콘이 있어야 함
+[1A[2K[157/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:77:7 › PhonesList Component › 각 필터 아이콘이 올바르게 렌더링되어야 함
+[1A[2K[158/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:250:9 › 아이콘 필터 (useIconFilter) › 3-4) 에러 상태 테스트 › 에러 메시지: "필터를 불러올 수 없습니다."인지 검증
+[1A[2K[159/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:96:7 › PhonesList Component › 카드 영역에 8개의 카드가 있어야 함
+[1A[2K  18) [chromium] › src/components/phones-list/tests/index.ui.spec.ts:96:7 › PhonesList Component › 카드 영역에 8개의 카드가 있어야 함 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: > [32m0[39m
+    Received:   [31m0[39m
+
+      100 |     await expect(cardArea).toBeVisible();
+      101 |     const cardCount = await cards.count();
+    > 102 |     expect(cardCount).toBeGreaterThan(0);
+          |                       ^
+      103 |   });
+      104 |
+      105 |   test("각 카드가 올바른 정보를 표시해야 함", async ({ page }) => {
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phones-list/tests/index.ui.spec.ts:102:23
+
+    Error Context: test-results/src-components-phones-list-245aa-ponent-카드-영역에-8개의-카드가-있어야-함-chromium/error-context.md
+
+
+[1A[2K[160/181] [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:275:9 › 아이콘 필터 (useIconFilter) › 3-4) 에러 상태 테스트 › 에러 발생 후에도 아이콘 필터는 계속 동작하는지 검증
+[1A[2K[161/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:105:7 › PhonesList Component › 각 카드가 올바른 정보를 표시해야 함
+[1A[2K[162/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:113:7 › PhonesList Component › 검색 버튼은 조건 충족 시 활성화되어야 함
+[1A[2K[163/181] [chromium] › src/components/phones-list/tests/search.spec.ts:30:9 › 검색 기능 (usePhoneSearch) › 검색 시나리오 › 검색 조건에 맞는 데이터가 반환되는지 검증
+[1A[2K[164/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:125:7 › PhonesList Component › 중고폰 판매 등록 버튼이 클릭 가능해야 함
+[1A[2K[165/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:130:7 › PhonesList Component › 페이지 레이아웃이 모바일에서도 올바르게 표시되어야 함
+[1A[2K[166/181] [chromium] › src/components/phones-list/tests/search.spec.ts:62:9 › 검색 기능 (usePhoneSearch) › 검색 시나리오 › 검색 결과가 카드 영역에 표시되는지 검증
+[1A[2K[167/181] [chromium] › src/components/phones-list/tests/index.ui.spec.ts:144:7 › PhonesList Component › 스크롤 가능한 필터가 렌더링되어야 함
+[1A[2K  19) [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:148:7 › 주소 검색 및 지오코딩 통합 테스트 › 주소 초기화 기능 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="btn-address-search"]')[22m
+
+
+      149 |     // 주소 검색
+      150 |     const searchButton = page.locator('[data-testid="btn-address-search"]');
+    > 151 |     await searchButton.click();
+          |                        ^
+      152 |     await page.waitForTimeout(200);
+      153 |
+      154 |     // 주소가 설정되었는지 확인
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.address.hook.spec.ts:151:24
+
+    Error Context: test-results/src-components-phone-new-t-55620--검색-및-지오코딩-통합-테스트-주소-초기화-기능-chromium/error-context.md
+
+
+[1A[2K[168/181] [chromium] › src/components/phones-list/tests/search.spec.ts:91:9 › 검색 기능 (usePhoneSearch) › 검색 시나리오 › 로딩 중에는 검색 버튼이 비활성화되고 텍스트가 변경되는지 검증
+[1A[2K[169/181] [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:166:7 › 주소 검색 및 지오코딩 통합 테스트 › 에러 처리 - 잘못된 주소 입력
+[1A[2K[170/181] [chromium] › src/components/phones-list/tests/search.spec.ts:119:9 › 검색 기능 (usePhoneSearch) › 검색 실패 시나리오 › 검색 결과가 없을 때 "검색 결과가 없습니다" 메시지 표시 검증
+[1A[2K[171/181] [chromium] › src/components/phones-list/tests/search.spec.ts:142:9 › 검색 기능 (usePhoneSearch) › 검색 실패 시나리오 › Supabase 에러 발생 시 에러 메시지 표시 검증
+[1A[2K[172/181] [chromium] › src/components/phones-list/tests/search.spec.ts:165:9 › 검색 기능 (usePhoneSearch) › 검색 버튼 활성화 조건 › keyword >= 2자이고 로딩 중이 아닐 때 활성화
+[1A[2K[173/181] [chromium] › src/components/phones-list/tests/search.spec.ts:181:9 › 검색 기능 (usePhoneSearch) › 검색 버튼 활성화 조건 › keyword < 2자일 때 비활성화
+[1A[2K[174/181] [chromium] › src/components/phones-list/tests/search.spec.ts:199:9 › 검색 기능 (usePhoneSearch) › 판매글 등록 버튼 › 판매글 등록 버튼이 항상 활성화되어 있는지 검증
+[1A[2K[175/181] [chromium] › src/components/phones-list/tests/search.spec.ts:208:9 › 검색 기능 (usePhoneSearch) › 판매글 등록 버튼 › 판매글 등록 버튼 클릭 시 /phones/new로 이동
+[1A[2K[176/181] [chromium] › src/components/phones-list/tests/search.spec.ts:221:9 › 검색 기능 (usePhoneSearch) › 필터와 검색 연동 › availableNow 필터가 검색 쿼리에 반영되는지 검증
+[1A[2K[177/181] [chromium] › src/components/phones-list/tests/search.spec.ts:249:9 › 검색 기능 (usePhoneSearch) › 필터와 검색 연동 › dateRange 필터가 검색 쿼리에 반영되는지 검증
+[1A[2K  20) [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:166:7 › 주소 검색 및 지오코딩 통합 테스트 › 에러 처리 - 잘못된 주소 입력 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="address-error"]')
+    Expected substring: [32m"주소를 찾을 수 없습니다"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="address-error"]')[22m
+
+
+      189 |     // 에러 메시지가 표시되는지 확인
+      190 |     const errorMessage = page.locator('[data-testid="address-error"]');
+    > 191 |     await expect(errorMessage).toContainText('주소를 찾을 수 없습니다');
+          |                                ^
+      192 |   });
+      193 | });
+      194 |
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.address.hook.spec.ts:191:32
+
+    Error Context: test-results/src-components-phone-new-t-ee2d3-코딩-통합-테스트-에러-처리---잘못된-주소-입력-chromium/error-context.md
+
+
+[1A[2K[178/181] [chromium] › src/components/phones-list/tests/search.spec.ts:279:9 › 검색 기능 (usePhoneSearch) › 데이터 바인딩 › PhoneCard에 Supabase 데이터가 올바르게 매핑되는지 검증
+[1A[2K  21) [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:87:5 › 거래 지역 정보가 빈 문자열인 경우 위치 아이콘 클릭 시 경고 메시지 표시 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="phone-detail-body"]') to be visible[22m
+
+
+      92 |
+      93 |   // 페이지가 완전히 로드될 때까지 대기 (data-testid)
+    > 94 |   await page.waitForSelector('[data-testid="phone-detail-body"]');
+         |              ^
+      95 |
+      96 |   // 새 창이 열리지 않는지 확인하기 위한 리스너 설정
+      97 |   let newPageOpened = false;
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-detail/tests/index.location.hook.spec.ts:94:14
+
+    Error Context: test-results/src-components-phone-detai-6f50b-열인-경우-위치-아이콘-클릭-시-경고-메시지-표시-chromium/error-context.md
+
+
+[1A[2K[179/181] [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:118:5 › 일부 거래 지역 정보만 있는 경우 있는 정보로만 지도 검색
+[1A[2K  22) [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:183:7 › PhoneNew Form 컴포넌트 테스트 › 수정 모드 - 취소 버튼으로 원본 값 복구 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="input-phone-name"]')[22m
+
+
+      188 |
+      189 |     const titleInput = page.locator('[data-testid="input-phone-name"]');
+    > 190 |     await titleInput.fill('임시 변경');
+          |                      ^
+      191 |     await page.locator('[data-testid="btn-cancel"]').click();
+      192 |     await expect(titleInput).toHaveValue('기존 중고폰');
+      193 |   });
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.form.hook.spec.ts:190:22
+
+    Error Context: test-results/src-components-phone-new-t-ca5df-테스트-수정-모드---취소-버튼으로-원본-값-복구-chromium/error-context.md
+
+
+[1A[2K[180/181] [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:195:7 › PhoneNew Form 컴포넌트 테스트 › 우편번호 검색 모달 토글
+[1A[2K  23) [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:118:5 › 일부 거래 지역 정보만 있는 경우 있는 정보로만 지도 검색 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="phone-detail-body"]') to be visible[22m
+
+
+      123 |
+      124 |   // 페이지가 완전히 로드될 때까지 대기 (data-testid)
+    > 125 |   await page.waitForSelector('[data-testid="phone-detail-body"]');
+          |              ^
+      126 |
+      127 |   // 새 창이 열리는 것을 감지
+      128 |   const [newPage] = await Promise.all([
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-detail/tests/index.location.hook.spec.ts:125:14
+
+    Error Context: test-results/src-components-phone-detai-cd2e9--지역-정보만-있는-경우-있는-정보로만-지도-검색-chromium/error-context.md
+
+
+[1A[2K  24) [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:195:7 › PhoneNew Form 컴포넌트 테스트 › 우편번호 검색 모달 토글 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="btn-postcode-search"]')[22m
+
+
+      195 |   test('우편번호 검색 모달 토글', async ({ page }) => {
+      196 |     const openButton = page.locator('[data-testid="btn-postcode-search"]');
+    > 197 |     await openButton.click();
+          |                      ^
+      198 |     await expect(page.locator('[data-testid="postcode-modal"]')).toBeVisible();
+      199 |     await page.locator('[data-testid="btn-close-postcode"]').click();
+      200 |     await expect(page.locator('[data-testid="postcode-modal"]')).toHaveCount(0);
+        at /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/components/phone-new/tests/index.form.hook.spec.ts:197:22
+
+    Error Context: test-results/src-components-phone-new-t-6929b-Form-컴포넌트-테스트-우편번호-검색-모달-토글-chromium/error-context.md
+
+
+[1A[2K[181/181] [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:203:7 › PhoneNew Form 컴포넌트 테스트 › 사진 첨부 - 최대 2장 제한 및 삭제
+[1A[2K  24 failed
+    [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:25:5 › 거래 지역 정보가 있는 경우 위치 아이콘 클릭 시 외부 지도 서비스로 새 창 열기 
+    [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:56:5 › 거래 지역 정보가 없는 경우 위치 아이콘 클릭 시 경고 메시지 표시 및 지도 창 열지 않기 
+    [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:87:5 › 거래 지역 정보가 빈 문자열인 경우 위치 아이콘 클릭 시 경고 메시지 표시 
+    [chromium] › src/components/phone-detail/tests/index.location.hook.spec.ts:118:5 › 일부 거래 지역 정보만 있는 경우 있는 정보로만 지도 검색 
+    [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:80:7 › 주소 검색 및 지오코딩 통합 테스트 › 주소 검색 성공 시나리오 - 주소 선택 후 자동 지오코딩 
+    [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:129:7 › 주소 검색 및 지오코딩 통합 테스트 › 상태 공유 시나리오 - Zustand 스토어 업데이트 
+    [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:148:7 › 주소 검색 및 지오코딩 통합 테스트 › 주소 초기화 기능 
+    [chromium] › src/components/phone-new/tests/index.address.hook.spec.ts:166:7 › 주소 검색 및 지오코딩 통합 테스트 › 에러 처리 - 잘못된 주소 입력 
+    [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:120:7 › PhoneNew Form 컴포넌트 테스트 › 신규등록 모드 - 필수값 입력 후 저장 
+    [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:151:7 › PhoneNew Form 컴포넌트 테스트 › 수정 모드 - 기존 데이터 로드 및 저장 
+    [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:183:7 › PhoneNew Form 컴포넌트 테스트 › 수정 모드 - 취소 버튼으로 원본 값 복구 
+    [chromium] › src/components/phone-new/tests/index.form.hook.spec.ts:195:7 › PhoneNew Form 컴포넌트 테스트 › 우편번호 검색 모달 토글 
+    [chromium] › src/components/phone-new/tests/index.routing.spec.ts:121:7 › PhoneNew 라우팅 테스트 - 신규등록 모드 (isEdit=false) › 취소 버튼 클릭 시 목록 페이지(/phones)로 이동 
+    [chromium] › src/components/phone-new/tests/index.routing.spec.ts:136:7 › PhoneNew 라우팅 테스트 - 신규등록 모드 (isEdit=false) › 등록 완료 후 목록 페이지(/phones)로 이동 
+    [chromium] › src/components/phone-new/tests/index.routing.spec.ts:193:7 › PhoneNew 라우팅 테스트 - 수정 모드 (isEdit=true) › 취소 버튼 클릭 시 상세 페이지(/phones/[id])로 이동 
+    [chromium] › src/components/phone-new/tests/index.routing.spec.ts:208:7 › PhoneNew 라우팅 테스트 - 수정 모드 (isEdit=true) › 수정 완료 후 상세 페이지(/phones/[id])로 이동 
+    [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:63:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 입력 후 자동으로 로컬스토리지에 임시 저장되고 새로고침 시 복원됨 
+    [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:83:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 유효성 검증 실패 시 에러 메시지가 나타나야 함 
+    [chromium] › src/components/phone-new/tests/index.submit.hook.spec.ts:110:7 › usePhoneSubmit 훅의 임시 저장 및 제출 흐름 › 등록 실패 시 데이터가 남아있고 페이지에서 벗어나지 않음 
+    [chromium] › src/components/phone-new/tests/index.ui.spec.ts:69:7 › PhoneNew 컴포넌트 UI › 에디터가 렌더링되어야 함 
+    [chromium] › src/components/phone-new/tests/index.ui.spec.ts:83:7 › PhoneNew 컴포넌트 UI › 주소 입력 필드가 렌더링되어야 함 
+    [chromium] › src/components/phone-new/tests/index.ui.spec.ts:109:7 › PhoneNew 컴포넌트 UI › 지도 영역이 렌더링되어야 함 
+    [chromium] › src/components/phones-list/tests/icon-filter.spec.ts:100:9 › 아이콘 필터 (useIconFilter) › 3-2) API 호출 테스트 › 아이콘 선택 시 해당 카테고리로 필터링된 데이터를 API에서 가져오는지 검증 
+    [chromium] › src/components/phones-list/tests/index.ui.spec.ts:96:7 › PhonesList Component › 카드 영역에 8개의 카드가 있어야 함 
+  4 skipped
+  153 passed (2.5m)

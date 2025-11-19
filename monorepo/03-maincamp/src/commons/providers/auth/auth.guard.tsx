@@ -7,6 +7,7 @@ import { useAuth } from './auth.provider';
 import { findRouteKeyByPath, isAccessible, getPath } from '@/commons/constants/url';
 import Modal from '@commons/ui/src/modal';
 import styles from './styles.module.css';
+import { isTestEnv } from '@/commons/utils/is-test-env';
 
 /**
  * AuthGuard Props
@@ -28,22 +29,16 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [hasShownModalForPath, setHasShownModalForPath] = useState<string | null>(null);
 
-  /**
-   * 테스트 환경 여부 확인
-   * 1. NEXT_PUBLIC_TEST_ENV 환경 변수 체크 (빌드 타임)
-   * 2. window.__TEST_BYPASS__ 전역 변수 체크 (런타임, Playwright에서 설정)
-   */
-  const isTestEnv = 
-    process.env.NEXT_PUBLIC_TEST_ENV === 'test' ||
-    (typeof window !== 'undefined' && (window as any).__TEST_BYPASS__ === true);
+  const [testBypass, setTestBypass] = useState(() => isTestEnv());
 
   /**
    * AuthProvider 초기화 후 권한 검증
    */
   useEffect(() => {
     // 테스트 환경인 경우 마운트되면 즉시 인가 성공 (loading 무시)
-    if (isTestEnv && mounted) {
+    if (testBypass && mounted) {
       setIsAuthorized(true);
+      setShowLoginModal(false);
       return;
     }
 
@@ -53,8 +48,9 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     }
 
     // 테스트 환경인 경우 항상 인가 성공
-    if (isTestEnv) {
+    if (testBypass) {
       setIsAuthorized(true);
+      setShowLoginModal(false);
       return;
     }
 
@@ -82,7 +78,17 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         setHasShownModalForPath(pathname);
       }
     }
-  }, [mounted, loading, isAuthenticated, pathname, isTestEnv, hasShownModalForPath]);
+  }, [mounted, loading, isAuthenticated, pathname, testBypass, hasShownModalForPath]);
+
+  /**
+   * 테스트 우회 플래그 동기화
+   */
+  useEffect(() => {
+    if (testBypass) return;
+    if (isTestEnv()) {
+      setTestBypass(true);
+    }
+  }, [testBypass]);
 
   /**
    * 컴포넌트 마운트 확인
@@ -133,7 +139,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   };
 
   // 테스트 환경인 경우 loading 상태를 무시하고 인가 처리
-  const shouldShowBlank = isTestEnv 
+  const shouldShowBlank = testBypass 
     ? (!mounted || !isAuthorized)
     : (!mounted || loading || !isAuthorized);
 
@@ -158,4 +164,3 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     </>
   );
 }
-

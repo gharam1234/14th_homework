@@ -1,0 +1,575 @@
+/**
+ * 로컬스토리지 기반 페이지네이션 테스트용 목데이터 생성 스크립트
+ * 
+ * 사용법:
+ *   이 스크립트를 HTML로 변환하여 브라우저에서 실행하거나,
+ *   브라우저 콘솔에 직접 복사/붙여넣기하여 실행합니다.
+ * 
+ * 생성 방법:
+ *   npm run generate:local-test-data
+ */
+
+interface LocalTestPhone {
+  id: string;
+  title: string;
+  price: number;
+  currency: string;
+  categories: string[];
+  sale_state: 'available' | 'reserved' | 'sold';
+  available_from: string;
+  available_until: string | null;
+  main_image_url: string;
+  model_name: string;
+  storage_capacity: string;
+  device_condition: string;
+  address: string;
+  tags: string[];
+  created_at: string;
+}
+
+// 다양한 모델명 템플릿
+const models = [
+  { name: 'iPhone', variants: ['14 Pro', '15 Pro', '15 Pro Max', '16', '16 Pro'], brand: 'apple' },
+  { name: 'Galaxy', variants: ['S23', 'S23 Ultra', 'S24', 'S24 Ultra', 'Note20'], brand: 'samsung' },
+  { name: 'Pixel', variants: ['7', '7 Pro', '8', '8 Pro'], brand: 'google' },
+  { name: 'Nothing Phone', variants: ['1', '2'], brand: 'nothing' },
+  { name: 'Xperia', variants: ['5', '10', '1'], brand: 'sony' },
+];
+
+const storageOptions = ['128GB', '256GB', '512GB', '1TB'];
+const conditions = ['S급', 'A급', 'B급', 'C급'];
+const saleStates: Array<'available' | 'reserved' | 'sold'> = ['available', 'reserved', 'sold'];
+const addresses = [
+  '서울시 강남구',
+  '서울시 마포구',
+  '서울시 서초구',
+  '서울시 송파구',
+  '서울시 종로구',
+  '경기도 성남시',
+  '경기도 수원시',
+  '인천광역시',
+  '부산광역시',
+  '대구광역시',
+];
+
+const imageUrls = [
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=640&h=480&fit=crop',
+  'https://images.unsplash.com/photo-1580898434531-5700dde6756c?w=640&h=480&fit=crop',
+  'https://images.unsplash.com/photo-1510557880182-3f8c5fed2fa8?w=640&h=480&fit=crop',
+  'https://images.unsplash.com/photo-1451188502541-13943edb6acb?w=640&h=480&fit=crop',
+  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=640&h=480&fit=crop',
+];
+
+function getRandomElement<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function getRandomPrice(): number {
+  // 50만원 ~ 200만원 사이 랜덤 가격
+  return Math.floor(Math.random() * 1500000) + 500000;
+}
+
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+function generateLocalPhoneData(index: number): LocalTestPhone {
+  const model = getRandomElement(models);
+  const variant = getRandomElement(model.variants);
+  const storage = getRandomElement(storageOptions);
+  const condition = getRandomElement(conditions);
+  const saleState = getRandomElement(saleStates);
+  const address = getRandomElement(addresses);
+  const price = getRandomPrice();
+  
+  // created_at을 다르게 설정하여 페이징 테스트에 적합하도록
+  // 최신순 정렬을 위해 시간을 역순으로 생성
+  const now = new Date();
+  const daysAgo = 100 - index; // 100일 전부터 현재까지
+  const createdAt = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+
+  const modelName = `${model.name} ${variant}`;
+  const title = `${modelName} ${storage}`;
+  
+  return {
+    id: generateUUID(),
+    title,
+    price,
+    currency: 'KRW',
+    categories: [model.brand, 'phone'],
+    sale_state: saleState,
+    available_from: createdAt.toISOString(),
+    available_until: null,
+    main_image_url: getRandomElement(imageUrls),
+    model_name: modelName,
+    storage_capacity: storage,
+    device_condition: condition,
+    address,
+    tags: [model.brand, condition.toLowerCase(), '직거래'],
+    created_at: createdAt.toISOString(),
+  };
+}
+
+function generateLocalTestData(count: number = 100) {
+  console.log(`🚀 로컬스토리지용 테스트 데이터 ${count}개 생성 시작...\n`);
+
+  const phones: LocalTestPhone[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    phones.push(generateLocalPhoneData(i));
+  }
+
+  // 로컬스토리지 키
+  const STORAGE_KEY = 'test_phones_pagination_data';
+  
+  try {
+    // JSON으로 직렬화하여 로컬스토리지에 저장
+    const dataJson = JSON.stringify(phones);
+    localStorage.setItem(STORAGE_KEY, dataJson);
+    
+    console.log(`✅ 성공: ${count}개의 테스트 데이터가 로컬스토리지에 저장되었습니다.`);
+    console.log(`   저장 키: ${STORAGE_KEY}`);
+    console.log(`   데이터 크기: ${(dataJson.length / 1024).toFixed(2)} KB`);
+    console.log(`\n💡 사용법:`);
+    console.log(`   1. 페이지를 새로고침하세요.`);
+    console.log(`   2. 페이지네이션 훅에서 이 데이터를 읽어올 수 있도록 설정하세요.`);
+    console.log(`\n🧹 삭제 방법:`);
+    console.log(`   localStorage.removeItem('${STORAGE_KEY}')`);
+    
+    return phones;
+  } catch (error) {
+    console.error('❌ 로컬스토리지 저장 실패:', error);
+    console.error('   로컬스토리지 용량 제한을 초과했을 수 있습니다.');
+    return null;
+  }
+}
+
+// 브라우저 환경에서만 실행
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.generateLocalTestData = generateLocalTestData;
+  
+  console.log('✨ 로컬 테스트 데이터 생성기 로드됨!');
+  console.log('사용법: generateLocalTestData(100) // 원하는 개수 입력');
+}
+
+// Node.js 환경에서 실행 시 HTML 파일 생성
+if (typeof window === 'undefined') {
+  import('fs').then(({ writeFileSync }) => {
+    import('path').then(({ resolve }) => {
+      const htmlContent = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로컬스토리지 테스트 데이터 생성기</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #4b5563;
+      transform: translateY(-2px);
+    }
+    .output {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 200px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #374151;
+    }
+    .log-success { color: #059669; font-weight: 600; }
+    .log-error { color: #dc2626; font-weight: 600; }
+    .log-info { color: #3b82f6; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 로컬스토리지 테스트 데이터 생성기</h1>
+    <p class="subtitle">페이지네이션 테스트를 위한 목 데이터를 로컬스토리지에 생성합니다.</p>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="currentCount">0</div>
+        <div class="stat-label">현재 데이터</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="storageSize">0 KB</div>
+        <div class="stat-label">용량</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="pageCount">0</div>
+        <div class="stat-label">페이지 수</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="dataCount">생성할 데이터 개수</label>
+      <input type="number" id="dataCount" value="100" min="1" max="1000" placeholder="예: 100">
+    </div>
+
+    <div class="button-group">
+      <button class="btn-primary" onclick="generateData()">✨ 데이터 생성</button>
+      <button class="btn-danger" onclick="clearData()">🗑️ 데이터 삭제</button>
+    </div>
+
+    <button class="btn-secondary" onclick="checkData()" style="width: 100%; margin-bottom: 20px;">
+      📊 현재 데이터 확인
+    </button>
+
+    <div class="output" id="output">
+      <div class="log-info">💡 버튼을 클릭하여 데이터를 생성하거나 삭제하세요.</div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'test_phones_pagination_data';
+    const PAGE_SIZE = 10;
+
+    // 데이터 모델 및 옵션
+    const models = [
+      { name: 'iPhone', variants: ['14 Pro', '15 Pro', '15 Pro Max', '16', '16 Pro'], brand: 'apple' },
+      { name: 'Galaxy', variants: ['S23', 'S23 Ultra', 'S24', 'S24 Ultra', 'Note20'], brand: 'samsung' },
+      { name: 'Pixel', variants: ['7', '7 Pro', '8', '8 Pro'], brand: 'google' },
+      { name: 'Nothing Phone', variants: ['1', '2'], brand: 'nothing' },
+      { name: 'Xperia', variants: ['5', '10', '1'], brand: 'sony' },
+    ];
+
+    const storageOptions = ['128GB', '256GB', '512GB', '1TB'];
+    const conditions = ['S급', 'A급', 'B급', 'C급'];
+    const saleStates = ['available', 'reserved', 'sold'];
+    const addresses = [
+      '서울시 강남구',
+      '서울시 마포구',
+      '서울시 서초구',
+      '서울시 송파구',
+      '서울시 종로구',
+      '경기도 성남시',
+      '경기도 수원시',
+      '인천광역시',
+      '부산광역시',
+      '대구광역시',
+    ];
+
+    const imageUrls = [
+      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=640&h=480&fit=crop',
+      'https://images.unsplash.com/photo-1580898434531-5700dde6756c?w=640&h=480&fit=crop',
+      'https://images.unsplash.com/photo-1510557880182-3f8c5fed2fa8?w=640&h=480&fit=crop',
+      'https://images.unsplash.com/photo-1451188502541-13943edb6acb?w=640&h=480&fit=crop',
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=640&h=480&fit=crop',
+    ];
+
+    // 유틸리티 함수들
+    function getRandomElement(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function getRandomPrice() {
+      return Math.floor(Math.random() * 1500000) + 500000;
+    }
+
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    // 개별 전화기 데이터 생성
+    function generateLocalPhoneData(index) {
+      const model = getRandomElement(models);
+      const variant = getRandomElement(model.variants);
+      const storage = getRandomElement(storageOptions);
+      const condition = getRandomElement(conditions);
+      const saleState = getRandomElement(saleStates);
+      const address = getRandomElement(addresses);
+      const price = getRandomPrice();
+      
+      const now = new Date();
+      const daysAgo = 100 - index;
+      const createdAt = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+
+      const modelName = model.name + ' ' + variant;
+      const title = modelName + ' ' + storage;
+      
+      return {
+        id: generateUUID(),
+        title: title,
+        price: price,
+        currency: 'KRW',
+        categories: [model.brand, 'phone'],
+        sale_state: saleState,
+        available_from: createdAt.toISOString(),
+        available_until: null,
+        main_image_url: getRandomElement(imageUrls),
+        model_name: modelName,
+        storage_capacity: storage,
+        device_condition: condition,
+        address: address,
+        tags: [model.brand, condition.toLowerCase(), '직거래'],
+        created_at: createdAt.toISOString(),
+      };
+    }
+
+    // 메인 데이터 생성 함수
+    function generateLocalTestData(count) {
+      count = count || 100;
+      console.log('🚀 로컬스토리지용 테스트 데이터 ' + count + '개 생성 시작...\\n');
+
+      const phones = [];
+      
+      for (let i = 0; i < count; i++) {
+        phones.push(generateLocalPhoneData(i));
+      }
+      
+      try {
+        const dataJson = JSON.stringify(phones);
+        localStorage.setItem(STORAGE_KEY, dataJson);
+        
+        console.log('✅ 성공: ' + count + '개의 테스트 데이터가 로컬스토리지에 저장되었습니다.');
+        console.log('   저장 키: ' + STORAGE_KEY);
+        console.log('   데이터 크기: ' + (dataJson.length / 1024).toFixed(2) + ' KB');
+        console.log('\\n💡 사용법:');
+        console.log('   1. 페이지를 새로고침하세요.');
+        console.log('   2. /phones 페이지에서 페이지네이션 테스트');
+        console.log('\\n🧹 삭제 방법:');
+        console.log('   localStorage.removeItem("' + STORAGE_KEY + '")');
+        
+        return phones;
+      } catch (error) {
+        console.error('❌ 로컬스토리지 저장 실패:', error);
+        console.error('   로컬스토리지 용량 제한을 초과했을 수 있습니다.');
+        return null;
+      }
+    }
+
+    function log(message, type = 'info') {
+      const output = document.getElementById('output');
+      const div = document.createElement('div');
+      div.className = 'log-' + type;
+      div.textContent = message;
+      output.appendChild(div);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearOutput() {
+      document.getElementById('output').innerHTML = '';
+    }
+
+    function updateStats() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) {
+        const phones = JSON.parse(data);
+        document.getElementById('currentCount').textContent = phones.length;
+        document.getElementById('storageSize').textContent = 
+          (data.length / 1024).toFixed(2) + ' KB';
+        document.getElementById('pageCount').textContent = 
+          Math.ceil(phones.length / PAGE_SIZE);
+      } else {
+        document.getElementById('currentCount').textContent = '0';
+        document.getElementById('storageSize').textContent = '0 KB';
+        document.getElementById('pageCount').textContent = '0';
+      }
+    }
+
+    function generateData() {
+      clearOutput();
+      const count = parseInt(document.getElementById('dataCount').value) || 100;
+      
+      log('🚀 테스트 데이터 생성 시작...', 'info');
+      log(\`   생성 개수: \${count}개\`, 'info');
+      
+      try {
+        const result = generateLocalTestData(count);
+        if (result) {
+          log(\`✅ \${count}개의 데이터가 성공적으로 생성되었습니다!\`, 'success');
+          log(\`   저장 위치: localStorage['\${STORAGE_KEY}']\`, 'info');
+          updateStats();
+        } else {
+          log('❌ 데이터 생성에 실패했습니다.', 'error');
+        }
+      } catch (error) {
+        log('❌ 에러: ' + error.message, 'error');
+      }
+    }
+
+    function clearData() {
+      clearOutput();
+      log('🧹 데이터 삭제 중...', 'info');
+      
+      const existingData = localStorage.getItem(STORAGE_KEY);
+      if (!existingData) {
+        log('ℹ️  삭제할 데이터가 없습니다.', 'info');
+        return;
+      }
+
+      localStorage.removeItem(STORAGE_KEY);
+      log('✅ 모든 테스트 데이터가 삭제되었습니다.', 'success');
+      updateStats();
+    }
+
+    function checkData() {
+      clearOutput();
+      log('📊 현재 데이터 확인 중...', 'info');
+      
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (!data) {
+        log('ℹ️  저장된 데이터가 없습니다.', 'info');
+        return;
+      }
+
+      try {
+        const phones = JSON.parse(data);
+        log(\`✓ 총 데이터 수: \${phones.length}개\`, 'success');
+        log(\`✓ 데이터 크기: \${(data.length / 1024).toFixed(2)} KB\`, 'success');
+        log(\`✓ 예상 페이지 수: \${Math.ceil(phones.length / PAGE_SIZE)}페이지 (페이지당 \${PAGE_SIZE}개)\`, 'success');
+        log('', 'info');
+        log('첫 번째 데이터 샘플:', 'info');
+        log(JSON.stringify(phones[0], null, 2), 'info');
+      } catch (error) {
+        log('❌ 데이터 파싱 에러: ' + error.message, 'error');
+      }
+    }
+
+    // 페이지 로드 시 현재 상태 표시
+    window.addEventListener('load', () => {
+      updateStats();
+      log('✨ 로컬 테스트 데이터 생성기가 준비되었습니다!', 'success');
+      log('💡 위의 버튼을 클릭하여 데이터를 관리하세요.', 'info');
+    });
+  </script>
+</body>
+</html>`;
+
+      const outputPath = resolve(process.cwd(), 'public', 'test-data-generator.html');
+      writeFileSync(outputPath, htmlContent, 'utf-8');
+      
+      console.log('✅ HTML 파일이 생성되었습니다!');
+      console.log(`   위치: ${outputPath}`);
+      console.log(`\n사용 방법:`);
+      console.log(`   1. 개발 서버 실행: npm run dev`);
+      console.log(`   2. 브라우저에서 접속: http://localhost:3000/test-data-generator.html`);
+      console.log(`   3. "데이터 생성" 버튼 클릭`);
+      console.log(`   4. /phones 페이지에서 페이지네이션 테스트\n`);
+    });
+  });
+}
+
+export { generateLocalTestData };
+

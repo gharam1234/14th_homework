@@ -1,0 +1,105 @@
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+     - @01-common.mdc
+     - @04-func.mdc
+
+조건-파일경로) 구현될 Hook 파일경로:
+  src/components/phone-detail/hooks/index.map-link.hook.ts
+
+조건-파일경로) 구현될 TEST 파일경로:
+  src/components/phone-detail/tests/index.map-link.hook.spec.ts
+
+==============================================
+
+핵심요구사항) Playwright 테스트를 이용하여 TDD 방식으로 구현해야 함.
+→ 즉, 테스트를 먼저 만들고, 테스트가 통과되도록 기능을 완성해야 함.
+
+테스트에서 사용하면 안 되는 라이브러리
+ - jest
+ - @testing-library/react
+
+테스트 조건
+ - timeout은 0~499ms 사이 또는 아예 설정하지 않기
+ - 페이지가 완전히 로드되었을 때만 테스트 시작
+  - 페이지 로드 확인은 data-testid로 접근해서 기다리기
+  - ❌ networkidle 같은 방식으로 로드 확인 금지
+
+핵심요구사항) 지도 요소(마커/지도 전체)를 클릭하면 Kakao Maps 길찾기 링크를 새 창으로 띄우기
+  1) 클릭 대상
+   - 마커 (data-testid="phone-detail-map-marker")
+   - 지도 컨테이너 (data-testid="phone-detail-map-container")
+
+  2) Kakao Maps URL 생성 규칙
+   - 형식:
+    https://map.kakao.com/link/map/[address],[latitude],[longitude
+]
+   - 예시:
+    https://map.kakao.com/link/map/서울
+ 강남구 역삼동,37.4979,127.0276
+   - 파라미터
+    - address: 기본 주소 (addressDetail이 있으면 뒤에 결합)
+    - latitude: 위도
+    - longitude: 경도
+
+  3) 링크 열기
+   - window.open(url, '_blank')
+   - 모바일이면 카카오맵 앱이 설치되어 있을 경우 앱으로 열림
+
+핵심요구사항) Hook 구조
+  1) Hook 이름: useMapLink
+
+  2) 입력 파라미터
+   - latitude: number (필수)
+   - longitude: number (필수)
+   - address: string (필수)
+   - addressDetail?: string (선택)
+
+  3) 반환값
+   - getMapUrl: () => string
+   - openMapLink: () => void
+   - isValidCoordinates: boolean
+
+  4) 유효성 검사
+   - latitude: -90 ~ 90 사이
+   - longitude: -180 ~ 180 사이
+   - address는 빈 문자열이면 안 됨
+
+핵심요구사항) 컴포넌트에서 Hook 반영
+  1) 마커 클릭
+   - data-testid="phone-detail-map-marker"
+   - onClick → openMapLink()
+
+  2) 지도 클릭
+   - data-testid="phone-detail-map-container"
+   - cursor: pointer
+   - onClick → openMapLink()
+
+  3) 클릭 전에 좌표 검증
+   - isValidCoordinates가 false면 동작 X
+   - 메시지: "유효한 위치 정보가 없습니다."
+
+핵심요구사항) Playwright 테스트 만들기
+  1) 테스트 케이스
+   1-1) Hook 테스트
+    - 올바른 URL 생성되는지
+    - 좌표 유효성 검사
+    - addressDetail 있을 때 처리 확인
+
+   1-2) 컴포넌트 통합 테스트
+    - 마커 클릭 → 새 탭에서 Kakao Maps 열림
+    - 좌표가 이상하면 링크 안 열림
+    - URL 구조가 정확한지 확인
+
+  2) 테스트 작성 시
+   - 실존 좌표 사용 (Mock 금지)
+   - window.open 검증 시 스파이 사용 OK
+
+핵심요구사항) 기타 조건
+  1) 보안/성능
+   - 주소는 encodeURIComponent로 인코딩
+   - useCallback으로 함수 감싸기 (불필요한 리렌더링 방지)
+
+  2) 접근성
+   - 마커에 role="button"
+   - 키보드(Enter/Space)로도 동작하도록 처리

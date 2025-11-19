@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams } from 'next/navigation';
 import styles from './styles.module.css';
 import { PhoneDetail as PhoneDetailType, PhoneDetailProps } from './types';
@@ -10,6 +11,9 @@ import { usePhoneDetailNavigation } from './hooks/index.navigation.hook';
 import { useFetchDetail, PhoneDetailData } from './hooks/index.fetch-detail.hook';
 import { useCopyLink } from './hooks/index.copylink.hook';
 import { useLocation } from './hooks/index.location.hook';
+import { useImageError } from './hooks/index.image-error.hook';
+import { useMapLink } from './hooks/index.map-link.hook';
+import { useKakaoMap } from './hooks/index.map.hook';
 import Modal from '@commons/ui/src/modal';
 
 /**
@@ -80,6 +84,26 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
   const params = useParams();
   const phoneIdFromParams = params?.id as string | undefined;
   const phoneId = propsPhoneId || phoneIdFromParams;
+  const [mounted, setMounted] = useState(false);
+  const [modalPortal, setModalPortal] = useState<HTMLElement | null>(null);
+
+  // SSR 대응: 마운트 확인 및 modal-portal 찾기
+  useEffect(() => {
+    setMounted(true);
+    
+    // modal-portal 찾기 (ModalProvider가 생성함)
+    const findPortal = () => {
+      const portal = document.getElementById('modal-portal');
+      if (portal) {
+        setModalPortal(portal);
+      } else {
+        // portal이 아직 없으면 잠시 후 다시 시도
+        setTimeout(findPortal, 100);
+      }
+    };
+    
+    findPortal();
+  }, []);
 
   // 데이터 조회 훅 사용
   const { data: fetchedData, isLoading, error, retry } = useFetchDetail(phoneId);
@@ -140,11 +164,65 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
   );
   const { handleCategoryTabClick, handleBackButtonClick } = usePhoneDetailNavigation();
 
+  // 모달을 Portal에 렌더링
+  const renderDeleteModal = useCallback(() => {
+    if (!isModalOpen || !mounted || typeof window === 'undefined') {
+      return null;
+    }
+
+    const modalPortal = document.getElementById('modal-portal');
+    if (!modalPortal) {
+      // modal-portal이 없으면 생성 시도
+      const portal = document.createElement('div');
+      portal.id = 'modal-portal';
+      document.body.appendChild(portal);
+      return null; // 다음 렌더링에서 다시 시도
+    }
+
+    return createPortal(
+      <Modal
+        variant="danger"
+        actions="dual"
+        title="삭제 확인"
+        description="정말로 이 판매 글을 삭제하시겠습니까?"
+        confirmText="삭제"
+        cancelText="취소"
+        onConfirm={deletePhone}
+        onCancel={hideDeleteModal}
+      />,
+      modalPortal
+    );
+  }, [isModalOpen, mounted, deletePhone, hideDeleteModal]);
+
   // 링크 복사 훅 사용
   const { copyLink } = useCopyLink();
 
   // 위치 훅 사용
   const { openMap } = useLocation(fetchedData);
+
+  // 지도 링크 훅 사용
+  const { openMapLink, isValidCoordinates } = useMapLink({
+    latitude: phoneData?.seller.latitude || 0,
+    longitude: phoneData?.seller.longitude || 0,
+    address: phoneData?.seller.location || '',
+    addressDetail: '',
+  });
+
+  // 이미지 에러 처리 훅 사용
+  const { handleImageError } = useImageError('/images/phone_sample.png');
+
+  // Kakao Maps 훅 사용
+  const {
+    mapContainerRef,
+    isMapLoaded,
+    mapError,
+    isValidCoordinates: hasValidMapCoordinates,
+  } = useKakaoMap({
+    latitude: fetchedData?.latitude ?? null,
+    longitude: fetchedData?.longitude ?? null,
+    address: fetchedData?.address ?? phoneData?.seller.location ?? '',
+    addressDetail: fetchedData?.address_detail ?? '',
+  });
 
   // 로딩 상태 표시
   if (isLoading) {
@@ -318,7 +396,8 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
                   src={phoneData.mainImage}
                   alt="메인 이미지"
                   className={styles.mainImage}
-                  data-testid="phone-main-image"
+                  data-testid="gallery-image-0"
+                  onError={handleImageError}
                 />
               </div>
 
@@ -330,6 +409,8 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
                       src={image}
                       alt={`썸네일 ${index + 1}`}
                       className={styles.thumbnailImage}
+                      data-testid={`gallery-image-${index + 1}`}
+                      onError={handleImageError}
                     />
                   </div>
                 ))}
@@ -355,21 +436,58 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
         {/* === 구분선 === */}
         <div className={styles.divider} />
 
-        {/* === 위치 섹션 === */}
-        <section className={styles.locationSection} data-testid="location-section">
-          <h2 className={styles.sectionTitle}>상세 위치</h2>
-          <div className={styles.mapContainer} data-testid="map-container">
-            <img
-              src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=844&h=280&fit=crop"
-              alt="판매자 위치"
-              className={styles.mapImage}
-            />
-          </div>
-        </section>
+        {/* === 거래 희망 지역 섹션 === */}
+        {hasValidMapCoordinates && (
+          <section className={styles.locationSection} data-testid="location-section">
+            <h2 className={styles.sectionTitle}>거래 희망 지역</h2>
+            
+            {/* 지도 컨테이너 */}
+            <div 
+              ref={mapContainerRef}
+              id="kakaoMap"
+              className={styles.kakaoMapContainer} 
+              data-testid="phone-detail-map-container"
+            >
+              {/* 로딩 중 표시 */}
+              {!isMapLoaded && !mapError && (
+                <div className={styles.mapLoadingOverlay}>
+                  <p>지도를 불러오는 중...</p>
+                </div>
+              )}
+              
+              {/* 에러 표시 */}
+              {mapError && (
+                <div className={styles.mapErrorOverlay}>
+                  <p>{mapError}</p>
+                </div>
+              )}
+            </div>
+            
+            {/* 주소 텍스트 표시 */}
+            {fetchedData?.address && (
+              <div className={styles.mapAddressInfo} data-testid="phone-detail-map-address">
+                <p className={styles.mapAddressText}>
+                  {fetchedData.address}
+                  {fetchedData.address_detail && ` ${fetchedData.address_detail}`}
+                </p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* 좌표 정보가 없을 때 */}
+        {!hasValidMapCoordinates && fetchedData && (
+          <section className={styles.locationSection} data-testid="location-section">
+            <h2 className={styles.sectionTitle}>거래 희망 지역</h2>
+            <div className={styles.mapNoDataContainer}>
+              <p className={styles.mapNoDataText}>등록된 위치 정보가 없습니다</p>
+            </div>
+          </section>
+        )}
       </div>
 
-      {/* 삭제 확인 모달 */}
-      {isModalOpen && (
+      {/* 삭제 확인 모달 - Portal을 사용하여 화면 중앙에 렌더링 */}
+      {isModalOpen && mounted && modalPortal && createPortal(
         <Modal
           variant="danger"
           actions="dual"
@@ -379,7 +497,8 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
           cancelText="취소"
           onConfirm={deletePhone}
           onCancel={hideDeleteModal}
-        />
+        />,
+        modalPortal
       )}
     </div>
   );

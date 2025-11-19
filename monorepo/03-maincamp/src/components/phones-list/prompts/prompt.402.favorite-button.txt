@@ -1,48 +1,51 @@
-아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
-구현 결과를 체크리스트로 반환할 것.
-
 ==============================================
 
-조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+조건-커서룰) 아래 커서룰을 적용해 작업하고, 이 작업이 끝나면
+            이 규칙들을 잘 적용했는지 체크리스트로 보여줄 것.
             - @01-common.mdc
             - @04-func.mdc
 
-조건-파일경로) 참고할 PAGE 경로: src/components/phones-list/index.tsx
-조건-파일경로) 구현될 HOOK 경로: src/components/phones-list/hooks/index.favorite.hook.ts
-조건-파일경로) 구현될 TEST 파일경로: src/components/phones-list/tests/index.favorite.spec.ts
+조건-파일경로) 참고할 PAGE 경로
+                src/components/phones-list/index.tsx
 
-조건-스키마문서) 참고할 Supabase 스키마 문서: 03-maincamp/sql/supabase.txt
+조건-파일경로) 새로 만들 HOOK 경로
+                src/components/phones-list/hooks/index.favorite.hook.ts
+
+조건-파일경로) 테스트 파일 경로
+                src/components/phones-list/tests/index.favorite.spec.ts
+
+조건-스키마문서) Supabase 스키마 참고 문서: 03-maincamp/sql/supabase.txt
                 - 테이블: phone_reactions
-                - 필드: id (UUID PK), phone_id, user_id, type ('favorite'), created_at, deleted_at
+                - 필드: id (UUID PK), phone_id, user_id, type('favorite'),
+                        created_at, deleted_at
 
 ==============================================
 
-핵심요구사항) playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+핵심요구사항) playwright 테스트(TDD)로 개발하며, 테스트가 통과될 때까지 반복할 것.
 
-1) 테스트 제외 라이브러리
+1) 사용할 수 없는 테스트 라이브러리
    - jest
    - @testing-library/react
 
 2) 테스트 조건
-   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
-   - 페이지가 완전히 로드된 후 테스트할 것.
-       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
-       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+   - timeout은 없애거나 500ms 미만으로 설정
+   - 페이지가 완전히 로드된 후 테스트 진행
+       - "data-testid"로 대기해서 페이지 로드 확인하기
+       - ❗ 금지: networkidle 방식으로 로드 확인
 
 3) 테스트 API 조건
 3-1) 데이터
-    - 실제 Supabase 데이터를 사용할 것.
-    - Mock 데이터를 사용하지 말 것.
+    - 실제 Supabase 사용 (Mock X)
 
-3-2) 성공 시나리오
-    - 로그인한 사용자의 찜 버튼 클릭 시 phone_reactions에 insert 검증
-    - 찜 상태가 UI에 반영되는지 검증 (낙관적 업데이트)
-    - 다시 클릭 시 phone_reactions에서 deleted_at 업데이트 검증
+3-2) 성공 흐름
+    - 로그인한 사용자 → 찜(하트) 버튼 클릭 → phone_reactions에 insert 되는지 확인
+    - UI에서 바로 하트가 채워지는지(낙관적 업데이트) 확인
+    - 다시 클릭하면 deleted_at이 업데이트되는지 확인
 
-3-3) 실패 시나리오
-    - 로그인 안 된 상태에서 클릭 시 로그인 페이지로 이동 검증
-    - API 호출 실패 시 이전 상태로 롤백 검증
-    - 실패 시 에러 토스트 메시지 표시 검증
+3-3) 실패 흐름
+    - 로그인 안 되어 있음 → 찜 클릭 → 로그인 페이지로 이동해야 함
+    - API 실패 → UI 상태 롤백되는지 확인
+    - 실패 → 에러 토스트 메시지가 보이는지 확인
 
 4) 데이터 조건
     - 저장소: Supabase
@@ -50,53 +53,57 @@
     - 상태관리: Zustand
     - 인증: auth.users (현재 로그인 사용자)
 
-핵심요구사항) 찜 버튼 기능을 step-by-step으로 구현할 것.
+==============================================
 
-1) 로그인 검증
-   - 찜 버튼 클릭 시 로그인 상태 확인
-   - 미로그인 상태 → 로그인 페이지로 이동 (commons/constants/url.ts의 LOGIN 경로 사용)
-   - 로그인 상태 → 찜 기능 실행
+핵심요구사항) 찜(관심상품) 기능을 단계적으로 만들기
 
-2) 낙관적 업데이트 구현
-   - 버튼 클릭 즉시 UI 상태 업데이트 (하트 아이콘 활성화)
-   - 동시에 Supabase에 insert/update 요청
-   - API 성공 시: UI 상태 유지
-   - API 실패 시: 이전 상태로 롤백, 에러 메시지 표시
+1) 로그인 여부 체크
+   - 찜 버튼 누르면 로그인 여부 먼저 확인
+   - 미로그인 → 로그인 페이지 이동 (commons/constants/url.ts에 있는 LOGIN 경로)
+   - 로그인됨 → 찜 기능 실행
+
+2) 낙관적 업데이트
+   - 클릭하자마자 UI에서 하트가 먼저 바뀌도록 함
+   - 그와 동시에 Supabase에 insert 또는 update 요청 보냄
+   - API 성공 → 그대로 유지
+   - API 실패 → UI 원래대로 돌리고 에러 토스트 보여주기
 
 3) Supabase 연동
    - 테이블: phone_reactions
    - 동작:
-       - 찜 추가: insert (phone_id, user_id, type: 'favorite', created_at)
-       - 찜 취소: phone_reactions의 deleted_at을 현재 시간으로 update
-   - 현재 사용자의 찜 상태 조회: phone_reactions where phone_id=? AND user_id=? AND type='favorite' AND deleted_at IS NULL
+       - 찜 추가 → insert(phone_id, user_id, type:'favorite', created_at)
+       - 찜 취소 → deleted_at을 현재 시간으로 update
+   - 현재 찜 상태 조회 → 
+       phone_id=?, user_id=?, type='favorite', deleted_at IS NULL 조건으로 조회
 
 4) Zustand 상태 추가
-   - favoritePhoneIds: Set<string> (찜한 상품 ID 목록)
-   - toggleFavorite(phoneId: string, userId: string): 찜 상태 토글
-   - setFavorites(phoneIds: string[]): 찜 목록 초기화
+   - favoritePhoneIds: Set<string> (찜한 phoneId 저장)
+   - toggleFavorite(phoneId: string, userId: string)
+   - setFavorites(phoneIds: string[]) : 초기 찜 목록 세팅
 
 5) UI 구현
-   - 각 폰 카드에 찜 버튼 추가 (하트 아이콘)
-   - 찜된 상품: 채워진 하트 (❤️)
-   - 찜되지 않은 상품: 빈 하트 (🤍)
-   - data-testid="favorite-button-{phoneId}" 추가
-   - 버튼 클릭 시 로딩 상태 표시 (disabled 처리)
+   - 각 폰 카드에 찜 버튼(하트 아이콘) 추가
+       - 찜 O → ❤️
+       - 찜 X → 🤍
+   - data-testid="favorite-button-{phoneId}"
+   - 클릭 시 로딩 상태 → 버튼 disabled
 
 6) 토스트 메시지
-   - 성공: "관심상품에 추가되었습니다." (찜 추가 시)
-   - 성공: "관심상품에서 제거되었습니다." (찜 취소 시)
-   - 실패: "관심상품 처리에 실패하였습니다. 다시 시도해주세요."
-   - data-testid="favorite-toast" 추가 (토스트 메시지에)
+   - 찜 추가 성공 → "관심상품에 추가되었습니다."
+   - 찜 삭제 성공 → "관심상품에서 제거되었습니다."
+   - 실패 → "관심상품 처리에 실패하였습니다. 다시 시도해주세요."
+   - data-testid="favorite-toast"
 
 7) 접근성
-   - aria-label="관심상품 저장" (찜 추가)
-   - aria-label="관심상품 제거" (찜 취소)
-   - aria-pressed 속성으로 상태 표현
+   - aria-label="관심상품 저장" 또는 "관심상품 제거"
+   - aria-pressed로 현재 상태 표현
 
-8) 테스트
-   - 로그인하지 않은 상태에서 찜 버튼 클릭 시 로그인 페이지로 이동 검증
-   - 로그인한 상태에서 찜 버튼 클릭 시 하트 아이콘이 채워지는지 검증 (낙관적 업데이트)
-   - 찜 버튼 다시 클릭 시 하트 아이콘이 빈 상태로 변하는지 검증
-   - 성공 토스트 메시지가 표시되는지 검증
-   - API 실패 시 이전 상태로 롤백되는지 검증
-   - API 실패 시 에러 토스트 메시지 표시 검증
+8) 테스트 시나리오
+   - 미로그인 → 찜 클릭 → 로그인 페이지 이동 검증
+   - 로그인 상태 → 찜 클릭 → 하트가 채워지는지 확인(낙관적 업데이트)
+   - 다시 클릭 → 하트가 빈 상태로 바뀌는지 확인
+   - 성공 토스트 메시지 뜨는지 확인
+   - API 실패 → UI 롤백되는지 확인
+   - API 실패 → 에러 토스트가 뜨는지 확인
+
+==============================================

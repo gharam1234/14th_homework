@@ -1,0 +1,189 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+==============================================
+
+조건-파일경로) 참고할 PAGE 파일경로: /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/src/app/(protected)/phones/new/page.tsx
+조건-파일경로) 구현될 HOOK 파일경로: src/components/phone-new/hooks/index.submit.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/phone-new/tests/index.submit.spec.ts
+
+==============================================
+
+조건-스키마) Supabase 테이블 및 필드 정보는 아래 문서를 참고할 것.
+            - 문서 경로: /Users/gharam12/Desktop/my-homework/14th_homework/monorepo/03-maincamp/sql/supabase.txt
+            - 테이블명: phones
+            - **중요금지사항** 문서에 정의된 필드명과 타입만 사용할 것. 임의로 변경하지 말 것.
+
+==============================================
+
+핵심요구사항) playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+3) 테스트 시나리오
+   3-1) 신규 등록 성공 시나리오
+        - 필수 필드 입력 후 제출
+        - phones 테이블에 insert 성공 검증
+        - 성공 알림 메시지 표시 검증
+        - /phones/[id] 페이지로 이동 검증
+
+   3-2) 수정 성공 시나리오
+        - 기존 데이터 로드 후 수정
+        - phones 테이블 update 성공 검증
+        - 성공 알림 메시지 표시 검증
+        - /phones/[id] 페이지로 이동 검증
+
+   3-3) 유효성 검증 실패 시나리오
+        - title 빈값 입력 시 에러 메시지 표시
+        - title 100자 초과 시 에러 메시지 표시
+        - price 숫자가 아닌 값 입력 시 에러 메시지 표시
+
+   3-4) 중복 요청 방지 시나리오
+        - 제출 중 로딩 상태 표시 검증
+        - 제출 중 버튼 비활성화 검증
+        - 제출 완료 후 버튼 활성화 검증
+
+==============================================
+
+핵심요구사항) 다음의 기능을 Supabase를 연동하여 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+
+1. 신규 등록 시나리오 (props.isEdit === false)
+   1-1) 다음의 데이터를 Supabase phones 테이블에 등록할 것
+        - 접속키: Supabase Client
+        - 테이블: phones
+        - 메서드: insert()
+        - 필수 필드:
+            - title: string (최대 100자)
+            - price: number (숫자만, 0 이상)
+            - description: string
+            - address: string
+            - latitude: number
+            - longitude: number
+            - model_name: string
+            - storage_capacity: string
+            - device_condition: string
+        - 선택 필드:
+            - summary: string | null
+            - tags: JSONB | null
+            - address_detail: string | null
+            - zipcode: string | null
+            - main_image_url: string | null (버킷: phones-images)
+        - 자동 설정 필드:
+            - seller_id: auth.users.id (현재 로그인 사용자)
+            - status: 'draft' (초기값)
+            - sale_state: 'available' (초기값)
+            - created_at: now()
+            - updated_at: now()
+
+   1-2) 이미지 업로드 처리 (선택사항)
+        - 버킷명: phones-images
+        - 파일명 패턴: [seller_id]/[timestamp]_[원본파일명]
+        - 허용 타입: jpg, png, webp
+        - 최대 크기: 10MB
+        - 업로드 성공 시 main_image_url에 public URL 저장
+
+   1-3) 신규 등록 성공 이후 로직을 완성할 것.
+        - 알림메시지: "중고폰 등록에 성공하였습니다."
+        - 이동할페이지: "/phones/[생성된 id]"
+
+2. 수정 시나리오 (props.isEdit === true)
+   2-1) 다음의 데이터를 Supabase phones 테이블에 수정할 것
+        - 접속키: Supabase Client
+        - 테이블: phones
+        - 메서드: update()
+        - 조건: id = [수정할 phone id] AND seller_id = [현재 사용자 id]
+        - 수정 가능 필드: 위 1-1의 필수/선택 필드 전체
+        - 자동 갱신 필드:
+            - updated_at: now()
+
+   2-2) 이미지 업로드 처리 (선택사항)
+        - 기존 이미지와 동일한 처리 로직 적용
+        - 새 이미지 업로드 시 기존 이미지 삭제는 하지 말 것
+
+   2-3) 수정 성공 이후 로직을 완성할 것.
+        - 알림메시지: "중고폰 수정에 성공하였습니다."
+        - 이동할페이지: "/phones/[수정한 id]"
+
+3. 유효성 검증 규칙
+   3-1) 제출 전 클라이언트 검증
+        - title: 필수, 빈값 불가, 최대 100자
+        - price: 필수, 숫자만, 0 이상
+        - description: 필수
+        - address, latitude, longitude: 필수
+        - model_name, storage_capacity, device_condition: 필수
+        - main_image_url (파일): 선택, jpg/png/webp만, 10MB 이하
+
+   3-2) 검증 실패 시 처리
+        - 각 필드별 에러 메시지 표시
+        - 제출 버튼 비활성화는 하지 말 것
+        - 스크롤을 첫 번째 에러 필드로 이동
+
+4. 중복 요청 방지 및 에러 처리
+   4-1) 로딩 플래그 구현
+        - 제출 시작: isSubmitting = true
+        - 제출 완료/실패: isSubmitting = false
+        - 제출 중 버튼 비활성화 및 로딩 표시
+
+   4-2) 타임아웃 설정
+        - Supabase 요청 타임아웃: 10초
+        - 타임아웃 발생 시 에러 메시지 표시
+
+   4-3) 재시도 전략
+        - 네트워크 에러 시 재시도 버튼 표시
+        - 재시도 횟수: 최대 3회
+        - 재시도 간격: 1초
+
+   4-4) 에러 처리
+        - 네트워크 에러: "네트워크 연결을 확인해주세요."
+        - 권한 에러: "수정 권한이 없습니다."
+        - 서버 에러: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        - 기타 에러: "등록/수정에 실패하였습니다. 다시 시도해주세요."
+
+5. 공통 응답 파서 구현
+   5-1) 성공 응답 처리
+        - Supabase insert/update 성공 시 data 파싱
+        - 생성/수정된 id 추출
+        - 성공 플래그 반환
+
+   5-2) 실패 응답 처리
+        - error 객체 파싱
+        - 에러 코드별 메시지 매핑
+        - 실패 플래그 및 에러 메시지 반환
+
+6. 실패 시 임시 저장 (선택사항)
+   6-1) 로컬스토리지 활용
+        - key: phone_draft_[seller_id]
+        - value: 입력한 폼 데이터 전체
+        - 저장 시점: 제출 실패 시
+
+   6-2) 페이지 재진입 시 복구
+        - 로컬스토리지에서 draft 확인
+        - 복구 여부 사용자에게 확인
+        - 복구 시 폼 데이터 자동 입력
+
+==============================================
+
+핵심요구사항) 목록 갱신 트리거 처리를 구현할 것.
+
+1) 성공 후 목록 갱신 방법
+   - Supabase Realtime 사용하지 말 것
+   - 페이지 이동 후 자동 새로고침에 의존할 것
+   - 또는 목록 페이지에서 데이터 refetch 로직 구현
+
+2) 캐시 무효화
+   - Next.js revalidatePath 사용 고려
+   - 또는 React Query invalidateQueries 사용 고려

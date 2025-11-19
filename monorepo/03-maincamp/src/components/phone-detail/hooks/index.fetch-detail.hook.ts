@@ -19,6 +19,8 @@ export interface PhoneDetailData {
   address: string | null;
   address_detail: string | null;
   zipcode: string | null;
+  latitude: number | null;
+  longitude: number | null;
   main_image_url: string;
   seller_id: string;
   sale_state: 'available' | 'reserved' | 'sold';
@@ -62,6 +64,8 @@ const mapFixtureToDetail = (record: SupabasePhoneRecord): PhoneDetailData => ({
   address: record.address,
   address_detail: record.address_detail,
   zipcode: record.zipcode,
+  latitude: record.latitude ?? null,
+  longitude: record.longitude ?? null,
   main_image_url: record.main_image_url ?? '',
   seller_id: record.seller_id,
   sale_state: record.sale_state,
@@ -129,6 +133,8 @@ export function useFetchDetail(phoneId: string | null | undefined): UseFetchDeta
         address: phoneData.address ?? null,
         address_detail: phoneData.address_detail ?? null,
         zipcode: phoneData.zipcode ?? null,
+        latitude: typeof phoneData.latitude === 'number' ? phoneData.latitude : null,
+        longitude: typeof phoneData.longitude === 'number' ? phoneData.longitude : null,
         main_image_url: phoneData.main_image_url ?? '',
         seller_id: phoneData.seller_id ?? '',
         sale_state: SALE_STATES.includes(phoneData.sale_state)

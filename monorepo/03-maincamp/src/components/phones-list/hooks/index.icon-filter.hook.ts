@@ -57,8 +57,8 @@ const mapFixturesToPhones = (category: string | null): Phone[] => {
 };
 
 /**
- * 아이콘 필터링 기능을 제공하는 커스텀 훅
- * @description 선택된 카테고리에 따라 휴대폰 데이터를 필터링하여 API에서 조회
+ * 브랜드 필터링 기능을 제공하는 커스텀 훅
+ * @description 선택된 브랜드 카테고리에 따라 휴대폰 데이터를 필터링하여 API에서 조회
  * @returns 선택된 카테고리, 로딩 상태, 에러, 필터링된 휴대폰 목록, 토글 함수
  */
 export const useIconFilter = (): UseIconFilterReturn => {
@@ -93,7 +93,8 @@ export const useIconFilter = (): UseIconFilterReturn => {
 
       // 카테고리가 선택된 경우, categories 필드에서 해당 값 필터링
       if (category) {
-        // Supabase의 JSON 배열 필터링
+        // Supabase의 JSON 배열 필터링 - categories 배열에 해당 카테고리가 포함된 경우 필터링
+        // cs 연산자는 배열이 다른 배열을 포함하는지 확인 (contains)
         query = query.filter('categories', 'cs', `["${category}"]`);
       }
 
@@ -103,7 +104,16 @@ export const useIconFilter = (): UseIconFilterReturn => {
         throw supabaseError;
       }
 
-      const formattedData: Phone[] = (data || []).map((row: any) => ({
+      const formattedData: Phone[] = (data || []).map((row: {
+        id: string | number;
+        title: string | null;
+        price: number | string | null;
+        categories: string[] | null;
+        sale_state: 'available' | 'reserved' | 'sold' | null;
+        available_from: string | null;
+        available_until: string | null;
+        main_image_url: string | null;
+      }) => ({
         id: row.id,
         title: row.title,
         price: row.price,
@@ -119,7 +129,7 @@ export const useIconFilter = (): UseIconFilterReturn => {
       } else {
         setPhonesList(formattedData);
       }
-    } catch (err) {
+    } catch {
       setError(FILTER_ERROR_MESSAGE);
       if (shouldFallbackToFixtures) {
         hydrateWithFixtures();
