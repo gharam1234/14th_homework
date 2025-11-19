@@ -49,9 +49,9 @@ const buildPhone = (overrides: Partial<SupabasePhoneRecord>): SupabasePhoneRecor
   model_name: 'iPhone 14 Pro',
   storage_capacity: '256GB',
   device_condition: 'A급',
-  address: '서울특별시 마포구 합정동 123-45',
-  address_detail: '홍대입구역 인근',
-  zipcode: '04055',
+  address: '서울시 마포구 합정동',
+  address_detail: '123번길 45',
+  zipcode: '04001',
   latitude: 37.5495,
   longitude: 126.9144,
   tags: ['apple', 'a급', '직거래'],
@@ -63,6 +63,24 @@ const buildPhone = (overrides: Partial<SupabasePhoneRecord>): SupabasePhoneRecor
 
 export const PHONE_RECORDS: SupabasePhoneRecord[] = [
   buildPhone({ id: 'listing-001' }),
+  buildPhone({
+    id: 'listing-002',
+    address: null,
+    address_detail: null,
+    zipcode: null,
+  }),
+  buildPhone({
+    id: 'listing-003',
+    address: '',
+    address_detail: '',
+    zipcode: '',
+  }),
+  buildPhone({
+    id: 'listing-004',
+    address: '서울시 강남구',
+    address_detail: null,
+    zipcode: null,
+  }),
   buildPhone({
     id: 'test-phone-001',
     title: '갤럭시 S24 Ultra 512GB',

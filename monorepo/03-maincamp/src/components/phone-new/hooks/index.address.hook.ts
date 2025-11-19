@@ -8,10 +8,16 @@ import type {
   KakaoReverseGeocodeResponse,
   Coordinates,
 } from '../types/address.types';
+import { isTestEnv } from '@/commons/utils/is-test-env';
 
 const KAKAO_REST_API_KEY =
   process.env.KAKAO_REST_API_KEY || process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY || '';
 const DAUM_POSTCODE_SRC = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+
+const getTestAddressOverrides = () => {
+  if (typeof window === 'undefined') return undefined;
+  return window.__TEST_ADDRESS_OVERRIDES__;
+};
 
 function ensureKakaoApiKey() {
   if (!KAKAO_REST_API_KEY) {
@@ -73,6 +79,15 @@ function convertDaumAddressToAddressData(data: DaumAddressData): AddressData {
  * 주소 → 좌표 변환 (지오코딩)
  */
 async function geocodeAddress(address: string): Promise<Coordinates> {
+  if (isTestEnv()) {
+    const overrides = getTestAddressOverrides();
+    const match = overrides?.geocode?.[address];
+    if (match) {
+      return match;
+    }
+    throw new Error(overrides?.geocodeError ?? '주소를 찾을 수 없습니다');
+  }
+
   const url = new URL('https://dapi.kakao.com/v2/local/search/address.json');
   url.searchParams.set('query', address);
 
@@ -114,6 +129,16 @@ async function geocodeAddress(address: string): Promise<Coordinates> {
  * 좌표 → 주소 변환 (역지오코딩)
  */
 async function reverseGeocode(latitude: number, longitude: number): Promise<AddressData> {
+  if (isTestEnv()) {
+    const overrides = getTestAddressOverrides();
+    const key = `${latitude},${longitude}`;
+    const match = overrides?.reverse?.[key];
+    if (match) {
+      return match;
+    }
+    throw new Error(overrides?.reverseError ?? '좌표에 해당하는 주소를 찾을 수 없습니다');
+  }
+
   const url = new URL('https://dapi.kakao.com/v2/local/geo/coord2address.json');
   url.searchParams.set('x', longitude.toString());
   url.searchParams.set('y', latitude.toString());

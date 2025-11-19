@@ -9,13 +9,12 @@ import { test, expect, Page } from '@playwright/test';
  */
 
 const LOCATION_BUTTON_SELECTOR = '[title="위치"]';
-const PHONE_DETAIL_ROUTE = '**/rest/v1/phones**';
 
 /**
  * 지도 URL이 올바른 형식인지 검증
  */
 function isValidMapUrl(url: string): boolean {
-  const kakaoMapPattern = /^https:\/\/map\.kakao\.com\/link\/search\/.+/;
+  const kakaoMapPattern = /^https:\/\/map\.kakao\.com\/(?:link\/search\/.+|\?q=.+)/;
   const naverMapPattern = /^https:\/\/map\.naver\.com\/v5\/search\/.+/;
   return kakaoMapPattern.test(url) || naverMapPattern.test(url);
 }
@@ -27,35 +26,6 @@ test('거래 지역 정보가 있는 경우 위치 아이콘 클릭 시 외부 �
   page,
   context,
 }) => {
-  // Mock 데이터 설정 (거래 지역 정보 포함)
-  await page.route(PHONE_DETAIL_ROUTE, async (route) => {
-    const method = route.request().method();
-    if (method === 'GET') {
-      await route.fulfill({
-        status: 200,
-        headers: { 'content-type': 'application/json; charset=utf-8' },
-        body: JSON.stringify([
-          {
-            id: 'listing-001',
-            title: '아이폰 14 Pro 256GB',
-            price: 1180000,
-            description: '좋은 상태입니다',
-            address: '서울시 마포구 합정동',
-            address_detail: '123번길 45',
-            zipcode: '04001',
-            seller_id: 'seller-001',
-            main_image_url: 'https://example.com/image.jpg',
-            sale_state: 'available',
-            created_at: '2025-02-18T10:30:00Z',
-          },
-        ]),
-      });
-      return;
-    }
-    await route.fallback();
-  });
-
-  // 페이지 로드
   await page.goto('/phone-detail/listing-001');
 
   // 페이지가 완전히 로드될 때까지 대기 (data-testid)
@@ -87,35 +57,6 @@ test('거래 지역 정보가 없는 경우 위치 아이콘 클릭 시 경고 �
   page,
   context,
 }) => {
-  // Mock 데이터 설정 (거래 지역 정보 없음)
-  await page.route(PHONE_DETAIL_ROUTE, async (route) => {
-    const method = route.request().method();
-    if (method === 'GET') {
-      await route.fulfill({
-        status: 200,
-        headers: { 'content-type': 'application/json; charset=utf-8' },
-        body: JSON.stringify([
-          {
-            id: 'listing-002',
-            title: '아이폰 14 Pro 256GB',
-            price: 1180000,
-            description: '좋은 상태입니다',
-            address: null,
-            address_detail: null,
-            zipcode: null,
-            seller_id: 'seller-001',
-            main_image_url: 'https://example.com/image.jpg',
-            sale_state: 'available',
-            created_at: '2025-02-18T10:30:00Z',
-          },
-        ]),
-      });
-      return;
-    }
-    await route.fallback();
-  });
-
-  // 페이지 로드
   await page.goto('/phone-detail/listing-002');
 
   // 페이지가 완전히 로드될 때까지 대기 (data-testid)
@@ -147,35 +88,6 @@ test('거래 지역 정보가 빈 문자열인 경우 위치 아이콘 클릭 �
   page,
   context,
 }) => {
-  // Mock 데이터 설정 (거래 지역 정보가 빈 문자열)
-  await page.route(PHONE_DETAIL_ROUTE, async (route) => {
-    const method = route.request().method();
-    if (method === 'GET') {
-      await route.fulfill({
-        status: 200,
-        headers: { 'content-type': 'application/json; charset=utf-8' },
-        body: JSON.stringify([
-          {
-            id: 'listing-003',
-            title: '아이폰 14 Pro 256GB',
-            price: 1180000,
-            description: '좋은 상태입니다',
-            address: '',
-            address_detail: '',
-            zipcode: '',
-            seller_id: 'seller-001',
-            main_image_url: 'https://example.com/image.jpg',
-            sale_state: 'available',
-            created_at: '2025-02-18T10:30:00Z',
-          },
-        ]),
-      });
-      return;
-    }
-    await route.fallback();
-  });
-
-  // 페이지 로드
   await page.goto('/phone-detail/listing-003');
 
   // 페이지가 완전히 로드될 때까지 대기 (data-testid)
@@ -207,35 +119,6 @@ test('일부 거래 지역 정보만 있는 경우 있는 정보로만 지도 �
   page,
   context,
 }) => {
-  // Mock 데이터 설정 (address만 있음)
-  await page.route(PHONE_DETAIL_ROUTE, async (route) => {
-    const method = route.request().method();
-    if (method === 'GET') {
-      await route.fulfill({
-        status: 200,
-        headers: { 'content-type': 'application/json; charset=utf-8' },
-        body: JSON.stringify([
-          {
-            id: 'listing-004',
-            title: '아이폰 14 Pro 256GB',
-            price: 1180000,
-            description: '좋은 상태입니다',
-            address: '서울시 강남구',
-            address_detail: null,
-            zipcode: null,
-            seller_id: 'seller-001',
-            main_image_url: 'https://example.com/image.jpg',
-            sale_state: 'available',
-            created_at: '2025-02-18T10:30:00Z',
-          },
-        ]),
-      });
-      return;
-    }
-    await route.fallback();
-  });
-
-  // 페이지 로드
   await page.goto('/phone-detail/listing-004');
 
   // 페이지가 완전히 로드될 때까지 대기 (data-testid)

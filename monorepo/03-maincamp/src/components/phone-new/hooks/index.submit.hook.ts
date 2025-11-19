@@ -1,17 +1,27 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { message } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 import { supabase } from '@/commons/libraries/supabaseClient';
 import { getPath } from '@/commons/constants/url';
+import { isTestEnv } from '@/commons/utils/is-test-env';
 
 const DRAFT_KEY = 'phone';
 const MAX_MEDIA_SIZE = 10 * 1024 * 1024;
 const ALLOWED_IMAGE_MIME = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PRICE = 9_999_999_999.99;
+
+const getTestPhoneSubmitConfig = () => {
+  if (typeof window === 'undefined') return undefined;
+  return window.__TEST_PHONE_SUBMIT__;
+};
+
+const waitForTestDelay = async (ms?: number) => {
+  if (!ms) return;
+  await new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 export interface SubmitMediaFile {
   url: string;
@@ -184,8 +194,12 @@ const normalizeTags = (values?: string[]) => {
     .filter((value): value is string => Boolean(value));
 };
 
+interface SubmitResult {
+  success: boolean;
+  nextPath?: string;
+}
+
 export function usePhoneSubmit() {
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
@@ -244,6 +258,19 @@ export function usePhoneSubmit() {
   }, []);
 
   const ensureSupabaseUser = useCallback(async (): Promise<string | null> => {
+    if (isTestEnv()) {
+      if (typeof window !== 'undefined') {
+        if (window.__TEST_PHONE_SUBMIT_USER_ID__ === null) {
+          message.warning('로그인이 필요합니다.');
+          return null;
+        }
+        if (window.__TEST_PHONE_SUBMIT_USER_ID__) {
+          return window.__TEST_PHONE_SUBMIT_USER_ID__!;
+        }
+      }
+      return 'test-user';
+    }
+
     const userId = await resolveSupabaseUserId();
     if (!userId) {
       message.warning('로그인이 필요합니다.');
@@ -253,7 +280,7 @@ export function usePhoneSubmit() {
   }, []);
 
   const submitData = useCallback(
-    async (data: SubmitProductState) => {
+    async (data: SubmitProductState): Promise<SubmitResult> => {
       setValidationErrors({});
       const result = phoneSubmitSchema.safeParse({
         ...data,
@@ -272,14 +299,14 @@ export function usePhoneSubmit() {
 
         setValidationErrors(errors);
         focusFirstValidationField(errors);
-        return;
+        return { success: false };
       }
 
       if (data.mediaFiles.length === 0) {
         const mediaError = { mediaFiles: '사진을 선택해 주세요.' };
         setValidationErrors(mediaError);
         focusFirstValidationField(mediaError);
-        return;
+        return { success: false };
       }
 
       setIsSubmitting(true);
@@ -288,8 +315,33 @@ export function usePhoneSubmit() {
         const sellerId = await ensureSupabaseUser();
         if (!sellerId) {
           setIsSubmitting(false);
-          return;
+          return { success: false };
         }
+
+        if (isTestEnv()) {
+          const config = getTestPhoneSubmitConfig();
+          await waitForTestDelay(config?.delayMs);
+          if (typeof window !== 'undefined') {
+            window.__TEST_PHONE_SUBMIT_LAST_PAYLOAD__ = {
+              sellerId,
+              data,
+            };
+          }
+
+          if (config?.result === 'error') {
+            saveDraft(data);
+            message.error(config?.errorMessage ?? '상품 등록에 실패하였습니다. 다시 시도해주세요.');
+            return { success: false };
+          }
+
+          clearDraft();
+          message.success('상품 등록에 성공하였습니다.');
+          const nextPath = config?.createdPhoneId
+            ? getPath('PHONE_DETAIL', { id: config.createdPhoneId })
+            : getPath('PHONES_LIST');
+          return { success: true, nextPath };
+        }
+
         const { data: phone, error: phoneError } = await supabase
           .from('phones')
           .insert([
@@ -390,15 +442,22 @@ export function usePhoneSubmit() {
 
         clearDraft();
         message.success('상품 등록에 성공하였습니다.');
-        router.push(getPath('PHONE_DETAIL', { id: phoneId }));
+        return {
+          success: true,
+          nextPath: getPath('PHONE_DETAIL', { id: phoneId }),
+        };
       } catch (error) {
         console.error('상품 등록 실패:', error);
-        message.error('상품 등록에 실패하였습니다. 다시 시도해주세요.');
+        message.error(
+          error instanceof Error ? error.message : '상품 등록에 실패하였습니다. 다시 시도해주세요.'
+        );
+        saveDraft(data);
+        return { success: false };
       } finally {
         setIsSubmitting(false);
       }
     },
-    [clearDraft, ensureSupabaseUser, router]
+    [clearDraft, ensureSupabaseUser, saveDraft]
   );
 
   return {

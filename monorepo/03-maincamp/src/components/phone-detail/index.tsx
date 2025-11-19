@@ -223,7 +223,8 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
                   {/* 삭제 아이콘 */}
                   <button
                     className={styles.iconButton}
-                    title="삭제"
+                    title="판매글 제거"
+                    aria-label="판매글 제거 아이콘"
                     onClick={showDeleteModal}
                     data-testid="delete-button"
                   >

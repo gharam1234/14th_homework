@@ -2,7 +2,6 @@ import { test, expect, Page } from '@playwright/test';
 
 const PHONE_DETAIL_URL = '/phones/listing-001';
 const PHONES_LIST_URL = '/phones';
-const SUPABASE_DELETE_ROUTE = '**/rest/v1/phones**';
 
 async function waitForPageLoad(page: Page) {
   await page.locator('[data-testid="phone-detail-body"]').waitFor({ state: 'visible' });
@@ -44,23 +43,13 @@ async function getNotification(page: Page): Promise<string | null> {
   return null;
 }
 
-type SupabaseDeleteMockOptions = {
-  status?: number;
-  body?: unknown;
-};
-
-async function mockSupabaseDelete(page: Page, options: SupabaseDeleteMockOptions = {}) {
-  await page.route(SUPABASE_DELETE_ROUTE, async (route) => {
-    if (route.request().method() !== 'DELETE') {
-      return route.continue();
-    }
-
-    await route.fulfill({
-      status: options.status ?? 200,
-      contentType: 'application/json',
-      body: JSON.stringify(options.body ?? []),
-    });
-  });
+async function setDeleteConfig(
+  page: Page,
+  config: { result?: 'success' | 'error'; delayMs?: number; redirectPath?: string; errorMessage?: string }
+) {
+  await page.evaluate((cfg) => {
+    window.__TEST_DELETE_CONFIG__ = cfg;
+  }, config);
 }
 
 test.describe('삭제 기능 테스트', () => {
@@ -118,8 +107,7 @@ test.describe('삭제 기능 테스트', () => {
   });
 
   test('삭제 버튼 클릭 시 로딩 상태를 표시해야 함', async ({ page }) => {
-    // 이 테스트는 Supabase 모킹이 필요함
-    await mockSupabaseDelete(page);
+    await setDeleteConfig(page, { result: 'success', delayMs: 500 });
     await clickDeleteButton(page);
     await waitForDeleteModal(page);
 
@@ -131,10 +119,9 @@ test.describe('삭제 기능 테스트', () => {
   });
 
   test('삭제 성공 시 성공 메시지를 표시하고 /phones로 이동해야 함', async ({ page }) => {
-    // Supabase 모킹 필요
+    await setDeleteConfig(page, { result: 'success', redirectPath: PHONES_LIST_URL });
     await clickDeleteButton(page);
     await waitForDeleteModal(page);
-    await mockSupabaseDelete(page, { body: [{ id: 'listing-001' }] });
     await clickConfirmDeleteButton(page);
 
     // 성공 메시지 확인
@@ -148,10 +135,9 @@ test.describe('삭제 기능 테스트', () => {
   });
 
   test('삭제 실패 시 에러 메시지를 표시해야 함', async ({ page }) => {
-    // Supabase 모킹 필요 - 실패 시나리오
+    await setDeleteConfig(page, { result: 'error', errorMessage: 'mock fail' });
     await clickDeleteButton(page);
     await waitForDeleteModal(page);
-    await mockSupabaseDelete(page, { status: 500, body: { message: 'mock fail' } });
     await clickConfirmDeleteButton(page);
 
     // 에러 메시지 확인
@@ -161,10 +147,9 @@ test.describe('삭제 기능 테스트', () => {
   });
 
   test('삭제 실패 시 모달이 닫혀야 함', async ({ page }) => {
-    // Supabase 모킹 필요 - 실패 시나리오
+    await setDeleteConfig(page, { result: 'error' });
     await clickDeleteButton(page);
     await waitForDeleteModal(page);
-    await mockSupabaseDelete(page, { status: 500, body: { message: 'mock fail' } });
     await clickConfirmDeleteButton(page);
 
     // 에러 메시지 표시 후 모달 닫힘
@@ -174,12 +159,11 @@ test.describe('삭제 기능 테스트', () => {
   });
 
   test('삭제 실패 시 페이지가 이동하지 않아야 함', async ({ page }) => {
-    // Supabase 모킹 필요 - 실패 시나리오
+    await setDeleteConfig(page, { result: 'error' });
     const initialUrl = page.url();
 
     await clickDeleteButton(page);
     await waitForDeleteModal(page);
-    await mockSupabaseDelete(page, { status: 500, body: { message: 'mock fail' } });
     await clickConfirmDeleteButton(page);
 
     // 에러 후 페이지에서 벗어나지 않음

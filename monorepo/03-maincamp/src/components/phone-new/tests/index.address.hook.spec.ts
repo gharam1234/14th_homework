@@ -1,7 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
 
-const KAKAO_API_KEY = process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY || 'test-kakao-key';
-
 /**
  * 폼이 완전히 로드될 때까지 대기
  */
@@ -14,114 +12,6 @@ async function waitForForm(page: Page) {
   });
   // 폼이 완전히 렌더링될 때까지 추가 대기
   await page.waitForTimeout(500);
-}
-
-/**
- * 카카오 지오코딩 API 모킹
- */
-async function mockKakaoAPI(page: Page) {
-  // 주소 → 좌표 변환 (지오코딩)
-  await page.route('**/v2/local/search/address.json*', async (route) => {
-    const url = new URL(route.request().url());
-    const query = url.searchParams.get('query');
-
-    if (query?.includes('서울특별시 강남구 테헤란로 123')) {
-      await route.fulfill({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          meta: { total_count: 1, pageable_count: 1, is_end: true },
-          documents: [{
-            address_name: '서울특별시 강남구 테헤란로 123',
-            address_type: 'ROAD',
-            x: '127.0276',
-            y: '37.4979',
-            address: {
-              address_name: '서울 강남구 역삼동 123',
-              region_1depth_name: '서울',
-              region_2depth_name: '강남구',
-              region_3depth_name: '역삼동',
-              mountain_yn: 'N',
-              main_address_no: '123',
-              sub_address_no: '',
-              zip_code: '06236'
-            },
-            road_address: {
-              address_name: '서울 강남구 테헤란로 123',
-              region_1depth_name: '서울',
-              region_2depth_name: '강남구',
-              region_3depth_name: '역삼동',
-              road_name: '테헤란로',
-              underground_yn: 'N',
-              main_building_no: '123',
-              sub_building_no: '',
-              building_name: '역삼빌딩',
-              zone_no: '06236'
-            }
-          }]
-        })
-      });
-    } else {
-      await route.fulfill({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          meta: { total_count: 0, pageable_count: 0, is_end: true },
-          documents: []
-        })
-      });
-    }
-  });
-
-  // 좌표 → 주소 변환 (역지오코딩)
-  await page.route('**/v2/local/geo/coord2address.json*', async (route) => {
-    const url = new URL(route.request().url());
-    const x = url.searchParams.get('x');
-    const y = url.searchParams.get('y');
-
-    if (x === '127.0276' && y === '37.4979') {
-      await route.fulfill({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          meta: { total_count: 1 },
-          documents: [{
-            address: {
-              address_name: '서울 강남구 역삼동 123',
-              region_1depth_name: '서울',
-              region_2depth_name: '강남구',
-              region_3depth_name: '역삼동',
-              mountain_yn: 'N',
-              main_address_no: '123',
-              sub_address_no: '',
-              zip_code: '06236'
-            },
-            road_address: {
-              address_name: '서울 강남구 테헤란로 123',
-              region_1depth_name: '서울',
-              region_2depth_name: '강남구',
-              region_3depth_name: '역삼동',
-              road_name: '테헤란로',
-              underground_yn: 'N',
-              main_building_no: '123',
-              sub_building_no: '',
-              building_name: '역삼빌딩',
-              zone_no: '06236'
-            }
-          }]
-        })
-      });
-    } else {
-      await route.fulfill({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          meta: { total_count: 0 },
-          documents: []
-        })
-      });
-    }
-  });
 }
 
 /**
@@ -165,10 +55,26 @@ async function mockDaumPostcode(page: Page) {
 
 test.describe('주소 검색 및 지오코딩 통합 테스트', () => {
   test.beforeEach(async ({ page }) => {
-    await mockKakaoAPI(page);
     await mockDaumPostcode(page);
     await page.goto('/phones/new');
     await waitForForm(page);
+    await page.evaluate(() => {
+      window.__TEST_ADDRESS_OVERRIDES__ = {
+        geocode: {
+          '서울 강남구 테헤란로 123': { latitude: 37.4979, longitude: 127.0276 },
+          '서울특별시 강남구 테헤란로 123': { latitude: 37.4979, longitude: 127.0276 },
+        },
+        reverse: {
+          '37.4979,127.0276': {
+            zipCode: '06236',
+            roadAddress: '서울 강남구 테헤란로 123',
+            jibunAddress: '서울 강남구 역삼동 123',
+            address: '서울 강남구 테헤란로 123',
+            detailAddress: '',
+          },
+        },
+      };
+    });
   });
 
   test('주소 검색 성공 시나리오 - 주소 선택 후 자동 지오코딩', async ({ page }) => {
@@ -258,6 +164,12 @@ test.describe('주소 검색 및 지오코딩 통합 테스트', () => {
   });
 
   test('에러 처리 - 잘못된 주소 입력', async ({ page }) => {
+    await page.evaluate(() => {
+      window.__TEST_ADDRESS_OVERRIDES__ = {
+        geocode: {},
+        geocodeError: '주소를 찾을 수 없습니다',
+      };
+    });
     // 존재하지 않는 주소로 검색 시도
     await page.evaluate(() => {
       // 잘못된 주소로 이벤트 발생

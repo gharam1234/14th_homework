@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { test, expect, Page } from '@playwright/test';
 
 /**
@@ -43,12 +44,26 @@ async function clearLocalStorage(page: Page) {
  * 테스트 유틸: 로컬스토리지에 중고폰 데이터 설정
  */
 async function setPhoneData(page: Page, phoneId: string, data: Record<string, unknown>) {
-  await page.evaluate(
-    ({ key, value }) => {
-      localStorage.setItem(key, JSON.stringify(value));
-    },
-    { key: `phone-${phoneId}`, value: data }
-  );
+  const setValue = () =>
+    page.evaluate(
+      ({ key, value }) => {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+          console.warn('setPhoneData failed:', error);
+          throw error;
+        }
+      },
+      { key: `phone-${phoneId}`, value: data }
+    );
+
+  try {
+    await setValue();
+  } catch (error) {
+    await page.goto('http://localhost:3000/phones/new');
+    await waitForPageLoad(page);
+    await setValue();
+  }
 }
 
 /**
@@ -70,43 +85,37 @@ async function fillPhoneForm(page: Page) {
   // 태그 입력
   await page.locator('[data-testid="input-phone-tags"]').fill('#Apple #A급 #안전거래');
 
-  // 우편번호 입력 (disabled 상태이므로 evaluate 사용)
   await page.evaluate(() => {
-    const input = document.querySelector('[data-testid="input-postcode"]') as HTMLInputElement;
-    if (input) {
-      input.value = '04043';
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    }
+    window.dispatchEvent(
+      new CustomEvent('phone:apply-address', {
+        detail: {
+          zonecode: '06236',
+          address: '서울특별시 강남구 역삼동 123',
+          roadAddress: '서울특별시 강남구 테헤란로 123',
+        },
+      })
+    );
   });
-
-  // 상세주소 입력
+  await expect(page.locator('[data-testid="selected-address"]')).toContainText('테헤란로 123');
   await page.locator('[data-testid="input-detailed-address"]').fill('서울시 마포구 합정동 123-4');
 }
 
 /**
  * 테스트 유틸: 이미지 첨부 (파일 선택 대화 시뮬레이션)
  */
+const SAMPLE_IMAGE_BUFFER = Buffer.from(
+  '89504e470d0a1a0a0000000d49484452000000010000000108020000009077053d0000000a49444154789c6360000002000154a20af50000000049454e44ae426082',
+  'hex'
+);
+
 async function attachImage(page: Page) {
-  // 파일 업로드 버튼 클릭
-  const uploadButton = page.locator('[data-testid="btn-upload-image"]');
-
-  // 파일 선택 대화가 나타나면 처리
-  const fileInputPromise = page.waitForEvent('filechooser');
-  await uploadButton.click();
-  const fileInput = await fileInputPromise;
-
-  // 테스트 이미지 파일 생성 및 업로드
-  // 실제로는 프로젝트의 테스트 자산 파일을 사용하거나
-  // 더미 파일을 생성해서 사용
-  // 여기서는 간단히 evaluate를 사용해서 폼의 이미지 상태 시뮬레이션
-  await page.evaluate(() => {
-    // imageFiles 상태에 이미지 추가 (테스트용)
-    const event = new CustomEvent('imageuploaded', { detail: { file: 'test-image.jpg' } });
-    document.dispatchEvent(event);
+  await page.setInputFiles('[data-testid="input-upload-image"]', {
+    name: 'sample.png',
+    mimeType: 'image/png',
+    buffer: SAMPLE_IMAGE_BUFFER,
   });
 
-  // 대신 실제 파일 업로드를 원하면 다음과 같이 사용:
-  // await fileInput.setFiles(testImagePath);
+  await expect(page.locator('[data-testid^="image-preview-"]')).toHaveCount(1);
 }
 
 test.describe('PhoneNew 라우팅 테스트 - 신규등록 모드 (isEdit=false)', () => {
@@ -134,30 +143,12 @@ test.describe('PhoneNew 라우팅 테스트 - 신규등록 모드 (isEdit=false)
   });
 
   test('등록 완료 후 목록 페이지(/phones)로 이동', async ({ page }) => {
-    // 1. 준비: 폼 필드 채우기
     await fillPhoneForm(page);
-
-    // 이미지 첨부 (버튼 활성화 조건: 이미지 1개 이상)
-    // 간단한 테스트를 위해 evaluate 사용
-    await page.evaluate(() => {
-      // imageFiles 상태 시뮬레이션 (테스트용)
-      // 실제 구현에서는 파일 업로드 사용
-      const btn = document.querySelector('[data-testid="btn-submit"]') as HTMLButtonElement;
-      if (btn) {
-        btn.disabled = false;
-      }
-    });
-
-    // 2. 실행: alert 처리 및 제출 버튼 클릭
-    page.on('dialog', (dialog) => {
-      // "등록이 완료되었습니다." alert 자동 처리
-      dialog.accept();
-    });
+    await attachImage(page);
 
     const submitButton = page.locator('[data-testid="btn-submit"]');
     await submitButton.click();
 
-    // 3. 검증: URL이 /phones로 변경되었는지 확인
     const expectedUrl = 'http://localhost:3000/phones';
     await expect(page).toHaveURL(expectedUrl);
   });
@@ -177,6 +168,7 @@ test.describe('PhoneNew 라우팅 테스트 - 수정 모드 (isEdit=true)', () =
       description: '생활 스크래치만 있는 아이폰 13 미니입니다.',
       price: '520000',
       tags: '#Apple #미니 #안전거래',
+      address: '서울특별시 서초구 서초대로 74길',
       postalCode: '06611',
       detailedAddress: '서울시 서초구 서초대로 74길 9',
       latitude: '37.4925',
@@ -184,7 +176,6 @@ test.describe('PhoneNew 라우팅 테스트 - 수정 모드 (isEdit=true)', () =
       images: ['image1.jpg'],
     };
     await setPhoneData(page, testListingId, testData);
-
     // 수정 페이지로 이동
     await page.goto(`http://localhost:3000/phones/${testListingId}/edit`);
     await waitForPageLoad(page);

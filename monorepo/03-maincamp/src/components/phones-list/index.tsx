@@ -586,11 +586,11 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
       <div className={styles.contentSection}>
         {/* 필터 섹션 */}
         <div className={styles.filterSection} data-testid="filter-section">
-          {BRAND_FILTERS.map((brand) => {
-            const IconComponent = {
-              apple: FilterIconApple,
-              samsung: FilterIconSamsung,
-              google: FilterIconGoogle,
+        {BRAND_FILTERS.map((brand) => {
+          const IconComponent = {
+            apple: FilterIconApple,
+            samsung: FilterIconSamsung,
+            google: FilterIconGoogle,
               xiaomi: FilterIconXiaomi,
               nothing: FilterIconNothing,
               sony: FilterIconSony,
@@ -599,15 +599,21 @@ export default function PhonesList({ onSearch }: IPhonesListProps) {
               others: FilterIconOthers,
             }[brand.id];
 
+            const isSelected = selectedCategory === brand.id;
+
             return (
               <button
                 key={brand.id}
-                className={`${styles.filterItem} ${
-                  selectedCategory === brand.id ? styles.filterItemSelected : ''
-                }`}
+                className={[
+                  styles.filterItem,
+                  isSelected ? styles.filterItemSelected : '',
+                  isSelected ? 'selected' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 onClick={() => handleBrandFilterClick(brand.id)}
                 data-testid={`filter-${brand.id}`}
-                aria-pressed={selectedCategory === brand.id}
+                aria-pressed={isSelected}
                 style={{
                   background: 'none',
                   border: 'none',

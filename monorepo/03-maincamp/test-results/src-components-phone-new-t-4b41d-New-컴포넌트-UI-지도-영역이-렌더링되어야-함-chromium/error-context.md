@@ -95,37 +95,38 @@
                 - generic [ref=e107]: "*"
               - generic [ref=e108]:
                 - textbox "01234" [ref=e109]
-                - button "우편번호 검색" [ref=e110] [cursor=pointer]
+                - button "우편번호 검색" [ref=e110] [cursor=pointer]:
+                  - button "우편번호 검색" [ref=e111]
               - paragraph
-            - textbox "상세주소를 입력해 주세요." [ref=e112]
-            - generic [ref=e113]:
-              - generic [ref=e114]:
-                - generic [ref=e115]: 위도(LAT)
-                - textbox "위도(LAT)" [ref=e116]:
+            - textbox "상세주소를 입력해 주세요." [ref=e113]
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: 위도(LAT)
+                - textbox "위도(LAT)" [ref=e117]:
                   - /placeholder: 주소를 먼저 입력해 주세요.
                   - text: "0"
                 - text: "0"
-              - generic [ref=e117]:
-                - generic [ref=e118]: 경도(LNG)
-                - textbox "경도(LNG)" [ref=e119]:
+              - generic [ref=e118]:
+                - generic [ref=e119]: 경도(LNG)
+                - textbox "경도(LNG)" [ref=e120]:
                   - /placeholder: 주소를 먼저 입력해 주세요.
                   - text: "0"
                 - text: "0"
-            - generic [ref=e120]:
-              - button "좌표로 주소 찾기" [disabled] [ref=e121] [cursor=pointer]
-              - button "주소 초기화" [ref=e122] [cursor=pointer]
-          - generic [ref=e123]:
-            - heading "거래 위치" [level=3] [ref=e124]
-            - generic [ref=e126]: 주소를 먼저 선택해 주세요.
-        - separator [ref=e127]
-        - generic [ref=e128]:
-          - generic [ref=e129]: 사진 첨부*
-          - button "Choose File" [ref=e130]
-          - button "+ 클릭해서 사진 업로드" [ref=e131] [cursor=pointer]:
-            - generic [ref=e132]:
-              - generic [ref=e133]: +
-              - paragraph [ref=e134]: 클릭해서 사진 업로드
-        - generic [ref=e135]:
-          - button "취소" [ref=e136] [cursor=pointer]
-          - button "등록하기" [disabled] [ref=e137]
+            - generic [ref=e121]:
+              - button "좌표로 주소 찾기" [disabled] [ref=e122] [cursor=pointer]
+              - button "주소 초기화" [ref=e123] [cursor=pointer]
+          - generic [ref=e124]:
+            - heading "거래 위치" [level=3] [ref=e125]
+            - generic [ref=e127]: 주소를 먼저 선택해 주세요.
+        - separator [ref=e128]
+        - generic [ref=e129]:
+          - generic [ref=e130]: 사진 첨부*
+          - button "Choose File" [ref=e131]
+          - button "+ 클릭해서 사진 업로드" [ref=e132] [cursor=pointer]:
+            - generic [ref=e133]:
+              - generic [ref=e134]: +
+              - paragraph [ref=e135]: 클릭해서 사진 업로드
+        - generic [ref=e136]:
+          - button "취소" [ref=e137] [cursor=pointer]
+          - button "등록하기" [disabled] [ref=e138]
 ```

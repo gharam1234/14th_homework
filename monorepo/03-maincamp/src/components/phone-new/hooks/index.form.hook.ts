@@ -154,13 +154,19 @@ export const getPhoneFromStorage = (phoneId: string): StoredPhonePayload | null 
 };
 
 /** usePhoneForm 훅 */
-export function usePhoneForm(props: IPhoneNewProps = {}): UseFormReturn<IPhoneFormInput> {
+export function usePhoneForm(
+  props: IPhoneNewProps = {},
+  draftDefaults?: IPhoneFormInput
+): UseFormReturn<IPhoneFormInput> {
   const { isEdit = false, phoneId } = props;
   const [isInitialized, setIsInitialized] = useState(false);
-  const initialValues = useMemo(() => getDefaultValues(), []);
+  const initialValues = useMemo(() => draftDefaults ?? getDefaultValues(), [draftDefaults]);
 
   // 폼 기본값 결정
   const getInitialValues = (): IPhoneFormInput => {
+    if (draftDefaults && !isEdit) {
+      return draftDefaults;
+    }
     if (isEdit && phoneId) {
       const storedData = getPhoneFromStorage(phoneId);
       if (storedData) return storedData.form;

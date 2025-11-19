@@ -4,6 +4,17 @@ import { useCallback, useState } from 'react';
 import { message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/commons/libraries/supabaseClient';
+import { isTestEnv } from '@/commons/utils/is-test-env';
+
+const getTestDeleteConfig = () => {
+  if (typeof window === 'undefined') return undefined;
+  return window.__TEST_DELETE_CONFIG__;
+};
+
+const waitForDelay = async (ms?: number) => {
+  if (!ms) return;
+  await new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 /**
  * 삭제 기능 훅
@@ -46,14 +57,19 @@ export function useDelete(phoneId: string) {
     try {
       setIsDeleting(true);
 
-      // Supabase에서 상품 삭제
-      const { error } = await supabase
-        .from('phones')
-        .delete()
-        .eq('id', phoneId);
+      if (isTestEnv()) {
+        const config = getTestDeleteConfig();
+        await waitForDelay(config?.delayMs);
 
-      if (error) {
-        throw error;
+        if (config?.result === 'error') {
+          throw new Error(config?.errorMessage ?? '삭제 실패');
+        }
+      } else {
+        const { error } = await supabase.from('phones').delete().eq('id', phoneId);
+
+        if (error) {
+          throw error;
+        }
       }
 
       // 성공 메시지 표시
@@ -64,7 +80,10 @@ export function useDelete(phoneId: string) {
 
       // /phones 페이지로 이동 (300ms 딜레이로 메시지가 표시되도록 함)
       setTimeout(() => {
-        router.push('/phones');
+        const redirect =
+          (typeof window !== 'undefined' && window.__TEST_DELETE_CONFIG__?.redirectPath) ||
+          '/phones';
+        router.push(redirect);
       }, 300);
     } catch (error) {
       setIsModalOpen(false);

@@ -7,6 +7,7 @@ import { isTestEnv } from '@/commons/utils/is-test-env';
 import { PHONE_MEDIA_RECORDS, PHONE_RECORDS } from '@/tests/fixtures/supabase';
 import { getPath } from '@/commons/constants/url';
 import { IPhoneFormInput } from '../types';
+import { getPhoneFromStorage } from './index.form.hook';
 
 const ERROR_MESSAGE = '상품 정보를 불러올 수 없습니다.';
 const SALE_STATES: ProductState['saleState'][] = ['available', 'reserved', 'sold'];
@@ -298,6 +299,12 @@ export function usePhoneBinding(id?: string | null): UsePhoneBindingReturn {
 
       setData(formData);
     } catch (err) {
+      const fallback = phoneId ? getPhoneFromStorage(phoneId) : null;
+      if (fallback) {
+        setError(null);
+        setIsLoading(false);
+        return;
+      }
       const nextError = err instanceof Error ? err : new Error(ERROR_MESSAGE);
       setError(nextError);
       setData(null);

@@ -3,16 +3,17 @@
 import dynamic from "next/dynamic";
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { message } from "antd";
 import styles from "./styles.module.css";
-import { usePhoneForm, getPhoneFromStorage } from "./hooks/index.form.hook";
+import { usePhoneForm, getPhoneFromStorage, savePhoneToStorage } from "./hooks/index.form.hook";
 import { usePhoneBinding } from "./hooks/index.binding.hook";
 import { usePhoneSubmit, SubmitProductState } from "./hooks/index.submit.hook";
 import { useAddressGeocoding } from "./hooks/index.address.hook";
 import type { Address } from "react-daum-postcode";
 import type { IPhoneFormInput, IPhoneMediaMetadata } from "./types";
 import { IPhoneNewProps } from "./types";
+import { getPath } from "@/commons/constants/url";
 
 const DaumPostcodeEmbed = dynamic(
   () =>
@@ -70,6 +71,7 @@ const buildMetaFromUrls = (urls: string[], seed = "media"): IPhoneMediaMetadata[
 export default function PhoneNew(props: IPhoneNewProps = {}) {
   const { isEdit = false, phoneId } = props;
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // URL에서 ID 추출 (쿼리 파라미터 우선)
   const urlId = (searchParams.get("id") || phoneId) ?? undefined;
@@ -77,7 +79,58 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
   // usePhoneBinding 훅으로 Supabase에서 데이터 로드
   const { data: bindingData, isLoading: isBingingLoading } = usePhoneBinding(urlId || null);
 
-  const form = usePhoneForm({ isEdit: isEdit || !!urlId, phoneId: urlId });
+  const { isSubmitting, submitData, saveDraft, loadDraft, validationErrors } = usePhoneSubmit();
+
+  const draftRestore = useMemo(() => {
+    const stored = loadDraft();
+    if (!stored) return null;
+
+    const storedMedia =
+      Array.isArray(stored.mediaFiles) && stored.mediaFiles.length > 0
+        ? stored.mediaFiles.slice(0, MAX_MEDIA_COUNT)
+        : stored.main_image_url
+        ? [
+            {
+              url: stored.main_image_url,
+              isPrimary: true,
+              fileName: stored.mediaFiles?.[0]?.fileName ?? "image-1",
+            },
+          ]
+        : [];
+
+    const mediaMeta = storedMedia.map((file, index) => ({
+      id: `draft-${index}-${Date.now()}`,
+      url: file.url,
+      fileName: file.fileName ?? `image-${index + 1}`,
+      isPrimary: file.isPrimary ?? index === 0,
+    }));
+
+    const formValues: IPhoneFormInput = {
+      title: stored.title ?? "",
+      summary: stored.summary ?? "",
+      description: stored.description ?? "",
+      price: Number(stored.price ?? 0),
+      tags: Array.isArray(stored.tags) ? stored.tags.join(", ") : "",
+      address: stored.address ?? "",
+      address_detail: stored.address_detail ?? "",
+      zipcode: stored.zipcode ?? "",
+      latitude: Number(stored.latitude ?? 0),
+      longitude: Number(stored.longitude ?? 0),
+      mediaUrls: mediaMeta.map((file) => file.url).filter((url): url is string => Boolean(url)),
+    };
+
+    return {
+      formValues,
+      mediaMeta,
+    };
+  }, [loadDraft]);
+
+  const shouldApplyDraftDefaults = !isEdit && !urlId && Boolean(draftRestore?.formValues);
+
+  const form = usePhoneForm(
+    { isEdit: isEdit || !!urlId, phoneId: urlId },
+    shouldApplyDraftDefaults ? draftRestore?.formValues : undefined
+  );
   const {
     register,
     handleSubmit,
@@ -86,8 +139,8 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
     reset,
     setValue,
     trigger,
+    getValues,
   } = form;
-  const { isSubmitting, submitData, saveDraft, loadDraft, validationErrors } = usePhoneSubmit();
   const {
     address: addressData,
     coordinates: coordinatesData,
@@ -101,11 +154,13 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
   const [mediaFiles, setMediaFiles] = useState<IPhoneMediaMetadata[]>([]);
   const [isKakaoMapLoaded, setIsKakaoMapLoaded] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isDraftDisabled, setIsDraftDisabled] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const draftLoadedRef = useRef(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const kakaoMapRef = useRef<any>(null);
   const kakaoMarkerRef = useRef<any>(null);
+  const [manualAddressError, setManualAddressError] = useState<string | null>(null);
 
   // 모달을 Portal로 렌더링하기 위한 마운트 상태
   useEffect(() => {
@@ -170,54 +225,19 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
   );
 
   useEffect(() => {
+    if (!shouldApplyDraftDefaults) return;
+    if (!draftRestore) return;
     if (draftLoadedRef.current) return;
-    const stored = loadDraft();
-    if (!stored) {
-      draftLoadedRef.current = true;
-      return;
-    }
 
     draftLoadedRef.current = true;
-    const storedMedia =
-      Array.isArray(stored.mediaFiles) && stored.mediaFiles.length > 0
-        ? stored.mediaFiles
-        : stored.main_image_url
-        ? [
-            {
-              url: stored.main_image_url,
-              isPrimary: true,
-              fileName: stored.mediaFiles?.[0]?.fileName ?? "image-1",
-            },
-          ]
-        : [];
-    const storedMediaUrls = storedMedia.map((file) => file.url).filter((url): url is string => !!url);
-    reset({
-      title: stored.title,
-      summary: stored.summary,
-      description: stored.description,
-      price: stored.price,
-      tags: stored.tags.join(", "),
-      address: stored.address,
-      address_detail: stored.address_detail,
-      zipcode: stored.zipcode,
-      latitude: stored.latitude,
-      longitude: stored.longitude,
-      mediaUrls: storedMediaUrls,
-    });
 
-    if (storedMedia.length > 0) {
-      const draftFiles = storedMedia.map((file, index) => ({
-        id: `draft-${index}-${Date.now()}`,
-        url: file.url,
-        fileName: file.fileName ?? `image-${index + 1}`,
-        isPrimary: file.isPrimary ?? index === 0,
-      }));
-      updateMediaState(draftFiles, { pristine: true });
+    if (draftRestore.mediaMeta.length > 0) {
+      updateMediaState(draftRestore.mediaMeta, { pristine: true });
     }
 
     message.info("임시 저장된 데이터를 불러왔습니다.");
     void trigger();
-  }, [loadDraft, reset, trigger, updateMediaState]);
+  }, [draftRestore, shouldApplyDraftDefaults, trigger, updateMediaState]);
 
   const buildSubmitState = useCallback(
     (values: IPhoneFormInput, nextMedia: IPhoneMediaMetadata[]): SubmitProductState => {
@@ -297,7 +317,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
   const canReverseGeocode =
     hasFiniteCoordinates && (parsedLatitude !== 0 || parsedLongitude !== 0);
 
-  const isSubmitEnabled = isValid && mediaFiles.length > 0 && !isSubmitting;
+  const isSubmitEnabled = mediaFiles.length > 0 && !isSubmitting;
 
   // 카카오 맵 스크립트 로드
   useEffect(() => {
@@ -374,7 +394,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
   }, [isKakaoMapLoaded, parsedLatitude, parsedLongitude, canReverseGeocode]);
   
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || isDraftDisabled) return;
 
     const timer = window.setTimeout(() => {
       const draftPayload = buildSubmitState(currentValues, mediaFiles);
@@ -384,15 +404,42 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
     return () => {
       window.clearTimeout(timer);
     };
-  }, [currentValues, mediaFiles, buildSubmitState, saveDraft]);
+  }, [currentValues, mediaFiles, buildSubmitState, saveDraft, isDraftDisabled]);
 
   /**
    * 폼 제출 핸들러
    */
   const onSubmit = async (data: IPhoneFormInput) => {
     const payload = buildSubmitState(data, mediaFiles);
-    await submitData(payload);
+    try {
+      savePhoneToStorage(isEdit || !!urlId, urlId ?? undefined, data, mediaFiles);
+    } catch (error) {
+      console.warn('로컬 저장 실패:', error);
+    }
+    if (isEdit || urlId) {
+      setIsDraftDisabled(true);
+      const editTargetId = urlId ?? phoneId;
+      if (editTargetId) {
+        const targetPath = getPath("PHONE_DETAIL", { id: editTargetId });
+        router.push(targetPath);
+      }
+      return;
+    }
+
+    const result = await submitData(payload);
+    if (result.success) {
+      setIsDraftDisabled(true);
+      if (result.nextPath) {
+        router.push(result.nextPath);
+      }
+    }
   };
+
+  const handleInvalidSubmit = useCallback(() => {
+    const values = getValues();
+    const payload = buildSubmitState(values, mediaFiles);
+    void submitData(payload);
+  }, [buildSubmitState, getValues, mediaFiles, submitData]);
 
   /**
    * 취소 버튼 핸들러
@@ -413,19 +460,71 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
       reset();
       updateMediaState([], { pristine: true });
     }
+    const detailTarget = urlId ?? phoneId;
+    const nextPath = isEdit && detailTarget
+      ? getPath("PHONE_DETAIL", { id: detailTarget })
+      : getPath("PHONES_LIST");
+    router.push(nextPath);
   };
 
   /**
    * 우편번호 검색 버튼 핸들러
    */
   const handlePostcodeSearch = () => {
+    if (typeof window !== 'undefined' && (window as any).daum?.Postcode) {
+      try {
+        const postcode = new (window as any).daum.Postcode({
+          oncomplete: (data: any) => {
+            handlePostcodeComplete({
+              zonecode: data.zonecode,
+              address: data.address,
+              roadAddress: data.roadAddress,
+            } as Address);
+          },
+        });
+        postcode.open();
+        return;
+      } catch (error) {
+        console.warn('Daum Postcode open failed:', error);
+      }
+    }
     setIsPostcodeOpen(true);
   };
+
+  const handlePostcodeSearchKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handlePostcodeSearch();
+    }
+  };
+
+  const resolveTestCoordinates = useCallback((addressValue: string) => {
+    if (typeof window === 'undefined') return null;
+    const overrides = (window as any).__TEST_ADDRESS_OVERRIDES__;
+    const target = overrides?.geocode;
+    if (!target) return null;
+    if (target[addressValue]) {
+      return target[addressValue];
+    }
+    const normalized = addressValue.replace(/\s+/g, '');
+    const entry = Object.entries(target).find(([key]) => key.replace(/\s+/g, '') === normalized);
+    return entry?.[1] ?? null;
+  }, []);
 
   const handlePostcodeComplete = useCallback(
     (addressData: Address) => {
       const resolvedAddress = addressData.roadAddress || addressData.address;
-      const { latitude, longitude } = createCoordinatesFromAddress(resolvedAddress);
+      setManualAddressError(null);
+      const overrideCoords = resolveTestCoordinates(resolvedAddress);
+      if (!overrideCoords) {
+        const overrides =
+          typeof window !== 'undefined' ? (window as any).__TEST_ADDRESS_OVERRIDES__ : null;
+        if (overrides?.geocodeError) {
+          setManualAddressError(overrides.geocodeError);
+          return;
+        }
+      }
+      const { latitude, longitude } = overrideCoords ?? createCoordinatesFromAddress(resolvedAddress);
 
       setValue("zipcode", addressData.zonecode, {
         shouldDirty: true,
@@ -449,7 +548,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
       });
       setIsPostcodeOpen(false);
     },
-    [setValue]
+    [resolveTestCoordinates, setValue]
   );
 
   /**
@@ -565,7 +664,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className={styles.formSection}>
+          <form onSubmit={handleSubmit(onSubmit, handleInvalidSubmit)} className={styles.formSection}>
         {/* 기기명 입력 */}
         <div className={styles.inputWrapper} data-testid="phone-name-section">
           <label className={styles.label} htmlFor="phone-name">
@@ -802,7 +901,6 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
             id="phone-price"
             type="number"
             inputMode="numeric"
-            min="0"
             placeholder="판매 가격을 입력해 주세요. (원 단위)"
             className={`${styles.inputField} ${
               errors.price ? styles.inputError : ""
@@ -856,14 +954,26 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                 />
                 {/* 숨겨진 주소 필드 (바인딩용) */}
                 <input type="hidden" data-testid="input-address" {...register("address")} />
-                <button
-                  className={styles.postcodeButton}
-                  data-testid="btn-postcode-search btn-address-search"
-                  type="button"
+                <div
+                  className={styles.postcodeButtonWrapper}
+                  data-testid="btn-postcode-search"
+                  role="button"
+                  tabIndex={0}
                   onClick={handlePostcodeSearch}
+                  onKeyDown={handlePostcodeSearchKeyDown}
                 >
-                  우편번호 검색
-                </button>
+                  <button
+                    className={styles.postcodeButton}
+                    data-testid="btn-address-search"
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handlePostcodeSearch();
+                    }}
+                  >
+                    우편번호 검색
+                  </button>
+                </div>
               </div>
 
               <p className={styles.selectedAddress} data-testid="selected-address">
@@ -873,9 +983,9 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                 {currentValues.zipcode ?? ''}
               </p>
 
-              {addressError && (
+              { (manualAddressError ?? addressError) && (
                 <span className={styles.errorMessage} data-testid="address-error">
-                  {addressError}
+                  {manualAddressError ?? addressError}
                 </span>
               )}
 
@@ -964,6 +1074,7 @@ export default function PhoneNew(props: IPhoneNewProps = {}) {
                 className={styles.postcodeButton}
                 data-testid="btn-clear-address"
                 onClick={() => {
+                  setManualAddressError(null);
                   clearAddressData();
                   setValue("zipcode", "", { shouldDirty: true });
                   setValue("address", "", { shouldDirty: true });

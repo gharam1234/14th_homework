@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { message } from 'antd';
+import { isTestEnv } from '@/commons/utils/is-test-env';
 
 /**
  * 지도 URL 타입
@@ -78,7 +79,7 @@ export function useLocation(
   /**
    * 지도 URL 생성
    * @description 지도 서비스별 URL 생성
-   * - 카카오맵: https://map.kakao.com/link/search/{검색어}
+   * - 카카오맵: https://map.kakao.com/?q={검색어}
    * - 네이버 지도: https://map.naver.com/v5/search/{검색어}
    * - 검색어는 encodeURIComponent()로 인코딩
    */
@@ -90,8 +91,8 @@ export function useLocation(
         return `https://map.naver.com/v5/search/${encodedQuery}`;
       }
 
-      // 기본값: 카카오맵
-      return `https://map.kakao.com/link/search/${encodedQuery}`;
+      // 기본값: 카카오맵 (q 파라미터로 검색)
+      return `https://map.kakao.com/?q=${encodedQuery}`;
     },
     [mapProvider]
   );
@@ -129,7 +130,17 @@ export function useLocation(
       const mapUrl = buildMapUrl(searchQuery);
 
       // 새 창으로 열기
-      window.open(mapUrl, '_blank', 'noopener,noreferrer');
+      if (isTestEnv()) {
+        console.log('[useLocation] mapUrl', mapUrl);
+        window.__TEST_LOCATION_LAST_URL__ = mapUrl;
+        if (window.__TEST_LOCATION_SUPPRESS_OPEN__) {
+          return;
+        }
+        window.open(mapUrl, '_blank');
+        return;
+      }
+
+      window.open(mapUrl, '_blank');
     } catch (error) {
       console.error('지도 열기 실패:', error);
       message.error('지도를 열 수 없습니다. 다시 시도해주세요.');

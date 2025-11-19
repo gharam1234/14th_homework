@@ -1,8 +1,5 @@
 import { Buffer } from 'buffer';
 import { test, expect, Page } from '@playwright/test';
-
-const SUPABASE_URL = 'https://fkkztiavgrmmazvdwtdw.supabase.co';
-const SUPABASE_SESSION_KEY = 'sb-fkkztiavgrmmazvdwtdw-auth-token';
 const DRAFT_KEY = 'phone';
 const SAMPLE_IMAGE_BUFFER = Buffer.from(
   '89504e470d0a1a0a0000000d49484452000000010000000108020000009077053d0000000a49444154789c6360000002000154a20af50000000049454e44ae426082',
@@ -53,142 +50,14 @@ async function attachImage(page: Page, name = 'sample.png') {
   await expect(page.locator('[data-testid^="image-preview-"]')).toHaveCount(1);
 }
 
-async function prepareAuth(page: Page) {
-  await page.addInitScript((sessionKey) => {
-    try {
-      const expiresAt = Math.floor(Date.now() / 1000) + 3600;
-      const sessionPayload = {
-        access_token: 'test-supabase-token',
-        token_type: 'bearer',
-        expires_in: 3600,
-        expires_at: expiresAt,
-        refresh_token: 'test-refresh-token',
-        user: {
-          id: 'test-user-001',
-          email: 'test@example.com',
-        },
-      };
-      localStorage.setItem(
-        sessionKey,
-        JSON.stringify({
-          currentSession: sessionPayload,
-          currentUser: sessionPayload.user,
-        })
-      );
-      try {
-        localStorage.removeItem('phone');
-      } catch (e) {
-        console.warn('localStorage removeItem failed:', e);
-      }
-    } catch (e) {
-      console.warn('localStorage setItem failed:', e);
-    }
-  }, SUPABASE_SESSION_KEY);
-}
-
-async function mockSupabase(page: Page, options: { failInsert?: boolean } = {}) {
-  await page.route(`${SUPABASE_URL}/**`, async (route) => {
-    const request = route.request();
-    const url = new URL(request.url());
-    const path = url.pathname;
-    const method = request.method();
-
-    if (path === '/auth/v1/session') {
-      await route.fulfill({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: {
-            session: {
-              access_token: 'test-supabase-token',
-              token_type: 'bearer',
-              expires_in: 3600,
-              expires_at: Math.floor(Date.now() / 1000) + 3600,
-              refresh_token: 'test-refresh-token',
-              user: {
-                id: 'test-user-001',
-                email: 'test@example.com',
-              },
-            },
-          },
-          error: null,
-        }),
-      });
-      return;
-    }
-
-    if (path.startsWith('/rest/v1/phones')) {
-      if (method === 'POST') {
-        if (options.failInsert) {
-          await route.fulfill({
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: 'PGRST500', message: '서버 오류' }),
-          });
-          return;
-        }
-
-        await route.fulfill({
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify([{ id: 'test-phone-123' }]),
-        });
-        return;
-      }
-
-      if (method === 'PATCH') {
-        await route.fulfill({
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify([{ id: 'test-phone-123' }]),
-        });
-        return;
-      }
-    }
-
-    if (path.startsWith('/rest/v1/phone_media')) {
-      await route.fulfill({
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify([{ id: 'media-1' }]),
-      });
-      return;
-    }
-
-    if (path.startsWith('/storage/v1/object/phones-images')) {
-      await route.fulfill({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: { path: '2024/01/01/sample.png' }, error: null }),
-      });
-      return;
-    }
-
-    if (path.startsWith('/storage/v1/object/public/phones-images/')) {
-      const encodedPath = path.replace('/storage/v1/object/public/phones-images/', '');
-      await route.fulfill({
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: {
-            publicUrl: `${SUPABASE_URL}/storage/v1/object/public/phones-images/${encodedPath}`,
-          },
-          error: null,
-        }),
-      });
-      return;
-    }
-
-    await route.continue();
-  });
-}
-
 test.describe('usePhoneSubmit 훅의 임시 저장 및 제출 흐름', () => {
   test.beforeEach(async ({ page }) => {
-    await prepareAuth(page);
-    await mockSupabase(page);
     await page.goto('/phones/new');
     await waitForForm(page);
+    await page.evaluate(() => {
+      window.__TEST_PHONE_SUBMIT_USER_ID__ = 'test-user-001';
+      window.__TEST_PHONE_SUBMIT__ = { result: 'success', createdPhoneId: 'test-phone-123' };
+    });
   });
 
   test('입력 후 자동으로 로컬스토리지에 임시 저장되고 새로고침 시 복원됨', async ({ page }) => {
@@ -239,7 +108,9 @@ test.describe('usePhoneSubmit 훅의 임시 저장 및 제출 흐름', () => {
   });
 
   test('등록 실패 시 데이터가 남아있고 페이지에서 벗어나지 않음', async ({ page }) => {
-    await mockSupabase(page, { failInsert: true });
+    await page.evaluate(() => {
+      window.__TEST_PHONE_SUBMIT__ = { result: 'error', errorMessage: 'mock fail' };
+    });
     await fillBaseFields(page);
     await attachImage(page);
 

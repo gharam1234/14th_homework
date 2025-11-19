@@ -100,8 +100,17 @@ async function setPhoneData(page: Page, phoneId: string) {
   };
 
   await page.evaluate(
-    ({ key, value }) => localStorage.setItem(key, JSON.stringify(value)),
-    { key: `phone-${phoneId}`, value: storedValue }
+    ({ key, value }) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.warn('setPhoneData failed:', error);
+      }
+    },
+    {
+      key: phoneId.startsWith('phone-') ? phoneId : `phone-${phoneId}`,
+      value: storedValue,
+    }
   );
 }
 
@@ -124,11 +133,8 @@ test.describe('PhoneNew Form 컴포넌트 테스트', () => {
     const submitButton = page.locator('[data-testid="btn-submit"]');
     await expect(submitButton).toBeEnabled();
 
-    const dialogPromise = page.waitForEvent('dialog');
     await submitButton.click();
-    const dialog = await dialogPromise;
-    await dialog.accept();
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(500);
 
     const storedEntries = await page.evaluate(() => {
       return Object.keys(localStorage)
@@ -165,16 +171,15 @@ test.describe('PhoneNew Form 컴포넌트 테스트', () => {
     const submitButton = page.locator('[data-testid="btn-submit"]');
     await expect(submitButton).toBeEnabled();
 
-    const dialogPromise = page.waitForEvent('dialog');
     await submitButton.click();
-    const dialog = await dialogPromise;
-    await dialog.accept();
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(500);
 
     const updated = await page.evaluate(({ key }) => {
       const raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : null;
-    }, { key: `phone-${phoneId}` });
+    }, {
+      key: phoneId.startsWith('phone-') ? phoneId : `phone-${phoneId}`,
+    });
 
     expect(updated.summary).toBe('수정된 요약');
     expect(updated.price).toBe(95000);

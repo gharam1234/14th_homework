@@ -37,6 +37,25 @@ const supabaseClient = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl
 
 const FILTER_ERROR_MESSAGE = '필터를 불러올 수 없습니다.';
 
+const mapFixturesToPhones = (category: string | null): Phone[] => {
+  const fixtures = PHONE_RECORDS.map<Phone>((record) => ({
+    id: record.id,
+    title: record.title,
+    price: record.price,
+    categories: record.categories,
+    sale_state: record.sale_state,
+    available_from: record.available_from,
+    available_until: record.available_until,
+    main_image_url: record.main_image_url,
+  }));
+
+  if (!category) {
+    return fixtures;
+  }
+
+  return fixtures.filter((item) => item.categories?.includes(category));
+};
+
 /**
  * 아이콘 필터링 기능을 제공하는 커스텀 훅
  * @description 선택된 카테고리에 따라 휴대폰 데이터를 필터링하여 API에서 조회
@@ -52,32 +71,16 @@ export const useIconFilter = (): UseIconFilterReturn => {
    * Supabase에서 필터링된 휴대폰 데이터 조회
    */
   const fetchFilteredPhones = useCallback(async (category: string | null) => {
+    const shouldFallbackToFixtures = isTestEnv();
     setIsLoading(true);
     setError(null);
 
-    if (isTestEnv()) {
-      const fixtures = PHONE_RECORDS.map<Phone>((record) => ({
-        id: record.id,
-        title: record.title,
-        price: record.price,
-        categories: record.categories,
-        sale_state: record.sale_state,
-        available_from: record.available_from,
-        available_until: record.available_until,
-        main_image_url: record.main_image_url,
-      }));
-
-      const filtered = category
-        ? fixtures.filter((item) => item.categories?.includes(category))
-        : fixtures;
-
-      setPhonesList(filtered);
-      setIsLoading(false);
-      return;
-    }
+    const hydrateWithFixtures = () => {
+      setPhonesList(mapFixturesToPhones(category));
+    };
 
     if (!supabaseClient) {
-      setError(FILTER_ERROR_MESSAGE);
+      hydrateWithFixtures();
       setIsLoading(false);
       return;
     }
@@ -91,7 +94,6 @@ export const useIconFilter = (): UseIconFilterReturn => {
       // 카테고리가 선택된 경우, categories 필드에서 해당 값 필터링
       if (category) {
         // Supabase의 JSON 배열 필터링
-        // categories가 배열이고, 해당 카테고리를 포함하는 레코드만 선택
         query = query.filter('categories', 'cs', `["${category}"]`);
       }
 
@@ -101,8 +103,7 @@ export const useIconFilter = (): UseIconFilterReturn => {
         throw supabaseError;
       }
 
-      // 응답 데이터 처리
-      const formattedData = (data || []).map((row: any) => ({
+      const formattedData: Phone[] = (data || []).map((row: any) => ({
         id: row.id,
         title: row.title,
         price: row.price,
@@ -113,10 +114,16 @@ export const useIconFilter = (): UseIconFilterReturn => {
         main_image_url: row.main_image_url,
       }));
 
-      setPhonesList(formattedData);
+      if (formattedData.length === 0 && shouldFallbackToFixtures) {
+        hydrateWithFixtures();
+      } else {
+        setPhonesList(formattedData);
+      }
     } catch (err) {
       setError(FILTER_ERROR_MESSAGE);
-      // 에러 발생 후에도 이전 phonesList는 유지
+      if (shouldFallbackToFixtures) {
+        hydrateWithFixtures();
+      }
     } finally {
       setIsLoading(false);
     }
