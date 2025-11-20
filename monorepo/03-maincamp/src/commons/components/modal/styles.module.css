@@ -1,0 +1,213 @@
+/* ================================
+   모달 기본 스타일 (modal.provider와 함께 사용)
+   ================================ */
+
+/* ================================
+   모달 기본 스타일
+   ================================ */
+
+.modal {
+  background-color: var(--color-background-primary);
+  border-radius: 24px;
+  width: 480px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* ================================
+   모달 콘텐츠 영역
+   ================================ */
+
+.modalContent {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.modalTitle {
+  font-family: var(--font-family-default);
+  font-weight: var(--typography-headline01-fontWeight);
+  font-size: var(--typography-headline01-fontSize);
+  line-height: var(--typography-headline01-lineHeight);
+  letter-spacing: -0.24px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.modalMessage {
+  font-family: var(--font-family-default);
+  font-weight: var(--typography-headline03-fontWeight);
+  font-size: var(--typography-headline03-fontSize);
+  line-height: var(--typography-headline03-lineHeight);
+  letter-spacing: -0.2px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ================================
+   모달 액션 영역
+   ================================ */
+
+.modalActions {
+  padding: 0 24px 24px 24px;
+  display: flex;
+  gap: 21px; /* 피그마에서 두 버튼 사이 간격 */
+  justify-content: center;
+}
+
+/* ================================
+   버튼 스타일 (피그마 기준)
+   ================================ */
+
+/* Single Action: 전체 너비 (432px) */
+.modalButtonSingle {
+  width: 432px;
+  min-width: 432px;
+  max-width: 432px;
+  height: 48px;
+  border-radius: 8px;
+  font-family: var(--font-family-default);
+  font-weight: var(--typography-title01-fontWeight);
+  font-size: var(--typography-title01-fontSize);
+  line-height: var(--typography-title01-lineHeight);
+  letter-spacing: -0.18px;
+  flex-shrink: 0;
+}
+
+/* Dual Actions: 고정 너비 (104px) */
+.modalButton {
+  width: 104px;
+  min-width: 104px;
+  max-width: 104px;
+  height: 48px;
+  border-radius: 8px;
+  font-family: var(--font-family-default);
+  font-weight: var(--typography-title01-fontWeight);
+  font-size: var(--typography-title01-fontSize);
+  line-height: var(--typography-title01-lineHeight);
+  letter-spacing: -0.18px;
+  flex-shrink: 0;
+}
+
+/* ================================
+   Variant 스타일
+   ================================ */
+
+/* Info Variant (기본) */
+.modal--info {
+  /* 기본 스타일 유지 */
+}
+
+/* Danger Variant */
+.modal--danger {
+  /* 위험 상황을 나타내는 추가 스타일 (필요시) */
+}
+
+.modal--danger .modalTitle {
+  color: var(--color-status-error); /* 빨간색 제목 */
+}
+
+/* ================================
+   Theme 스타일
+   ================================ */
+
+/* Light Theme (기본) */
+.modal--light {
+  background-color: var(--color-background-primary);
+}
+
+.modal--light .modalTitle {
+  color: var(--color-text-primary);
+}
+
+.modal--light .modalMessage {
+  color: var(--color-text-secondary);
+}
+
+/* Dark Theme */
+.modal--dark {
+  background-color: var(--color-background-primary);
+}
+
+.modal--dark .modalTitle {
+  color: var(--color-text-primary);
+}
+
+.modal--dark .modalMessage {
+  color: var(--color-text-secondary);
+}
+
+/* ================================
+   Actions 스타일
+   ================================ */
+
+/* Single Actions */
+.modal--single .modalActions {
+  justify-content: center;
+}
+
+/* Dual Actions */
+.modal--dual .modalActions {
+  justify-content: center;
+}
+
+/* ================================
+   반응형 스타일
+   ================================ */
+
+@media (max-width: 520px) {
+  .modal {
+    width: calc(100vw - 40px);
+    max-width: 480px;
+    margin: 0 20px;
+  }
+  
+  .modalButtonSingle {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
+  
+  .modalButton {
+    min-width: 80px;
+    flex: 1;
+  }
+  
+  .modalActions {
+    gap: 12px;
+  }
+}
+
+/* ================================
+   접근성 스타일
+   ================================ */
+
+.modal:focus {
+  outline: 2px solid var(--color-interactive-primary);
+  outline-offset: 2px;
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  .modal {
+    border: 2px solid var(--color-border-primary);
+  }
+  
+  .modalTitle {
+    color: var(--color-text-primary);
+  }
+  
+  .modalMessage {
+    color: var(--color-text-primary);
+  }
+}
+
+/* 애니메이션 감소 설정 - 애니메이션 제거로 인해 불필요 */

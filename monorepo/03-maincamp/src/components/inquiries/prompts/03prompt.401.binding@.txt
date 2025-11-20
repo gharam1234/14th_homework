@@ -1,0 +1,75 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 HOOK 파일경로: src/components/inquiries/hooks/index.inquiry-detail.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/inquiries/tests/index.inquiry-detail.spec.ts
+
+조건-참고) Supabase 스키마 참고 문서: sql/supabase.txt
+            - 테이블: phone_inquiries
+            - 답변 대상이 되는 기존 문의 데이터 조회
+
+==============================================
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+    - jest
+    - @testing-library/react
+
+2) 테스트 조건
+    - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+    - 페이지가 완전히 로드된 후 테스트할 것.
+        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+3) 테스트 API 조건
+    3-1) 데이터
+        - 실제 Supabase 데이터를 사용할 것.
+        - Mock 데이터를 사용하지 말 것.
+
+    3-2) 성공 시나리오
+        - phone_inquiries 테이블에서 특정 문의 데이터 조회 후 UI 업데이트
+
+    3-3) 실패 시나리오
+        - API 호출 실패 또는 데이터 없음 처리
+
+4) 데이터 조건
+    - 저장소: Supabase (phone_inquiries 테이블)
+    - 조회 조건: 특정 phone_id와 parent_id가 NULL인 문의 (최상위 문의만)
+    - 응답 데이터 구조:
+        {
+          id: string (UUID),
+          phone_id: string,
+          author_id: string,
+          content: string,
+          is_answer: boolean,
+          created_at: string (ISO 8601),
+          updated_at: string
+        }
+
+핵심요구사항) 현재의 모든 구조를 그대로 유지하고, 하드코딩된 Mock데이터를 제거하고, 실제 Supabase 데이터를 바인딩할 것.
+
+1) 바인딩할 데이터
+    - Supabase phone_inquiries 테이블에서 조회한 문의 데이터
+
+2) 데이터 바인딩 상세내용
+    - content: 문의 내용 (100자 제한, overflow 처리)
+    - author_id: 작성자 ID (사용자 프로필 정보 연계)
+    - created_at: 작성 날짜 (YYYY.MM.DD 형식으로 포맷팅)
+    - is_answer: 답변 여부 (false인 경우만 "답변 하기" 버튼 표시)
+    - 조건부 처리: is_answer가 true인 경우 이미 답변이 있는 상태이므로 입력창 숨김
+
+3) CSS 처리
+    - 기존 스타일 유지하되, 데이터 로드 중 상태 표시 (스켈레톤 또는 로딩 스피너)
+    - 데이터 로드 완료 후 콘텐츠 표시
+
+4) 테스트
+    - Supabase에서 실제 문의 데이터 조회 후 UI 업데이트 검증
+    - 데이터가 올바르게 바인딩되었는지 확인 (content, author_id, created_at)
+    - is_answer 값에 따라 입력창 표시/숨김 검증

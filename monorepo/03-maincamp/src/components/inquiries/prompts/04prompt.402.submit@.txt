@@ -1,0 +1,102 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 참고할 PAGE 경로: src/app/products/[id]/page.tsx
+조건-파일경로) 구현될 HOOK 파일경로: src/components/inquiries/hooks/index.reply-submit.hook.ts
+조건-파일경로) 구현될 TEST 파일경로: src/components/inquiries/tests/index.reply-submit.spec.ts
+
+조건-참고) Supabase 스키마 참고 문서: sql/supabase.txt
+            - 테이블: phone_inquiries
+            - 필드: id, phone_id, parent_id, author_id, content, is_answer, status, created_at, updated_at
+
+==============================================
+
+핵심요구사항) 다음의 기능을 supabase를 연동하여 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+            1. 답변 등록 시나리오
+                1-1) 다음의 데이터를 Supabase phone_inquiries 테이블에 등록할 것
+                        - 접속키: supabase 공개 키 (기존 설정 사용)
+                        - 테이블명: phone_inquiries
+                        - 데이터
+                            - id: UUID (자동 생성)
+                            - phone_id: 상품 ID (URL 파라미터에서 추출)
+                            - parent_id: 부모 문의 ID (현재 문의 ID)
+                            - author_id: 현재 로그인 사용자 ID (auth.users.id)
+                            - content: 답변 내용 (textarea 입력값, 최대 100자, 필수)
+                            - is_answer: true (판매자 답변 표시)
+                            - status: 'active' (활성 상태)
+                            - link_url: null (링크 없음)
+                            - link_title: null
+                            - link_description: null
+                            - link_image: null
+                            - thread_path: 부모 thread_path + '/' + 현재 ID (트리 구조)
+                            - created_at: 현재 시간 (timestamp)
+                            - updated_at: 현재 시간
+
+                1-2) 답변 등록 성공 이후 로직을 완성할 것.
+                        - 알림메시지: "답변 등록에 성공하였습니다."
+                        - 입력창 초기화: textarea 비우기, 글자 수 0으로 초기화
+                        - 입력창 숨김: 답변 작성 UI 접기
+                        - 페이지 새로고침: 등록된 답변이 바로 표시되도록 데이터 재조회
+
+            2. 답변 등록 실패 시나리오
+                2-1) 다음의 경우를 처리할 것
+                        - Supabase 연결 실패
+                        - 데이터 유효성 검증 실패 (내용이 비어있거나 100자 초과)
+                        - 권한 오류 (로그인되지 않은 사용자)
+
+                2-2) 실패 이후 로직을 완성할 것.
+                        - 에러 알림: "답변 등록에 실패하였습니다. 다시 시도해주세요."
+                        - 입력 데이터 보존: textarea 내용 유지
+                        - 재시도 버튼: 사용자가 다시 시도할 수 있도록 유지
+
+핵심요구사항) 다음의 유효성 검증을 step-by-step 으로 구현할 것.
+            1) 필드별 검증 규칙
+                - content (답변 내용): 필수, 최소 1자, 최대 100자, 빈값 불가
+                - 실시간 글자 수 체크: 100자 초과 입력 불가
+                - 제출 전 검증: 내용 입력 여부 확인
+
+            2) 검증 실패 시 처리
+                - 검증 실패 메시지 표시 (textarea 아래에 red 텍스트)
+                - 제출 버튼 비활성화 (disabled 상태)
+                - data-testid: "inquiry-reply-error-message"
+
+            3) 검증 성공 시 처리
+                - 제출 버튼 활성화
+                - 에러 메시지 숨김
+
+핵심요구사항) Playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+    - jest
+    - @testing-library/react
+
+2) 테스트 조건
+    - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+    - 페이지가 완전히 로드된 후 테스트할 것.
+        - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+        - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+3) 테스트 시나리오
+    3-1) 성공 시나리오
+        - textarea에 답변 내용 입력
+        - "답변 하기" 버튼 클릭
+        - Supabase에 데이터 저장 확인
+        - 성공 알림 메시지 표시 확인
+        - 입력창 초기화 확인
+        - data-testid: "inquiry-reply-success-message"
+
+    3-2) 검증 실패 시나리오
+        - 빈 textarea 상태에서 제출 버튼 클릭 시도
+        - 에러 메시지 표시 확인
+        - 제출 버튼 비활성화 확인
+
+    3-3) API 실패 시나리오
+        - Supabase 연결 실패 상황에서 제출
+        - 실패 알림 메시지 표시 확인
+        - 입력 데이터 보존 확인

@@ -1,0 +1,47 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 컴포넌트 경로: src/components/inquiries/index.tsx
+조건-파일경로) 참고할 인증 파일: src/commons/providers/auth/auth.provider.tsx
+조건-파일경로) 참고할 스키마: sql/supabase.txt
+
+==============================================
+
+핵심요구사항) 다음의 기능을 playwright 테스트를 활용하여 TDD 기반으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+핵심요구사항) 수정/삭제 버튼을 조건부로 렌더링할 것.
+                1) 버튼 표시 조건
+                    - phone_inquiries.is_answer === true (판매자 답변임)
+                    - phone_inquiries.author_id === 현재 사용자 ID (본인 작성 답변)
+                    - 위 두 조건 모두 만족할 때만 수정/삭제 버튼 표시
+
+                2) 현재 사용자 정보 조회
+                    - useAuth() 훅 사용 (AuthContext에서 제공)
+                    - user.id 필드로 현재 사용자 ID 가져오기
+                    - useAuth() 훅 위치: src/commons/providers/auth/auth.provider.tsx (line 285)
+
+                3) 데이터 비교 로직
+                    - reply.is_answer && reply.author_id === user?.id 일 때 표시
+                    - 로그인하지 않은 사용자(user === null)는 버튼 미표시
+
+                4) 테스트 케이스
+                    - 판매자 답변일 때 버튼이 표시되는지 확인
+                    - 판매자 답변이 아닐 때 버튼이 숨겨지는지 확인
+                    - 다른 사용자의 답변일 때 버튼이 숨겨지는지 확인
+                    - data-testid 속성으로 버튼 식별 가능해야 함

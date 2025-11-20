@@ -1,0 +1,348 @@
+/* Button 컴포넌트 스타일 - Figma 디자인 시스템 기반 */
+
+/* 기본 버튼 스타일 */
+.button {
+  /* 레이아웃 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  /* 기본 크기 - Figma에서 분석한 기본 버튼 크기 기준 */
+  min-height: 24px;
+  padding: 0 12px;
+  
+  /* 테두리 및 모양 */
+  border: 1px solid transparent;
+  border-radius: 8px;
+  
+  /* 폰트 - Figma에서 확인된 Pretendard Variable 사용 */
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 600; /* SemiBold */
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.18px;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  
+  /* 상호작용 */
+  cursor: pointer;
+  user-select: none;
+  
+  /* 전환 효과 */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 포커스 상태 기본값 */
+  outline: none;
+  
+  /* 기본 상태에서 변형 방지 */
+  transform: translateZ(0);
+}
+
+/* 버튼 포커스 상태 */
+.button:focus-visible {
+  outline: 2px solid var(--focus-color, #3A5CF3);
+  outline-offset: 2px;
+}
+
+/* 버튼 활성 상태 */
+.button:active {
+  transform: translateY(1px);
+}
+
+/* === VARIANT 스타일 === */
+
+/* Primary Variant */
+.button--primary.button--light {
+  background-color: #000000; /* Figma 노드 3:1727과 일치 */
+  color: #FFFFFF;
+  border-color: #000000;
+}
+
+.button--primary.button--light:hover:not(:disabled) {
+  background-color: #333333; /* 어두운 회색 */
+  border-color: #333333;
+}
+
+.button--primary.button--light:active:not(:disabled) {
+  background-color: #1A1A1A; /* 더 어두운 회색 */
+  border-color: #1A1A1A;
+}
+
+.button--primary.button--dark {
+  background-color: #15D66F; /* DARK_THEME_COLORS.primary */
+  color: #000000;
+  border-color: #15D66F;
+}
+
+.button--primary.button--dark:hover:not(:disabled) {
+  background-color: #92E6B9; /* green10 */
+  border-color: #92E6B9;
+}
+
+.button--primary.button--dark:active:not(:disabled) {
+  background-color: #D3F3E0; /* green05 */
+  border-color: #D3F3E0;
+}
+
+/* Secondary Variant */
+.button--secondary.button--light {
+  background-color: #FFFFFF;
+  color: #1C1C1C; /* gray 90 */
+  border-color: #1C1C1C; /* gray 90 */
+}
+
+.button--secondary.button--light:hover:not(:disabled) {
+  background-color: #F2F2F2; /* gray05 */
+  color: #333333; /* gray 80 */
+  border-color: #333333; /* gray 80 */
+}
+
+.button--secondary.button--light:active:not(:disabled) {
+  background-color: #E4E4E4; /* gray10 */
+  color: #000000; /* black */
+  border-color: #000000; /* black */
+}
+
+.button--secondary.button--dark {
+  background-color: transparent;
+  color: #15D66F;
+  border-color: #15D66F;
+}
+
+.button--secondary.button--dark:hover:not(:disabled) {
+  background-color: #333333; /* gray80 */
+  color: #92E6B9;
+  border-color: #92E6B9;
+}
+
+.button--secondary.button--dark:active:not(:disabled) {
+  background-color: #1C1C1C; /* gray90 */
+  color: #D3F3E0;
+  border-color: #D3F3E0;
+}
+
+/* Tertiary Variant */
+.button--tertiary.button--light {
+  background-color: transparent;
+  color: #777777; /* gray60 */
+  border-color: transparent;
+}
+
+.button--tertiary.button--light:hover:not(:disabled) {
+  background-color: #F2F2F2; /* gray05 */
+  color: #333333; /* gray80 */
+}
+
+.button--tertiary.button--light:active:not(:disabled) {
+  background-color: #E4E4E4; /* gray10 */
+  color: #000000; /* black */
+}
+
+.button--tertiary.button--dark {
+  background-color: transparent;
+  color: #C7C7C7; /* gray30 */
+  border-color: transparent;
+}
+
+.button--tertiary.button--dark:hover:not(:disabled) {
+  background-color: #333333; /* gray80 */
+  color: #FFFFFF; /* white */
+}
+
+.button--tertiary.button--dark:active:not(:disabled) {
+  background-color: #1C1C1C; /* gray90 */
+  color: #FFFFFF; /* white */
+}
+
+/* === SIZE 스타일 === */
+
+/* Small Size */
+.button--small {
+  min-height: 40px;
+  padding: 0 8px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.14px;
+  gap: 4px;
+}
+
+/* Medium Size (기본값) - min-width 제거됨 (요구사항 반영) */
+.button--medium {
+  min-height: 48px;
+  padding: 0 12px;
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.18px;
+  gap: 6px;
+  /* min-width 없음 - 콘텐츠에 따라 너비 자동 조정 */
+}
+
+/* Large Size */
+.button--large {
+  min-height: 64px;
+  padding: 0 16px;
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.20px;
+  gap: 8px;
+}
+
+/* === 상태 스타일 === */
+
+/* Disabled 상태 */
+.button--disabled,
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+}
+
+.button--disabled:hover,
+.button:disabled:hover {
+  /* hover 효과 제거 */
+  background-color: inherit;
+  border-color: inherit;
+  transform: none;
+}
+
+/* Loading 상태 */
+.button--loading {
+  cursor: wait;
+}
+
+.button--loading .content {
+  opacity: 0.7;
+}
+
+/* Full Width */
+.button--full-width {
+  width: 100%;
+}
+
+/* === 아이콘 스타일 === */
+
+/* 시작 아이콘 */
+.startIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.startIcon svg,
+.startIcon img {
+  width: 1em;
+  height: 1em;
+}
+
+/* 끝 아이콘 */
+.endIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.endIcon svg,
+.endIcon img {
+  width: 1em;
+  height: 1em;
+}
+
+/* 콘텐츠 래퍼 */
+.content {
+  flex: 1;
+  transition: opacity 0.2s ease;
+}
+
+/* === 로딩 스피너 스타일 === */
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spinnerIcon {
+  width: 1em;
+  height: 1em;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === 아이콘과 함께 사용되는 경우의 간격 조정 === */
+
+.button--with-start-icon.button--small {
+  padding-left: 6px;
+}
+
+.button--with-start-icon.button--medium {
+  padding-left: 8px;
+}
+
+.button--with-start-icon.button--large {
+  padding-left: 12px;
+}
+
+.button--with-end-icon.button--small {
+  padding-right: 6px;
+}
+
+.button--with-end-icon.button--medium {
+  padding-right: 8px;
+}
+
+.button--with-end-icon.button--large {
+  padding-right: 12px;
+}
+
+/* === 접근성 및 반응형 === */
+
+/* 모바일에서의 터치 타깃 크기 보장 */
+@media (max-width: 768px) {
+  .button--small {
+    min-height: 40px; /* 모바일에서는 최소 32px */
+  }
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  .button {
+    border-width: 2px;
+  }
+  
+  .button--tertiary.button--light,
+  .button--tertiary.button--dark {
+    border-color: currentColor;
+  }
+}
+
+/* 모션 감소 설정 지원 */
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .content,
+  .spinnerIcon {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* 프린트 스타일 */
+@media print {
+  .button {
+    background: transparent;
+    color: black;
+    border: 1px solid black;
+  }
+}

@@ -1,0 +1,52 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+조건-파일경로) 구현될 TSX 파일경로: src/components/inquiries/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/inquiries/styles.module.css
+
+==============================================
+
+핵심요구사항) 완성된 컴포넌트를 페이지에서 import하여 연결시킬 것.
+                - 연결될 경로: src/app/products/[id]/page.tsx
+
+핵심요구사항) 기존 문의 목록 구조를 유지하면서, 각 문의 아래에 답변 작성 입력 UI를 추가할 것.
+
+핵심요구사항) 답변 작성 UI는 다음 요소들로 구성할 것.
+                1) "답변 하기" 버튼
+                    - 클릭 시 답변 입력창이 표시됨
+                    - data-testid: "inquiry-reply-button"
+
+                2) 답변 입력창 (처음에는 숨김 상태)
+                    - textarea 요소: 최대 100자 입력 가능
+                    - placeholder: "답변을 입력해주세요. (0/100)"
+                    - data-testid: "inquiry-reply-textarea"
+
+                3) 실시간 글자 수 카운팅
+                    - "현재입력/100" 형태로 표시
+                    - 100자 초과 입력 불가
+                    - data-testid: "inquiry-reply-charcount"
+
+                4) 취소 버튼
+                    - 클릭 시 입력창 숨김
+                    - data-testid: "inquiry-reply-cancel-button"
+
+                5) 답변 하기 버튼
+                    - 입력창 아래에 위치
+                    - data-testid: "inquiry-reply-submit-button"
+                    - 클릭 시 답변 등록 (다음 402 Function Submit 프롬프트에서 구현)
+
+핵심요구사항) 답변 입력 UI의 스타일은 다음 규칙을 따를 것.
+                - 문의 영역 하단에 24px 왼쪽 여백을 두어 인덴트 처리
+                - 배경색: 기존 문의와 구분되도록 faint한 배경 사용
+                - padding: 기존 컴포넌트와 일관성 유지
+                - textarea의 최소 높이: 100px
+                - 버튼 그룹: flexbox로 우측 정렬
+
+핵심요구사항 ) 일단 로컬스토리지를 통해서 데이터바인딩을 구현할 것 (차후에 슈파베이스 연동예정)

@@ -1,0 +1,81 @@
+참고할 파일 경로: src/components/inquiries/index.tsx
+구현될 HOOK 경로: src/components/inquiries/hooks/index.delete.hook.ts
+
+==============================================
+
+핵심요구사항) 다음의 기능을 supabase를 연동하여 TDD 기반으로 step-by-step 으로 구현하고, 테스트에 통과할 때까지 반복할 것.
+
+1) 테스트 제외 라이브러리
+   - jest
+   - @testing-library/react
+
+2) 테스트 조건
+   - timeout은 설정하지 않거나, 500ms 미만으로 설정할 것.
+   - 페이지가 완전히 로드된 후 테스트할 것.
+       - 페이지 로드 식별 요구사항: 고정식별자 data-testid 대기 방법
+       - **중요금지사항** 페이지 로드 식별 금지사항: networkidle 대기 방법
+
+3) 삭제 시나리오
+    3-1) 다음의 데이터를 supabase phone_inquiries 테이블에서 업데이트할 것 (물리 삭제 아님)
+                - 접속키: supabase.from('phone_inquiries').update()
+                - 테이블: phone_inquiries
+                - 업데이트할 필드
+                    - status: 'deleted' (삭제됨 상태로 표시)
+                - 식별 기준: 해당 답변의 id로 WHERE 조건 설정
+                - 물리 삭제하지 말고, status를 'deleted'로 변경하는 소프트 삭제 처리
+                - 참고 스키마: sql/supabase.txt (line 54-69)
+
+    3-2) 삭제 성공 이후 로직을 완성할 것.
+                - 알림메시지: "답변이 삭제되었습니다."
+                - UI 갱신: 해당 답변 아이템을 리스트에서 제거 또는 숨김 (로컬 상태)
+                - 에러 처리: 삭제 실패 시 "삭제에 실패했습니다. 다시 시도해주세요." 메시지 표시
+
+핵심요구사항) 삭제 확인 모달을 구현할 것.
+                1) 모달 표시 조건
+                    - 삭제 버튼(X 아이콘) 클릭 시 확인 모달 표시
+                    - 모달이 열려있는 동안 배경 클릭 시 닫기
+                    - 모달 밖 클릭 시 자동 종료
+
+                2) 모달 콘텐츠
+                    - 제목: "답변을 삭제하시겠습니까?"
+                    - 설명: "삭제된 답변은 복구할 수 없습니다." (선택사항)
+                    - 버튼:
+                        - 삭제 버튼: 빨강/위험색 (variant: danger)
+                        - 취소 버튼: 회색/기본색 (variant: secondary)
+
+                3) 삭제 동작
+                    - 삭제 버튼 클릭 시 Supabase 업데이트 실행
+                    - 업데이트 완료 후 모달 자동 종료
+                    - 성공 메시지 표시
+
+                4) 로딩 상태
+                    - 삭제 중: 삭제 버튼 비활성화, 로딩 스피너 표시
+                    - 취소 버튼은 항상 활성화
+
+                5) 테스트 케이스
+                    - 삭제 버튼 클릭 시 확인 모달 표시
+                    - 모달에서 "삭제" 버튼 클릭 시 Supabase 업데이트 실행
+                    - 성공 메시지 표시 확인
+                    - 취소 버튼으로 모달 닫기 확인
+                    - 배경 클릭으로 모달 닫기 확인
+                    - 모달 닫힌 후 리스트 업데이트 확인
+
+핵심요구사항) 커스텀 훅 index.delete.hook.ts에 다음 로직을 구현할 것.
+                1) 상태 관리
+                    - isDeleteModalOpen: 삭제 확인 모달 열림 상태
+                    - deleteTargetId: 삭제 대상 답변 ID
+                    - isDeleting: Supabase 삭제 중 상태
+                    - error: 에러 메시지
+
+                2) 함수
+                    - openDeleteModal(replyId): 삭제 확인 모달 열기
+                    - closeDeleteModal(): 삭제 확인 모달 닫기
+                    - confirmDelete(replyId): Supabase 삭제 실행
+                        - status를 'deleted'로 업데이트
+                        - 성공 시 콜백 함수 실행
+                        - 실패 시 에러 메시지 설정
+                        - 완료 후 모달 자동 종료
+
+                3) 반환값
+                    - isDeleteModalOpen, deleteTargetId, isDeleting, error
+                    - openDeleteModal, closeDeleteModal, confirmDelete

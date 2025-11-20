@@ -1,0 +1,95 @@
+구현될 파일 경로: src/components/inquiries/index.tsx
+참고할 HOOK들:
+  - src/components/inquiries/hooks/index.edit.hook.ts
+  - src/components/inquiries/hooks/index.delete.hook.ts
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @04-func.mdc
+
+조건-파일경로) 구현될 컴포넌트 경로: src/components/inquiries/index.tsx
+
+==============================================
+
+핵심요구사항) 기존의 inquiries 컴포넌트에서 수정/삭제 훅들을 연동하고, UI와 로직을 완성할 것.
+
+1) 훅 연동
+    1-1) useEditHook() 훅 연동
+        - isEditingId, editContent, startEdit, cancelEdit, updateContent, submitEdit 사용
+        - 각 답변 아이템에서 수정 모드 토글 처리
+
+    1-2) useDeleteHook() 훅 연동
+        - isDeleteModalOpen, deleteTargetId, openDeleteModal, closeDeleteModal, confirmDelete 사용
+        - 삭제 확인 모달 렌더링
+        - 모달 액션 처리
+
+2) 수정 UI 연동
+    2-1) 수정 모드 토글
+        - 수정 버튼 클릭 → startEdit() 호출
+        - isEditingId === reply.id 일 때 입력폼 렌더링
+        - 기존 content는 숨김
+
+    2-2) 입력폼 필드
+        - textarea 또는 input 요소
+        - value={editContent} 바인딩
+        - onChange={(e) => updateContent(e.target.value)}
+        - 최대 100자 표시 (현재 입력 글자 수 / 100)
+
+    2-3) 수정 액션
+        - 저장 버튼: onClick={() => submitEdit(reply.id)}
+        - 취소 버튼: onClick={() => cancelEdit()}
+        - 로딩 중 상태 표시
+
+3) 삭제 UI 연동
+    3-1) 삭제 버튼 액션
+        - 삭제 버튼(X) 클릭 → openDeleteModal(reply.id) 호출
+
+    3-2) 삭제 확인 모달
+        - 조건: isDeleteModalOpen && deleteTargetId === reply.id 일 때만 표시
+        - 모달 백그라운드 클릭: closeDeleteModal()
+        - 취소 버튼: closeDeleteModal()
+        - 삭제 버튼: confirmDelete(deleteTargetId)
+
+    3-3) 로딩 상태
+        - 삭제 중: isDeleting === true → 삭제 버튼 비활성화
+        - 로딩 스피너 또는 로딩 텍스트 표시
+
+4) 알림 메시지 처리
+    4-1) 수정 성공
+        - "답변이 수정되었습니다." 토스트/스낵바 메시지 표시
+        - 자동 제거 (2-3초 후)
+
+    4-2) 수정 실패
+        - "수정에 실패했습니다. 다시 시도해주세요." 메시지 표시
+        - error 메시지 표시 유지
+
+    4-3) 삭제 성공
+        - "답변이 삭제되었습니다." 토스트/스낵바 메시지 표시
+        - 자동 제거 (2-3초 후)
+
+    4-4) 삭제 실패
+        - "삭제에 실패했습니다. 다시 시도해주세요." 메시지 표시
+        - error 메시지 표시 유지
+
+5) 리스트 업데이트 (선택)
+    5-1) 수정 성공 시
+        - 로컬 상태 업데이트: 해당 reply의 content, status, updated_at 변경
+        - Supabase 쿼리 재실행 (옵션)
+
+    5-2) 삭제 성공 시
+        - 로컬 상태 업데이트: 해당 reply를 리스트에서 제거 또는 status='deleted'로 표시
+        - UI에서 숨김 처리 (상태가 'deleted'인 아이템은 표시하지 않음)
+
+핵심요구사항) 에러 처리 및 엣지 케이스를 관리할 것.
+                1) 네트워크 에러
+                    - Supabase 연결 실패 시 재시도 옵션 제공 (선택사항)
+
+                2) 동시 요청 방지
+                    - 이미 저장/삭제 중일 때는 버튼 클릭 비활성화
+                    - isLoading 또는 isDeleting 상태로 방지
+
+                3) 세션 만료
+                    - useAuth() 훅에서 user가 null이면 버튼 비활성화
+                    - 로그인 권유 메시지 (선택)
