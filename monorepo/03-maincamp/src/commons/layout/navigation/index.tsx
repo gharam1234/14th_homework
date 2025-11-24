@@ -10,6 +10,8 @@ import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/commons/libraries/supabaseClient'
+import ChargePopup from '@/components/point-charge-popup'
+import { createPortal } from 'react-dom'
 
 export default function LayoutNavigation(){
     const router = useRouter()
@@ -20,6 +22,16 @@ export default function LayoutNavigation(){
     const { setAccessToken } = useAccessTokenStore()
     const clearAccessToken = useAccessTokenStore((state) => state.clearAccessToken)
     const [userEmail, setUserEmail] = useState<string | null>(null)
+
+    // 포인트 충전 모달 상태
+    const [isChargeModalOpen, setIsChargeModalOpen] = useState(false)
+    const [selectedAmount, setSelectedAmount] = useState('')
+    const [mounted, setMounted] = useState(false)
+
+    // Portal을 위한 mounted 상태
+    useEffect(() => {
+      setMounted(true)
+    }, [])
 
     useEffect(() => {
       let isMounted = true;
@@ -63,6 +75,32 @@ export default function LayoutNavigation(){
         router.push("/")
     }
 
+    // 포인트 충전 모달 핸들러
+    const handleOpenChargeModal = () => {
+      setIsChargeModalOpen(true)
+      setSelectedAmount('')
+    }
+
+    const handleCloseChargeModal = () => {
+      setIsChargeModalOpen(false)
+      setSelectedAmount('')
+    }
+
+    const handleConfirmCharge = () => {
+      // TODO: 실제 충전 로직 구현
+      console.log('충전 금액:', selectedAmount)
+      alert(`${selectedAmount}원 충전이 완료되었습니다.`)
+      handleCloseChargeModal()
+    }
+
+    // 충전 금액 옵션
+    const chargeOptions = [
+      { value: '10000', label: '10,000원' },
+      { value: '30000', label: '30,000원' },
+      { value: '50000', label: '50,000원' },
+      { value: '100000', label: '100,000원' },
+    ]
+
      const items: MenuProps['items'] = [
   {
     label: (
@@ -72,9 +110,7 @@ export default function LayoutNavigation(){
   },
   {
     label: (
-      <div>포인트충전</div>
-      
-      
+      <div onClick={handleOpenChargeModal}>포인트충전</div>
     ),
     key: '1',
   },
@@ -91,10 +127,11 @@ export default function LayoutNavigation(){
 ];
     
     return (
+        <>
         <div className={styles.container}>
             <div className={styles.navigation}>
                 <div className={styles.main}>
-                   
+
                         <img className={styles.main__logo} src="/images/logo.png" alt="" />
                         <ul className={styles.main__menu}>
                             <li className={styles.main__menu__item}>트립토크</li>
@@ -102,10 +139,10 @@ export default function LayoutNavigation(){
                             <li className={styles.main__menu__item}>마이 페이지</li>
                         </ul>
 
-                 
+
                 </div>
                 <div className={styles.login}>
-                    { userEmail ? 
+                    { userEmail ?
                     <div>
 
                     <Dropdown menu={{ items }}>
@@ -117,10 +154,32 @@ export default function LayoutNavigation(){
     </a>
   </Dropdown>
                     </div>
-                    
+
                         : <button onClick={onClickToLogin} className={styles.login__loginBtn}>로그인<RightOutlined className={styles.anticon} /></button>}
                 </div>
             </div>
         </div>
+
+        {/* 포인트 충전 모달 */}
+        {mounted && isChargeModalOpen && createPortal(
+          <div
+            className={styles.modalOverlay}
+            onClick={handleCloseChargeModal}
+          >
+            <div onClick={(e) => e.stopPropagation()}>
+              <ChargePopup
+                options={chargeOptions}
+                selectedValue={selectedAmount}
+                cancelText="취소"
+                confirmText="충전하기"
+                onChangeAmount={setSelectedAmount}
+                onCancel={handleCloseChargeModal}
+                onConfirm={handleConfirmCharge}
+              />
+            </div>
+          </div>,
+          document.body
+        )}
+        </>
     )
 }

@@ -90,19 +90,22 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
   // SSR 대응: 마운트 확인 및 modal-portal 찾기
   useEffect(() => {
     setMounted(true);
-    
-    // modal-portal 찾기 (ModalProvider가 생성함)
-    const findPortal = () => {
-      const portal = document.getElementById('modal-portal');
-      if (portal) {
-        setModalPortal(portal);
-      } else {
-        // portal이 아직 없으면 잠시 후 다시 시도
-        setTimeout(findPortal, 100);
+
+    // modal-portal이 없으면 직접 생성해 두고 참조를 보관한다.
+    const ensurePortal = () => {
+      if (typeof document === 'undefined') return;
+
+      let portal = document.getElementById('modal-portal');
+      if (!portal) {
+        portal = document.createElement('div');
+        portal.id = 'modal-portal';
+        document.body.appendChild(portal);
       }
+
+      setModalPortal(portal);
     };
-    
-    findPortal();
+
+    ensurePortal();
   }, []);
 
   // 데이터 조회 훅 사용
@@ -163,36 +166,6 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
     currentPhoneId
   );
   const { handleCategoryTabClick, handleBackButtonClick } = usePhoneDetailNavigation();
-
-  // 모달을 Portal에 렌더링
-  const renderDeleteModal = useCallback(() => {
-    if (!isModalOpen || !mounted || typeof window === 'undefined') {
-      return null;
-    }
-
-    const modalPortal = document.getElementById('modal-portal');
-    if (!modalPortal) {
-      // modal-portal이 없으면 생성 시도
-      const portal = document.createElement('div');
-      portal.id = 'modal-portal';
-      document.body.appendChild(portal);
-      return null; // 다음 렌더링에서 다시 시도
-    }
-
-    return createPortal(
-      <Modal
-        variant="danger"
-        actions="dual"
-        title="삭제 확인"
-        description="정말로 이 판매 글을 삭제하시겠습니까?"
-        confirmText="삭제"
-        cancelText="취소"
-        onConfirm={deletePhone}
-        onCancel={hideDeleteModal}
-      />,
-      modalPortal
-    );
-  }, [isModalOpen, mounted, deletePhone, hideDeleteModal]);
 
   // 링크 복사 훅 사용
   const { copyLink } = useCopyLink();
@@ -487,19 +460,24 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
       </div>
 
       {/* 삭제 확인 모달 - Portal을 사용하여 화면 중앙에 렌더링 */}
-      {isModalOpen && mounted && modalPortal && createPortal(
-        <Modal
-          variant="danger"
-          actions="dual"
-          title="삭제 확인"
-          description="정말로 이 판매 글을 삭제하시겠습니까?"
-          confirmText="삭제"
-          cancelText="취소"
-          onConfirm={deletePhone}
-          onCancel={hideDeleteModal}
-        />,
-        modalPortal
-      )}
+      {isModalOpen && mounted && modalPortal &&
+        createPortal(
+          <div className={styles.modalOverlay} data-testid="delete-modal-overlay">
+            <div className={styles.modalWrapper}>
+              <Modal
+                variant="danger"
+                actions="dual"
+                title="삭제 확인"
+                description="정말로 이 판매 글을 삭제하시겠습니까?"
+                confirmText="삭제"
+                cancelText="취소"
+                onConfirm={deletePhone}
+                onCancel={hideDeleteModal}
+              />
+            </div>
+          </div>,
+          modalPortal
+        )}
 
       {/* 토스트 메시지 */}
       {toastMessage && (
