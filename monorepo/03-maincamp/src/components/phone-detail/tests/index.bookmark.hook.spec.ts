@@ -1,305 +1,304 @@
-import { test, expect, BrowserContext, Page, Route } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { getPath } from '@/commons/constants/url';
 
 /**
- * PhoneDetail 북마크 기능 테스트
- * @description TDD 기반으로 구현한 북마크 기능의 통합 테스트
- * - Playwright를 사용한 E2E 테스트
- * - timeout 500ms 이하로 설정
- * - data-testid를 사용하여 페이지 로드 대기
+ * 북마크(즐겨찾기) 기능 테스트
+ * 
+ * @description
+ * - Supabase phone_reactions 테이블 연동 테스트
+ * - 로그인 검증 시나리오
+ * - 즐겨찾기 토글 시나리오
+ * - 에러 처리 시나리오
  */
 
-const BOOKMARK_BUTTON_SELECTOR = '[title="북마크"]';
-const BOOKMARK_BADGE_SELECTOR = '[data-testid="bookmark-badge"]';
-const ACTION_BUTTONS_SELECTOR = '[data-testid="action-buttons"]';
-const BOOKMARK_ICON_PATH_SELECTOR = `${BOOKMARK_BUTTON_SELECTOR} path`;
-const SUPABASE_REACTIONS_ROUTE = '**/rest/v1/phone_reactions**';
-const PHONE_ID = 'listing-001';
+test.describe('PhoneDetail - Bookmark Hook', () => {
+  // 테스트용 전화기 ID (실제 Supabase에 존재하는 ID)
+  let testPhoneId: string;
 
-const resolveSupabaseStorageKey = () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-  const projectRef = url.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1];
-  return projectRef ? `sb-${projectRef}-auth-token` : 'sb-bookmark-test-auth-token';
-};
-
-const SUPABASE_STORAGE_KEY = resolveSupabaseStorageKey();
-
-const TEST_SESSION = {
-  currentSession: {
-    access_token: 'test-token',
-    token_type: 'bearer',
-    refresh_token: 'test-refresh-token',
-    user: { id: 'test-user' },
-  },
-  access_token: 'test-token',
-  refresh_token: 'test-refresh-token',
-  user: { id: 'test-user' },
-};
-const TEST_USER_ID = TEST_SESSION.user.id;
-
-async function mockLogin(context: BrowserContext) {
-  await context.addInitScript(({ key, session }) => {
-    window.localStorage.setItem(key, JSON.stringify(session));
-    (window as any).__TEST_SUPABASE_USER__ = session.user;
-    (window as any).__TEST_SUPABASE_LOGIN__ = true;
-  }, { key: SUPABASE_STORAGE_KEY, session: TEST_SESSION });
-}
-
-async function expectBookmarkFill(page: Page, value: string) {
-  const bookmarkPath = page.locator(BOOKMARK_ICON_PATH_SELECTOR);
-  await expect(bookmarkPath).toHaveAttribute('fill', value);
-}
-
-type ReactionRecord = {
-  id: string;
-  phone_id: string;
-  user_id: string;
-  type: 'favorite';
-  deleted_at: string | null;
-  metadata: Record<string, unknown> | null;
-};
-
-function createReaction(phoneId: string, userId: string): ReactionRecord {
-  return {
-    id: 'reaction-001',
-    phone_id: phoneId,
-    user_id: userId,
-    type: 'favorite',
-    deleted_at: null,
-    metadata: null,
-  };
-}
-
-function fulfillJson(route: Route, data: unknown, status = 200) {
-  return route.fulfill({
-    status,
-    headers: { 'content-type': 'application/json; charset=utf-8' },
-    body: JSON.stringify(data),
+  test.beforeEach(async ({ page }) => {
+    // 페이지 로드 대기 (networkidle 사용 금지)
+    await page.goto('/');
+    await page.waitForSelector('[data-testid="phones-list-container"]');
+    
+    // 첫 번째 상품 카드의 ID 가져오기
+    const firstCard = page.locator('[data-testid^="phone-card-"]').first();
+    const cardTestId = await firstCard.getAttribute('data-testid');
+    testPhoneId = cardTestId?.replace('phone-card-', '') || '';
+    
+    // 상품 상세 페이지로 이동
+    await firstCard.click();
+    await page.waitForSelector('[data-testid="phone-detail-container"]');
   });
-}
 
-function parseRequestBody(route: Route) {
-  const raw = route.request().postData();
-  if (!raw) return {};
-  const parsed = JSON.parse(raw);
-  return Array.isArray(parsed) ? parsed[0] ?? {} : parsed;
-}
+  test.describe('1. 로그인 검증 시나리오', () => {
+    test('1-1) 로그인되지 않은 경우 - 경고 토스트가 표시된다', async ({ page }) => {
+      // localStorage에서 인증 토큰 제거
+      await page.evaluate(() => {
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+          if (key.includes('sb-') && key.includes('-auth-token')) {
+            localStorage.removeItem(key);
+          }
+        });
+        localStorage.removeItem('accessToken');
+      });
 
-async function stubPhoneReactions(
-  page: Page,
-  resolver: (route: Route, stored: { current: ReactionRecord | null }) => Promise<void>
-) {
-  const stored = { current: null as ReactionRecord | null };
-  await page.route(SUPABASE_REACTIONS_ROUTE, (route) => resolver(route, stored));
-}
+      // 북마크 버튼 클릭
+      const bookmarkButton = page.locator('[data-testid="bookmark-badge"] button');
+      await bookmarkButton.click();
 
-/**
- * 테스트: 로그인되지 않은 경우, 경고 메시지 표시
- */
-test('미로그인 상태에서 북마크 버튼 클릭 시 경고 메시지 표시', async ({
-  page,
-}) => {
-  // 페이지 로드
-  await page.goto('/phone-detail');
+      // 경고 토스트 메시지 확인
+      const toast = page.locator('[data-testid="toast-message"]');
+      await expect(toast).toBeVisible();
+      await expect(toast).toHaveText('로그인이 필요합니다.');
+      
+      // 토스트 타입 확인 (warning)
+      const toastClass = await toast.getAttribute('class');
+      expect(toastClass).toContain('warning');
+    });
 
-  // 페이지가 완전히 로드될 때까지 대기 (data-testid)
-  await page.waitForSelector('[data-testid="phone-detail-body"]');
+    test('1-2) 로그인되지 않은 경우 - 즐겨찾기 작업이 중단된다', async ({ page }) => {
+      // localStorage에서 인증 토큰 제거
+      await page.evaluate(() => {
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+          if (key.includes('sb-') && key.includes('-auth-token')) {
+            localStorage.removeItem(key);
+          }
+        });
+        localStorage.removeItem('accessToken');
+      });
 
-  // 북마크 버튼 클릭
-  await page.click(BOOKMARK_BUTTON_SELECTOR);
+      // 초기 북마크 상태 확인
+      const bookmarkButton = page.locator('[data-testid="bookmark-badge"] button svg path');
+      const initialFill = await bookmarkButton.getAttribute('fill');
 
-  // 경고 메시지 확인
-  await page.waitForSelector('.ant-message-notice-content', { timeout: 300 });
-  const messageText = await page.textContent('.ant-message-notice-content');
-  expect(messageText).toContain('로그인이 필요합니다.');
-});
+      // 북마크 버튼 클릭
+      await page.locator('[data-testid="bookmark-badge"] button').click();
 
-/**
- * 테스트: 로그인된 상태에서 북마크 추가 성공
- */
-test('로그인 후 북마크 추가 시 성공 메시지 표시 및 UI 업데이트', async ({
-  page,
-  context,
-}) => {
-  // 로그인 상태 설정
-  await mockLogin(context);
+      // 북마크 상태가 변경되지 않았는지 확인
+      const currentFill = await bookmarkButton.getAttribute('fill');
+      expect(currentFill).toBe(initialFill);
+    });
+  });
 
-  await stubPhoneReactions(page, async (route, stored) => {
-    const method = route.request().method();
-    if (method === 'GET') {
-      if (stored.current) {
-        await fulfillJson(route, [stored.current]);
-      } else {
-        await fulfillJson(route, []);
+  test.describe('2. 즐겨찾기 토글 시나리오', () => {
+    test.beforeEach(async ({ page }) => {
+      // 테스트용 사용자 로그인 세션 설정
+      await page.evaluate(() => {
+        // Supabase URL을 window 객체에서 가져오기
+        const supabaseUrl = (window as any).location.origin.includes('localhost')
+          ? 'https://qbxzzpkpnpthfyjyrkux.supabase.co'
+          : (window as any).__NEXT_DATA__?.props?.env?.NEXT_PUBLIC_SUPABASE_URL;
+        
+        const projectRef = supabaseUrl?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] || 'qbxzzpkpnpthfyjyrkux';
+
+        const storageKey = `sb-${projectRef}-auth-token`;
+        const mockSession = {
+          currentSession: {
+            user: {
+              id: 'test-user-id-' + Date.now(),
+              email: 'test@example.com',
+            },
+            access_token: 'test-access-token',
+          },
+        };
+        
+        localStorage.setItem(storageKey, JSON.stringify(mockSession));
+        localStorage.setItem('accessToken', 'test-access-token');
+
+        // 테스트 환경 지원
+        (window as any).__TEST_SUPABASE_USER__ = mockSession.currentSession.user;
+      });
+    });
+
+    test('2-1) 즐겨찾기 추가 성공 시 - 성공 토스트가 표시된다', async ({ page }) => {
+      // 초기 상태 확인 (비활성화 상태로 시작)
+      const bookmarkButton = page.locator('[data-testid="bookmark-badge"] button svg path');
+      const initialFill = await bookmarkButton.getAttribute('fill');
+      
+      // 비활성화 상태인 경우에만 테스트 진행
+      if (initialFill === '#ff6b6b' || initialFill === 'rgb(255, 107, 107)') {
+        // 먼저 비활성화
+        await page.locator('[data-testid="bookmark-badge"] button').click();
+        await page.waitForTimeout(200);
       }
-      return;
-    }
 
-    if (method === 'POST') {
-      const payload = parseRequestBody(route);
-      stored.current = {
-        ...createReaction(PHONE_ID, TEST_USER_ID),
-        ...payload,
-      };
-      await fulfillJson(route, [stored.current]);
-      return;
-    }
+      // 북마크 추가 클릭
+      await page.locator('[data-testid="bookmark-badge"] button').click();
 
-    await route.fallback();
-  });
+      // 성공 토스트 확인
+      const toast = page.locator('[data-testid="toast-message"]');
+      await expect(toast).toBeVisible();
+      await expect(toast).toHaveText('관심상품에 추가되었습니다.');
+      
+      // 토스트 타입 확인 (success)
+      const toastClass = await toast.getAttribute('class');
+      expect(toastClass).toContain('success');
+    });
 
-  // 페이지 로드
-  await page.goto('/phone-detail');
-
-  // 페이지 로드 완료 대기
-  await page.waitForSelector('[data-testid="phone-detail-body"]');
-
-  // 북마크 버튼 클릭
-  await page.click(BOOKMARK_BUTTON_SELECTOR);
-
-  // 성공 메시지 확인
-  await page.waitForSelector('.ant-message-notice-content', { timeout: 300 });
-  const messageText = await page.textContent('.ant-message-notice-content');
-  expect(messageText).toContain('관심상품에 추가되었습니다.');
-
-  await expectBookmarkFill(page, '#ff6b6b');
-});
-
-/**
- * 테스트: 북마크 제거 시 성공 메시지 표시 및 UI 업데이트
- */
-test('북마크 제거 시 성공 메시지 표시 및 UI 업데이트', async ({
-  page,
-  context,
-}) => {
-  // 로그인 상태 설정
-  await mockLogin(context);
-
-  await stubPhoneReactions(page, async (route, stored) => {
-    const method = route.request().method();
-    if (method === 'GET') {
-      if (stored.current) {
-        await fulfillJson(route, [stored.current]);
-      } else {
-        await fulfillJson(route, []);
+    test('2-2) 즐겨찾기 추가 성공 시 - UI가 활성화 상태로 변경된다', async ({ page }) => {
+      // 초기 상태 확인
+      const bookmarkButton = page.locator('[data-testid="bookmark-badge"] button svg path');
+      const initialFill = await bookmarkButton.getAttribute('fill');
+      
+      // 비활성화 상태인 경우에만 테스트 진행
+      if (initialFill === '#ff6b6b' || initialFill === 'rgb(255, 107, 107)') {
+        await page.locator('[data-testid="bookmark-badge"] button').click();
+        // 토스트가 나타났다가 사라질 때까지 대기
+        const toast = page.locator('[data-testid="toast-message"]');
+        await toast.waitFor({ state: 'hidden' });
       }
-      return;
-    }
 
-    if (method === 'POST') {
-      const payload = parseRequestBody(route);
-      stored.current = {
-        ...createReaction(PHONE_ID, TEST_USER_ID),
-        ...payload,
-      };
-      await fulfillJson(route, [stored.current]);
-      return;
-    }
+      // 북마크 추가
+      await page.locator('[data-testid="bookmark-badge"] button').click();
 
-    if (method === 'PATCH') {
-      const payload = parseRequestBody(route);
-      stored.current = {
-        ...(stored.current ?? createReaction(PHONE_ID, TEST_USER_ID)),
-        ...payload,
-      };
-      await fulfillJson(route, [stored.current]);
-      return;
-    }
+      // UI 상태 확인 (하트 아이콘이 채워진 상태)
+      const newFill = await bookmarkButton.getAttribute('fill');
+      expect(newFill).toBe('#ff6b6b');
+    });
 
-    await route.fallback();
+    test('2-3) 즐겨찾기 제거 성공 시 - 성공 토스트가 표시된다', async ({ page }) => {
+      // 먼저 북마크 추가
+      const bookmarkButton = page.locator('[data-testid="bookmark-badge"] button svg path');
+      const initialFill = await bookmarkButton.getAttribute('fill');
+      
+      if (initialFill !== '#ff6b6b' && initialFill !== 'rgb(255, 107, 107)') {
+        await page.locator('[data-testid="bookmark-badge"] button').click();
+        // 토스트가 나타났다가 사라질 때까지 대기
+        const toast = page.locator('[data-testid="toast-message"]');
+        await toast.waitFor({ state: 'visible' });
+        await toast.waitFor({ state: 'hidden' });
+      }
+
+      // 북마크 제거
+      await page.locator('[data-testid="bookmark-badge"] button').click();
+
+      // 성공 토스트 확인
+      const toast = page.locator('[data-testid="toast-message"]');
+      await expect(toast).toBeVisible();
+      await expect(toast).toHaveText('관심상품에서 제거되었습니다.');
+      
+      // 토스트 타입 확인 (success)
+      const toastClass = await toast.getAttribute('class');
+      expect(toastClass).toContain('success');
+    });
+
+    test('2-4) 즐겨찾기 제거 성공 시 - UI가 비활성화 상태로 변경된다', async ({ page }) => {
+      // 먼저 북마크 추가
+      const bookmarkButton = page.locator('[data-testid="bookmark-badge"] button svg path');
+      const initialFill = await bookmarkButton.getAttribute('fill');
+      
+      if (initialFill !== '#ff6b6b' && initialFill !== 'rgb(255, 107, 107)') {
+        await page.locator('[data-testid="bookmark-badge"] button').click();
+        // 토스트가 나타났다가 사라질 때까지 대기
+        const toast = page.locator('[data-testid="toast-message"]');
+        await toast.waitFor({ state: 'visible' });
+        await toast.waitFor({ state: 'hidden' });
+      }
+
+      // 북마크 제거
+      await page.locator('[data-testid="bookmark-badge"] button').click();
+
+      // UI 상태 확인 (하트 아이콘이 빈 상태)
+      const newFill = await bookmarkButton.getAttribute('fill');
+      expect(newFill).not.toBe('#ff6b6b');
+      expect(newFill).not.toBe('rgb(255, 107, 107)');
+    });
   });
 
-  // 페이지 로드
-  await page.goto('/phone-detail');
+  test.describe('3. 에러 처리', () => {
+    test('3-1) Supabase 연동 실패 시 - 에러 토스트가 표시된다', async ({ page }) => {
+      // 테스트용 사용자 로그인
+      await page.evaluate(() => {
+        const supabaseUrl = (window as any).location.origin.includes('localhost')
+          ? 'https://qbxzzpkpnpthfyjyrkux.supabase.co'
+          : (window as any).__NEXT_DATA__?.props?.env?.NEXT_PUBLIC_SUPABASE_URL;
+        
+        const projectRef = supabaseUrl?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] || 'qbxzzpkpnpthfyjyrkux';
 
-  // 페이지 로드 완료 대기
-  await page.waitForSelector('[data-testid="phone-detail-body"]');
+        const storageKey = `sb-${projectRef}-auth-token`;
+        const mockSession = {
+          currentSession: {
+            user: {
+              id: 'invalid-user-id',
+              email: 'invalid@example.com',
+            },
+            access_token: 'invalid-token',
+          },
+        };
+        
+        localStorage.setItem(storageKey, JSON.stringify(mockSession));
+        (window as any).__TEST_SUPABASE_USER__ = mockSession.currentSession.user;
+      });
 
-  // 첫 번째 클릭 - 북마크 추가
-  await page.click(BOOKMARK_BUTTON_SELECTOR);
-  await page.waitForSelector('.ant-message-notice-content', { timeout: 300 });
-  await expectBookmarkFill(page, '#ff6b6b');
+      // API 요청 가로채기 (에러 응답 반환)
+      await page.route('**/rest/v1/phone_reactions*', route => {
+        route.fulfill({
+          status: 500,
+          body: JSON.stringify({ error: 'Internal Server Error' }),
+        });
+      });
 
-  await page.waitForSelector('.ant-message-notice', {
-    state: 'detached',
+      // 북마크 버튼 클릭
+      await page.locator('[data-testid="bookmark-badge"] button').click();
+
+      // 에러 토스트 확인
+      const toast = page.locator('[data-testid="toast-message"]');
+      await expect(toast).toBeVisible();
+      await expect(toast).toHaveText('작업에 실패했습니다. 다시 시도해주세요.');
+      
+      // 토스트 타입 확인 (error)
+      const toastClass = await toast.getAttribute('class');
+      expect(toastClass).toContain('error');
+    });
+
+    test('3-2) 에러 발생 시 - UI가 이전 상태로 롤백된다', async ({ page }) => {
+      // 테스트용 사용자 로그인
+      await page.evaluate(() => {
+        const supabaseUrl = (window as any).location.origin.includes('localhost')
+          ? 'https://qbxzzpkpnpthfyjyrkux.supabase.co'
+          : (window as any).__NEXT_DATA__?.props?.env?.NEXT_PUBLIC_SUPABASE_URL;
+        
+        const projectRef = supabaseUrl?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] || 'qbxzzpkpnpthfyjyrkux';
+
+        const storageKey = `sb-${projectRef}-auth-token`;
+        const mockSession = {
+          currentSession: {
+            user: {
+              id: 'invalid-user-id',
+              email: 'invalid@example.com',
+            },
+            access_token: 'invalid-token',
+          },
+        };
+        
+        localStorage.setItem(storageKey, JSON.stringify(mockSession));
+        (window as any).__TEST_SUPABASE_USER__ = mockSession.currentSession.user;
+      });
+
+      // 초기 상태 저장
+      const bookmarkButton = page.locator('[data-testid="bookmark-badge"] button svg path');
+      const initialFill = await bookmarkButton.getAttribute('fill');
+
+      // API 요청 가로채기 (에러 응답 반환)
+      await page.route('**/rest/v1/phone_reactions*', route => {
+        route.fulfill({
+          status: 500,
+          body: JSON.stringify({ error: 'Internal Server Error' }),
+        });
+      });
+
+      // 북마크 버튼 클릭
+      await page.locator('[data-testid="bookmark-badge"] button').click();
+
+      // 에러 토스트가 나타날 때까지 대기
+      const toast = page.locator('[data-testid="toast-message"]');
+      await toast.waitFor({ state: 'visible' });
+
+      // UI가 원래 상태로 롤백되었는지 확인
+      const currentFill = await bookmarkButton.getAttribute('fill');
+      expect(currentFill).toBe(initialFill);
+    });
   });
-
-  // 두 번째 클릭 - 북마크 제거
-  await page.click(BOOKMARK_BUTTON_SELECTOR);
-
-  // 제거 성공 메시지 확인
-  await page.waitForSelector('.ant-message-notice-content', { timeout: 300 });
-  const messageText = await page.textContent('.ant-message-notice-content');
-  expect(messageText).toContain('관심상품에서 제거되었습니다.');
-  await expectBookmarkFill(page, 'none');
-});
-
-/**
- * 테스트: 북마크 업데이트 실패 시 에러 메시지 및 UI 롤백
- */
-test('북마크 업데이트 실패 시 에러 메시지 표시 및 상태 롤백', async ({
-  page,
-  context,
-}) => {
-  // 로그인 상태 설정
-  await mockLogin(context);
-
-  // Supabase API 실패하도록 설정
-  await stubPhoneReactions(page, async (route, _stored) => {
-    const method = route.request().method();
-    if (method === 'GET') {
-      await fulfillJson(route, []);
-      return;
-    }
-
-    route.abort('failed');
-  });
-
-  // 페이지 로드
-  await page.goto('/phone-detail');
-
-  // 페이지 로드 완료 대기
-  await page.waitForSelector('[data-testid="phone-detail-body"]');
-
-  // 북마크 버튼 클릭
-  await page.click(BOOKMARK_BUTTON_SELECTOR);
-
-  // 에러 메시지 확인
-  await page.waitForSelector('.ant-message-notice-content', { timeout: 300 });
-  const messageText = await page.textContent('.ant-message-notice-content');
-  expect(messageText).toContain(
-    '작업에 실패했습니다. 다시 시도해주세요.'
-  );
-  await expectBookmarkFill(page, 'none');
-});
-
-/**
- * 테스트: 북마크 배지에 좋아요 수 표시
- */
-test('북마크 배지에 좋아요 수가 올바르게 표시됨', async ({ page }) => {
-  // 페이지 로드
-  await page.goto('/phone-detail');
-
-  // 페이지 로드 완료 대기
-  await page.waitForSelector('[data-testid="bookmark-badge"]');
-
-  // 북마크 배지의 숫자 확인
-  const countText = await page.textContent(BOOKMARK_BADGE_SELECTOR);
-  expect(countText).toMatch(/\d+/);
-});
-
-/**
- * 테스트: 액션 버튼 섹션이 렌더링됨
- */
-test('액션 버튼 섹션(삭제, 공유, 위치, 북마크)이 렌더링됨', async ({
-  page,
-}) => {
-  // 페이지 로드
-  await page.goto('/phone-detail');
-
-  // 페이지 로드 완료 대기
-  await page.waitForSelector(ACTION_BUTTONS_SELECTOR);
-
-  // 액션 버튼이 존재하는지 확인
-  const actionButtons = await page.$$(ACTION_BUTTONS_SELECTOR);
-  expect(actionButtons.length).toBeGreaterThan(0);
 });

@@ -1,40 +1,43 @@
-import { useCallback, useState } from 'react';
-import { message } from 'antd';
-import { supabase } from '@/commons/libraries/supabaseClient';
-import { isTestEnv } from '@/commons/utils/is-test-env';
+'use client';
 
+import { useState, useCallback, useEffect } from 'react';
+import { supabase } from '@/commons/libraries/supabaseClient';
+
+// 상수 정의
 const REACTIONS_TABLE = 'phone_reactions';
 const FAVORITE_TYPE = 'favorite';
+const TOAST_AUTO_CLOSE_DELAY = 3000;
+
+// 토스트 메시지
+const TOAST_MESSAGES = {
+  LOGIN_REQUIRED: '로그인이 필요합니다.',
+  ADD_SUCCESS: '관심상품에 추가되었습니다.',
+  REMOVE_SUCCESS: '관심상품에서 제거되었습니다.',
+  ERROR: '작업에 실패했습니다. 다시 시도해주세요.',
+} as const;
 
 /**
- * Supabase 스토리지 키 추출
- */
-const getSupabaseStorageKey = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const projectRef = supabaseUrl?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1];
-  if (!projectRef) return null;
-  return `sb-${projectRef}-auth-token`;
-};
-
-/**
- * Supabase에서 저장된 세션의 사용자 정보를 조회
- * @description 테스트 환경에서 setItem으로 넣어둔 세션 정보를 활용하기 위해 추가
+ * Supabase 세션에서 사용자 ID 추출
+ * @description localStorage에서 Supabase 세션 정보를 조회하여 사용자 정보를 반환
+ * @returns 사용자 정보 객체 또는 null
  */
 const getStoredSessionUser = () => {
   if (typeof window === 'undefined') return null;
-  const storageKey = getSupabaseStorageKey();
-  if (!storageKey) return null;
 
+  // Supabase 스토리지 키 생성
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const projectRef = supabaseUrl?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1];
+  if (!projectRef) return null;
+
+  const storageKey = `sb-${projectRef}-auth-token`;
   const rawSession = window.localStorage.getItem(storageKey);
   if (!rawSession) return null;
 
   try {
     const parsed = JSON.parse(rawSession);
-
     if (parsed?.currentSession?.user) {
       return parsed.currentSession.user;
     }
-
     if (parsed?.user) {
       return parsed.user;
     }
@@ -42,6 +45,7 @@ const getStoredSessionUser = () => {
     console.warn('세션 정보 파싱 실패:', error);
   }
 
+  // 테스트 환경 지원
   if ((window as any).__TEST_SUPABASE_USER__) {
     return (window as any).__TEST_SUPABASE_USER__;
   }
@@ -50,130 +54,229 @@ const getStoredSessionUser = () => {
 };
 
 /**
- * 북마크 상태 관리 훅
- * @description 즐겨찾기 토글 기능을 제공합니다.
- * 로그인 검증, Supabase 동기화, 에러 처리를 포함합니다.
+ * 토스트 메시지 타입
+ */
+export interface ToastMessage {
+  type: 'success' | 'error' | 'warning';
+  message: string;
+}
+
+/**
+ * 북마크 훅 반환 타입
+ */
+export interface UseBookmarkReturn {
+  /** 북마크 상태 */
+  isBookmarked: boolean;
+  /** 북마크 처리 중 여부 */
+  isLoading: boolean;
+  /** 토스트 메시지 */
+  toastMessage: ToastMessage | null;
+  /** 북마크 토글 함수 */
+  toggleBookmark: () => Promise<void>;
+  /** 토스트 메시지 닫기 */
+  closeToast: () => void;
+}
+
+/**
+ * 북마크(즐겨찾기) 기능 훅
+ * 
+ * @description
+ * - 로그인 여부 체크 (Supabase Auth session/user 정보)
+ * - Supabase phone_reactions 테이블 연동
+ * - 토글 로직: insert/update (deleted_at)
+ * - 토스트 메시지 표시
+ * - 낙관적 업데이트 및 에러 시 롤백
+ * 
  * @param phoneId - 상품 ID
  * @param initialBookmarked - 초기 북마크 상태 (기본값: false)
- * @returns { isBookmarked, toggleBookmark, isLoading }
+ * @returns UseBookmarkReturn
+ * 
+ * @example
+ * ```tsx
+ * const { isBookmarked, toggleBookmark, toastMessage } = useBookmark('phone-123');
+ * 
+ * <button onClick={toggleBookmark}>
+ *   {isBookmarked ? '❤️' : '🤍'}
+ * </button>
+ * ```
  */
-export function useBookmark(phoneId: string, initialBookmarked = false) {
+export function useBookmark(
+  phoneId: string | undefined,
+  initialBookmarked = false
+): UseBookmarkReturn {
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
   const [isLoading, setIsLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState<ToastMessage | null>(null);
 
   /**
-   * 로그인 상태 확인
-   * @returns 로그인된 유저 정보 또는 null
+   * 초기 로드 시 북마크 상태 조회
    */
-  const checkAuth = useCallback(async () => {
-    if (isTestEnv()) {
-      if ((window as any).__TEST_SUPABASE_LOGIN__) {
-        return (
-          (window as any).__TEST_SUPABASE_USER__ ?? {
-            id: 'test-user',
-          }
-        );
+  useEffect(() => {
+    if (!phoneId) return;
+
+    const loadBookmarkStatus = async () => {
+      const user = getStoredSessionUser();
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from(REACTIONS_TABLE)
+          .select('id, deleted_at')
+          .eq('phone_id', phoneId)
+          .eq('user_id', user.id)
+          .eq('type', FAVORITE_TYPE)
+          .maybeSingle();
+
+        if (error && error.code !== 'PGRST116') {
+          console.warn('북마크 상태 조회 실패:', error);
+          return;
+        }
+
+        // 데이터가 존재하고 deleted_at이 null이면 북마크된 상태
+        if (data && !data.deleted_at) {
+          setIsBookmarked(true);
+        } else {
+          setIsBookmarked(false);
+        }
+      } catch (error) {
+        console.warn('북마크 상태 조회 중 오류:', error);
       }
-      return null;
-    }
+    };
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    loadBookmarkStatus();
+  }, [phoneId]);
 
-    if (session?.user) {
-      return session.user;
-    }
+  /**
+   * 토스트 메시지 표시 함수
+   * @param type - 메시지 타입 ('success' | 'error' | 'warning')
+   * @param message - 표시할 메시지 내용
+   */
+  const showToast = useCallback((type: 'success' | 'error' | 'warning', message: string) => {
+    setToastMessage({ type, message });
 
-    return getStoredSessionUser();
+    // 자동으로 토스트 닫기
+    setTimeout(() => {
+      setToastMessage(null);
+    }, TOAST_AUTO_CLOSE_DELAY);
   }, []);
 
   /**
-   * 북마크 상태 토글
+   * 토스트 메시지 닫기
+   */
+  const closeToast = useCallback(() => {
+    setToastMessage(null);
+  }, []);
+
+  /**
+   * 북마크 토글 함수
    * @description
-   * 1. 로그인 검증
-   * 2. 현재 상태의 반대로 업데이트
-   * 3. 성공/실패 메시지 표시
-   * 4. 실패 시 이전 상태로 롤백
+   * 1. 로그인 여부 확인 (미로그인 시 경고 토스트)
+   * 2. 낙관적 업데이트 (UI 즉시 반영)
+   * 3. Supabase API 호출 (insert 또는 update)
+   * 4. 실패 시 UI 롤백 및 에러 토스트
    */
   const toggleBookmark = useCallback(async () => {
-    if (isLoading) return;
+    if (!phoneId) return;
 
-    const user = await checkAuth();
+    // 1. 로그인 여부 체크
+    const user = getStoredSessionUser();
     if (!user) {
-      message.warning('로그인이 필요합니다.');
+      // 미로그인 시 경고 토스트
+      showToast('warning', TOAST_MESSAGES.LOGIN_REQUIRED);
       return;
     }
 
-    const previousState = isBookmarked;
+    // 2. 로딩 중이면 중복 요청 방지
+    if (isLoading) return;
+
+    setIsLoading(true);
+
+    // 3. 현재 북마크 상태 저장 (롤백용)
+    const previousBookmarked = isBookmarked;
+
+    // 4. 낙관적 업데이트 (UI 즉시 반영)
+    setIsBookmarked(!isBookmarked);
 
     try {
-      setIsLoading(true);
-
-      const { data: reaction, error: reactionError } = await supabase
-        .from(REACTIONS_TABLE)
-        .select('id, deleted_at, metadata')
-        .eq('phone_id', phoneId)
-        .eq('user_id', user.id)
-        .eq('type', FAVORITE_TYPE)
-        .limit(1)
-        .maybeSingle();
-
-      if (reactionError && (reactionError as { code?: string }).code !== 'PGRST116') {
-        throw reactionError;
-      }
-
-      const isActive = Boolean(reaction && !reaction.deleted_at);
-      const targetState = isActive ? false : true;
-      setIsBookmarked(targetState);
-
-      if (isActive && reaction?.id) {
-        const { error: deactivateError } = await supabase
+      if (isBookmarked) {
+        // 북마크 제거: deleted_at 업데이트
+        const { error: updateError } = await supabase
           .from(REACTIONS_TABLE)
-          .update({ deleted_at: new Date().toISOString() })
-          .eq('id', reaction.id)
+          .update({ 
+            deleted_at: new Date().toISOString(),
+            metadata: { updated_by: 'bookmark_hook' }
+          })
           .eq('phone_id', phoneId)
           .eq('user_id', user.id)
-          .eq('type', FAVORITE_TYPE);
+          .eq('type', FAVORITE_TYPE)
+          .is('deleted_at', null);
 
-        if (deactivateError) {
-          throw deactivateError;
+        if (updateError) throw updateError;
+
+        // 성공 토스트
+        showToast('success', TOAST_MESSAGES.REMOVE_SUCCESS);
+      } else {
+        // 기존 레코드 확인
+        const { data: existingData, error: selectError } = await supabase
+          .from(REACTIONS_TABLE)
+          .select('id, deleted_at')
+          .eq('phone_id', phoneId)
+          .eq('user_id', user.id)
+          .eq('type', FAVORITE_TYPE)
+          .maybeSingle();
+
+        if (selectError && selectError.code !== 'PGRST116') {
+          throw selectError;
         }
 
-        message.success('관심상품에서 제거되었습니다.');
-        return;
+        if (existingData) {
+          // 기존 레코드가 있으면 deleted_at을 null로 업데이트
+          const { error: updateError } = await supabase
+            .from(REACTIONS_TABLE)
+            .update({ 
+              deleted_at: null,
+              metadata: { updated_by: 'bookmark_hook' }
+            })
+            .eq('id', existingData.id);
+
+          if (updateError) throw updateError;
+        } else {
+          // 기존 레코드가 없으면 새로 생성
+          const { error: insertError } = await supabase
+            .from(REACTIONS_TABLE)
+            .insert({
+              phone_id: phoneId,
+              user_id: user.id,
+              type: FAVORITE_TYPE,
+              deleted_at: null,
+              metadata: { created_by: 'bookmark_hook' },
+              created_at: new Date().toISOString(),
+            });
+
+          if (insertError) throw insertError;
+        }
+
+        // 성공 토스트
+        showToast('success', TOAST_MESSAGES.ADD_SUCCESS);
       }
-
-      const metadata = (reaction?.metadata as Record<string, unknown> | null) ?? {};
-      const payload = {
-        phone_id: phoneId,
-        user_id: user.id,
-        type: FAVORITE_TYPE,
-        deleted_at: null,
-        metadata,
-      };
-
-      const { error: upsertError } = await supabase
-        .from(REACTIONS_TABLE)
-        .upsert(payload, { onConflict: 'phone_id,user_id,type' });
-
-      if (upsertError) {
-        throw upsertError;
-      }
-
-      message.success('관심상품에 추가되었습니다.');
     } catch (error) {
-      setIsBookmarked(previousState);
-      message.error('작업에 실패했습니다. 다시 시도해주세요.');
-      console.error('북마크 업데이트 실패:', error);
+      console.error('북마크 처리 실패:', error);
+
+      // 5. 실패 시 롤백 (UI 원래대로 복구)
+      setIsBookmarked(previousBookmarked);
+
+      // 에러 토스트
+      showToast('error', TOAST_MESSAGES.ERROR);
     } finally {
       setIsLoading(false);
     }
-  }, [checkAuth, isBookmarked, isLoading, phoneId]);
+  }, [phoneId, isBookmarked, isLoading, showToast]);
 
   return {
     isBookmarked,
-    toggleBookmark,
     isLoading,
+    toastMessage,
+    toggleBookmark,
+    closeToast,
   };
 }

@@ -153,8 +153,8 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
   const summaryText = fetchedData?.summary ?? phoneData?.summary ?? '';
 
   // 북마크 훅 사용
-  const { isBookmarked, toggleBookmark } = useBookmark(
-    currentPhoneId,
+  const { isBookmarked, toggleBookmark, toastMessage, closeToast } = useBookmark(
+    currentPhoneId || '',
     false
   );
 
@@ -499,6 +499,23 @@ export default function PhoneDetail({ data = DUMMY_PHONE_DATA, onShare, phoneId:
           onCancel={hideDeleteModal}
         />,
         modalPortal
+      )}
+
+      {/* 토스트 메시지 */}
+      {toastMessage && (
+        <div
+          className={`${styles.toast} ${
+            toastMessage.type === 'error' 
+              ? styles.toastError 
+              : toastMessage.type === 'warning'
+              ? styles.toastWarning
+              : styles.toastSuccess
+          }`}
+          onClick={closeToast}
+          data-testid="toast-message"
+        >
+          {toastMessage.message}
+        </div>
       )}
     </div>
   );

@@ -20,14 +20,24 @@ export default function Inquiries({
   inquiries = [],
   onSubmitInquiry,
   onSubmitReply,
+  onSubmitNestedReply,
   onEditInquiry,
   onDeleteInquiry,
   onReplyClick,
+  editingReplyId,
+  editingReplyContent,
+  isEditingLoading,
+  editingError,
+  onEditingReplyContentChange,
+  onSubmitEditReply,
+  onCancelEditReply,
 }: InqueriesProps) {
   // 입력 텍스트 상태 관리
   const [inquiryText, setInquiryText] = useState('');
   const [expandedReplies, setExpandedReplies] = useState<{ [key: string]: boolean }>({});
   const [replyTexts, setReplyTexts] = useState<{ [key: string]: string }>({});
+  const [expandedNestedReplies, setExpandedNestedReplies] = useState<{ [key: string]: boolean }>({});
+  const [nestedReplyTexts, setNestedReplyTexts] = useState<{ [key: string]: string }>({});
 
   /**
    * 문의 제출 핸들러
@@ -61,18 +71,24 @@ export default function Inquiries({
   /**
    * 답변 제출 핸들러
    */
-  const handleSubmitReply = (inquiryId: string) => {
+  const handleSubmitReply = async (inquiryId: string) => {
     const text = replyTexts[inquiryId];
     if (text?.trim() && onSubmitReply) {
-      onSubmitReply(inquiryId, text);
-      setReplyTexts((prev) => ({
-        ...prev,
-        [inquiryId]: '',
-      }));
-      setExpandedReplies((prev) => ({
-        ...prev,
-        [inquiryId]: false,
-      }));
+      try {
+        const result = await onSubmitReply(inquiryId, text);
+        if (result !== false) {
+          setReplyTexts((prev) => ({
+            ...prev,
+            [inquiryId]: '',
+          }));
+          setExpandedReplies((prev) => ({
+            ...prev,
+            [inquiryId]: false,
+          }));
+        }
+      } catch (error) {
+        console.error('답변 제출 실패:', error);
+      }
     }
   };
 
@@ -87,6 +103,54 @@ export default function Inquiries({
     setReplyTexts((prev) => ({
       ...prev,
       [inquiryId]: '',
+    }));
+  };
+
+  /**
+   * 중첩 답변 버튼 클릭 핸들러
+   */
+  const handleNestedReplyClick = (replyId: string) => {
+    setExpandedNestedReplies((prev) => ({
+      ...prev,
+      [replyId]: !prev[replyId],
+    }));
+  };
+
+  /**
+   * 중첩 답변 제출 핸들러
+   */
+  const handleSubmitNestedReply = async (parentId: string) => {
+    const text = nestedReplyTexts[parentId];
+    if (text?.trim() && onSubmitNestedReply) {
+      try {
+        const result = await onSubmitNestedReply(parentId, text);
+        if (result !== false) {
+          setNestedReplyTexts((prev) => ({
+            ...prev,
+            [parentId]: '',
+          }));
+          setExpandedNestedReplies((prev) => ({
+            ...prev,
+            [parentId]: false,
+          }));
+        }
+      } catch (error) {
+        console.error('중첩 답변 제출 실패:', error);
+      }
+    }
+  };
+
+  /**
+   * 중첩 답변 취소 핸들러
+   */
+  const handleCancelNestedReply = (replyId: string) => {
+    setExpandedNestedReplies((prev) => ({
+      ...prev,
+      [replyId]: false,
+    }));
+    setNestedReplyTexts((prev) => ({
+      ...prev,
+      [replyId]: '',
     }));
   };
 
@@ -165,7 +229,7 @@ export default function Inquiries({
               {inquiry.author.avatar ? (
                 <img src={inquiry.author.avatar} alt={inquiry.author.name} className={styles.profileAvatarImg} />
               ) : (
-                <div style={{ width: '24px', height: '24px' }} />
+                <div className={styles.avatarPlaceholder} />
               )}
             </div>
             <span className={styles.profileName}>{inquiry.author.name}</span>
@@ -235,59 +299,208 @@ export default function Inquiries({
   );
 
   /**
-   * 답변 아이템 렌더링 (들여쓰기)
+   * 답변 아이템 렌더링 (들여쓰기) - 재귀 구조
    */
-  const renderReplyItem = (reply: InquiryItem, parentIndex: number, replyIndex: number) => (
-    <div key={reply.id} className={styles.replyWrapper} data-testid={`reply-item-${parentIndex}-${replyIndex}`}>
-      {/* 들여쓰기 표시 */}
-      <div className={styles.replyBorder}>
-        <div className={styles.replyIcon2}>{renderReturnIcon()}</div>
-      </div>
+  const renderReplyItem = (reply: InquiryItem, parentIndex: number, replyIndex: number, depth: number = 1): JSX.Element => {
+    // depth에 따른 패딩 계산
+    const getDepthClassName = () => {
+      switch (depth) {
+        case 1:
+          return styles.replyWrapperDepth1;
+        case 2:
+          return styles.replyWrapperDepth2;
+        case 3:
+          return styles.replyWrapperDepth3;
+        case 4:
+          return styles.replyWrapperDepth4;
+        case 5:
+          return styles.replyWrapperDepth5;
+        default:
+          // 5단계 이상은 CSS 클래스 기반 처리
+          return `${styles.replyWrapperDepth5}`;
+      }
+    };
 
-      {/* 답변 내용 */}
-      <div className={styles.replyContent}>
-        <div className={styles.replyItem}>
-          {/* 프로필 및 액션 버튼 */}
-          <div className={styles.replyHeader}>
-            <div className={styles.replyProfile}>
-              <div className={styles.profileAvatar}>
-                {reply.author.avatar ? (
-                  <img src={reply.author.avatar} alt={reply.author.name} className={styles.profileAvatarImg} />
-                ) : (
-                  <div style={{ width: '24px', height: '24px' }} />
-                )}
-              </div>
-              <span className={styles.profileName}>{reply.author.name}</span>
-            </div>
+    const depthClass = getDepthClassName();
 
-            {/* 수정/삭제 버튼 */}
-            {(reply.canEdit || reply.canDelete) && (
-              <div className={styles.replyActions}>
-                {reply.canEdit && (
-                  <button className={styles.actionButton} onClick={() => onEditInquiry?.(reply.id, reply.content)} data-testid={`edit-reply-${reply.id}`}>
-                    {renderEditIcon()}
-                  </button>
-                )}
-                {reply.canDelete && (
-                  <button className={styles.actionButton} onClick={() => onDeleteInquiry?.(reply.id)} data-testid={`delete-reply-${reply.id}`}>
-                    {renderCloseIcon()}
-                  </button>
-                )}
-              </div>
-            )}
+    return (
+      <div key={reply.id}>
+        {/* 답변 아이템 */}
+        <div
+          className={`${styles.replyWrapper} ${depthClass}`}
+          data-testid={`nested-reply-item-${parentIndex}-${replyIndex}-${depth}`}
+        >
+          {/* 들여쓰기 표시 */}
+          <div className={styles.replyBorder}>
+            <div className={styles.replyIcon2}>{renderReturnIcon()}</div>
           </div>
 
           {/* 답변 내용 */}
-          <div className={styles.replyBody}>{reply.content}</div>
+          <div className={styles.replyContent}>
+            {/* 수정 모드가 아닐 때: 일반 답변 표시 */}
+            {editingReplyId !== reply.id ? (
+              <div className={styles.replyItem}>
+                {/* 프로필 및 액션 버튼 */}
+                <div className={styles.replyHeader}>
+                  <div className={styles.replyProfile}>
+                    <div className={styles.profileAvatar}>
+                      {reply.author.avatar ? (
+                        <img src={reply.author.avatar} alt={reply.author.name} className={styles.profileAvatarImg} />
+                      ) : (
+                        <div className={styles.avatarPlaceholder} />
+                      )}
+                    </div>
+                    <span className={styles.profileName}>{reply.author.name}</span>
+                  </div>
 
-          {/* 답변 날짜 */}
-          <div className={styles.replyFooter}>
-            <span className={styles.replyDate}>{reply.createdAt}</span>
+                  {/* 수정/삭제/중첩답변 버튼 */}
+                  <div className={styles.replyActions}>
+                    {/* 중첩 답변 버튼 */}
+                    <button
+                      className={styles.nestedReplyButton}
+                      onClick={() => handleNestedReplyClick(reply.id)}
+                      data-testid={`nested-reply-button-${reply.id}`}
+                    >
+                      <div className={styles.replyIcon}>{renderReplyIcon()}</div>
+                      <span>답변 하기</span>
+                    </button>
+
+                    {/* 수정/삭제 버튼 */}
+                    {(reply.canEdit || reply.canDelete) && (
+                      <div className={styles.replyActionsButtons}>
+                        {reply.canEdit && (
+                          <button
+                            className={styles.actionButton}
+                            onClick={() => onEditInquiry?.(reply.id, reply.content)}
+                            data-testid={`edit-reply-${reply.id}`}
+                          >
+                            {renderEditIcon()}
+                          </button>
+                        )}
+                        {reply.canDelete && (
+                          <button
+                            className={styles.actionButton}
+                            onClick={() => onDeleteInquiry?.(reply.id)}
+                            data-testid={`delete-reply-${reply.id}`}
+                          >
+                            {renderCloseIcon()}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 답변 내용 */}
+                <div className={styles.replyBody} data-testid={`reply-content-${reply.id}`}>
+                  {reply.content}
+                </div>
+
+                {/* 답변 날짜 */}
+                <div className={styles.replyFooter}>
+                  <span className={styles.replyDate}>{reply.createdAt}</span>
+                </div>
+              </div>
+            ) : (
+              /* 수정 모드: 수정 폼 표시 */
+              <div className={styles.editReplyForm}>
+                {/* 수정 입력 필드 */}
+                <div className={styles.textareaContainer}>
+                  <textarea
+                    className={styles.replyTextarea}
+                    placeholder={inputSection.placeholder}
+                    value={editingReplyContent || ''}
+                    onChange={(e) => {
+                      const text = e.target.value.slice(0, 100);
+                      onEditingReplyContentChange?.(text);
+                    }}
+                    data-testid={`edit-reply-textarea-${reply.id}`}
+                    disabled={isEditingLoading}
+                  />
+                  <div className={styles.charCount}>{editingReplyContent?.length || 0}/100</div>
+                </div>
+
+                {/* 에러 메시지 표시 */}
+                {editingError && (
+                  <div className={styles.editError} data-testid={`edit-reply-error-${reply.id}`}>
+                    {editingError}
+                  </div>
+                )}
+
+                {/* 저장/취소 버튼 */}
+                <div className={styles.editButtonGroup}>
+                  <button
+                    className={styles.cancelButton}
+                    onClick={() => onCancelEditReply?.()}
+                    disabled={isEditingLoading}
+                    data-testid={`edit-reply-cancel-${reply.id}`}
+                  >
+                    취소
+                  </button>
+                  <button
+                    className={styles.submitReplyButton}
+                    onClick={() => onSubmitEditReply?.(reply.id)}
+                    disabled={isEditingLoading}
+                    data-testid={`edit-reply-save-${reply.id}`}
+                  >
+                    {isEditingLoading ? '저장 중...' : '저장'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* 중첩 답변 입력 섹션 (확장 시 표시) */}
+            {expandedNestedReplies[reply.id] && (
+              <div className={styles.replyInputSection}>
+                <div className={styles.replyInputWrapper}>
+                  <div className={styles.textareaContainer}>
+                    <textarea
+                      className={styles.replyTextarea}
+                      placeholder={inputSection.placeholder}
+                      value={nestedReplyTexts[reply.id] || ''}
+                      onChange={(e) => {
+                        const text = e.target.value.slice(0, inputSection.maxLength);
+                        setNestedReplyTexts((prev) => ({
+                          ...prev,
+                          [reply.id]: text,
+                        }));
+                      }}
+                      data-testid={`nested-reply-textarea-${reply.id}`}
+                    />
+                    <div className={styles.charCount}>
+                      {nestedReplyTexts[reply.id]?.length || 0}/{inputSection.maxLength}
+                    </div>
+                  </div>
+
+                  <div className={styles.replyButtonGroup}>
+                    <button
+                      className={styles.cancelButton}
+                      onClick={() => handleCancelNestedReply(reply.id)}
+                      data-testid={`nested-reply-cancel-${reply.id}`}
+                    >
+                      취소
+                    </button>
+                    <button
+                      className={styles.submitReplyButton}
+                      onClick={() => handleSubmitNestedReply(reply.id)}
+                      data-testid={`nested-reply-submit-${reply.id}`}
+                    >
+                      답변 하기
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* 자식 답변 재귀 렌더링 */}
+        {inquiries
+          .filter((item) => item.parentId === reply.id)
+          .map((childReply, childIndex) => renderReplyItem(childReply, parentIndex, childIndex, depth + 1))}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className={styles.container} data-testid="inquiries-container">
@@ -324,7 +537,7 @@ export default function Inquiries({
       </section>
 
       {/* === 구분선 === */}
-      <hr style={{ border: 'none', borderTop: '1px solid #e4e4e4', margin: 0 }} />
+      <hr className={styles.inputDivider} />
 
       {/* === 문의 목록 === */}
       <section className={styles.inquiriesList} data-testid="inquiries-list">
@@ -334,23 +547,23 @@ export default function Inquiries({
               {/* 문의 아이템 */}
               {renderInquiryItem(inquiry, index)}
 
-              {/* 답변 아이템들 */}
+              {/* 1단계 답변 아이템들 (parentId === inquiry.id) */}
               {inquiry.parentId == null && (
                 <>
                   {inquiries
                     .filter((item) => item.parentId === inquiry.id)
-                    .map((reply, replyIndex) => renderReplyItem(reply, index, replyIndex))}
+                    .map((reply, replyIndex) => renderReplyItem(reply, index, replyIndex, 1))}
                 </>
               )}
 
               {/* 구분선 */}
               {index < inquiries.filter((item) => item.parentId == null).length - 1 && (
-                <hr style={{ border: 'none', borderTop: '1px solid #e4e4e4', margin: 0 }} />
+                <hr className={styles.inquiriesDivider} />
               )}
             </div>
           ))
         ) : (
-          <div style={{ textAlign: 'center', padding: '2rem', color: '#ababab' }}>문의가 없습니다.</div>
+          <div className={styles.emptyMessage}>문의가 없습니다.</div>
         )}
       </section>
     </div>

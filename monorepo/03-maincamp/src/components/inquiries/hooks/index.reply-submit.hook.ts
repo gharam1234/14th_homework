@@ -100,10 +100,8 @@ const getStoredSessionUser = (): AuthUser | null => {
 export interface UseReplySubmitOptions {
   /** 문의 대상 상품 ID */
   phoneId: string;
-  /** 부모 문의 ID */
-  inquiryId: string;
   /** 제출 성공 시 콜백 */
-  onSuccess?: () => void;
+  onSuccess?: (parentInquiryId: string, replyId?: string) => void;
   /** 제출 실패 시 콜백 */
   onError?: (error: unknown) => void;
 }
@@ -115,7 +113,7 @@ export interface UseReplySubmitReturn {
   /** 제출 중 상태 */
   isSubmitting: boolean;
   /** 답변 제출 함수 */
-  submitReply: (content: string) => Promise<boolean>;
+  submitReply: (parentInquiryId: string, content: string) => Promise<boolean>;
   /** 유효성 검증 에러 메시지 */
   validationError: string | null;
 }
@@ -135,30 +133,27 @@ export interface UseReplySubmitReturn {
  * 
  * @param options - 훅 옵션 객체
  * @param options.phoneId - 문의 대상 상품 ID (UUID)
- * @param options.inquiryId - 부모 문의 ID (UUID)
  * @param options.onSuccess - 제출 성공 시 콜백 함수
  * @param options.onError - 제출 실패 시 콜백 함수
  * 
  * @returns 훅 반환 객체
  * @returns isSubmitting - 제출 중 상태 (true: 제출 중, false: 대기)
- * @returns submitReply - 답변 제출 함수 (content: string) => Promise<boolean>
+ * @returns submitReply - 답변 제출 함수 (parentId: string, content: string) => Promise<boolean>
  * @returns validationError - 유효성 검증 에러 메시지
  * 
  * @example
  * ```tsx
  * const { isSubmitting, submitReply, validationError } = useReplySubmit({
  *   phoneId: 'some-uuid',
- *   inquiryId: 'parent-inquiry-uuid',
  *   onSuccess: () => router.refresh(),
  *   onError: (error) => console.error(error),
  * });
  * 
- * await submitReply('답변 내용입니다.');
+ * await submitReply('parent-inquiry-uuid', '답변 내용입니다.');
  * ```
  */
 export function useReplySubmit({
   phoneId,
-  inquiryId,
   onSuccess,
   onError,
 }: UseReplySubmitOptions): UseReplySubmitReturn {
@@ -197,12 +192,12 @@ export function useReplySubmit({
    * @description 부모 문의의 thread_path를 조회하여 답변의 thread_path 생성에 사용
    * @returns 부모 문의 정보 또는 null
    */
-  const fetchParentInquiry = useCallback(async (): Promise<ParentInquiry | null> => {
+  const fetchParentInquiry = useCallback(async (parentInquiryId: string): Promise<ParentInquiry | null> => {
     try {
       const { data, error } = await supabase
         .from(TABLE_NAME)
         .select('id, thread_path')
-        .eq('id', inquiryId)
+        .eq('id', parentInquiryId)
         .single();
 
       if (error) {
@@ -215,22 +210,23 @@ export function useReplySubmit({
       console.error('[useReplySubmit] 부모 문의 조회 중 예외 발생:', error);
       return null;
     }
-  }, [inquiryId]);
+  }, []);
 
   /**
    * 답변 제출 함수
    * @description
-   * 1. 유효성 검증 (phoneId, inquiryId, content 길이, 로그인)
+ * 1. 유효성 검증 (phoneId, parentId, content 길이, 로그인)
    * 2. 부모 문의의 thread_path 조회
    * 3. Supabase에 insert
    * 4. insert 후 thread_path 업데이트 (필요한 경우)
    * 5. 성공/실패 메시지 표시
    * 
-   * @param rawContent - 사용자가 입력한 답변 내용
+ * @param parentInquiryId - 부모 문의 ID
+ * @param rawContent - 사용자가 입력한 답변 내용
    * @returns 제출 성공 여부 (true: 성공, false: 실패)
    */
   const submitReply = useCallback(
-    async (rawContent: string): Promise<boolean> => {
+    async (parentInquiryId: string, rawContent: string): Promise<boolean> => {
       console.log('[useReplySubmit] submit invoked', rawContent);
       
       // 유효성 검증: phoneId
@@ -241,7 +237,7 @@ export function useReplySubmit({
       }
 
       // 유효성 검증: inquiryId
-      if (!inquiryId || !isValidUuid(inquiryId)) {
+      if (!parentInquiryId || !isValidUuid(parentInquiryId)) {
         message.error(ERROR_MESSAGES.INVALID_INQUIRY);
         setValidationError(ERROR_MESSAGES.INVALID_INQUIRY);
         return false;
@@ -283,7 +279,7 @@ export function useReplySubmit({
 
       try {
         // 부모 문의의 thread_path 조회
-        const parentInquiry = await fetchParentInquiry();
+        const parentInquiry = await fetchParentInquiry(parentInquiryId);
         if (!parentInquiry) {
           throw new Error('부모 문의를 찾을 수 없습니다.');
         }
@@ -299,7 +295,7 @@ export function useReplySubmit({
             {
               content,
               phone_id: phoneId,
-              parent_id: inquiryId,
+              parent_id: parentInquiryId,
               author_id: user.id,
               status: 'active',
               is_answer: true,
@@ -333,7 +329,7 @@ export function useReplySubmit({
 
         console.log('[useReplySubmit] insert succeeded');
         message.success(SUCCESS_MESSAGES.SUBMIT_SUCCESS);
-        onSuccess?.();
+        onSuccess?.(parentInquiryId, insertedData?.id);
         return true;
       } catch (error) {
         console.error('답변 등록 실패:', error);
@@ -344,7 +340,7 @@ export function useReplySubmit({
         setIsSubmitting(false);
       }
     },
-    [checkAuth, fetchParentInquiry, inquiryId, isSubmitting, onError, onSuccess, phoneId]
+    [checkAuth, fetchParentInquiry, isSubmitting, onError, onSuccess, phoneId]
   );
 
   return {

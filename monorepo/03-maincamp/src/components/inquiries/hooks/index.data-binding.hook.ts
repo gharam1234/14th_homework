@@ -211,7 +211,8 @@ export function useInquiryDataBinding({
           status
         `)
         .eq('phone_id', phoneId)
-        .eq('status', 'active')
+        .in('status', ['active', 'edited'])
+        .order('thread_path', { ascending: true })
         .order('created_at', { ascending: true });
 
       if (queryError) {
@@ -258,4 +259,3 @@ export function useInquiryDataBinding({
     refetch: fetchInquiries,
   };
 }
-

@@ -1,0 +1,92 @@
+아래의 조건을 모두 적용하여, 아래의 요구사항을 모두 구현할 것.
+구현 결과를 체크리스트로 반환할 것.
+
+==============================================
+
+조건-커서룰) 아래의 커서룰을 적용하여 작업하고, 이 작업이 끝나면 해당 rules 적용 결과를 체크리스트로 반환할 것.
+            - @01-common.mdc
+            - @02-wireframe.mdc
+            - @03-ui.mdc
+
+==============================================
+
+조건-파일경로) 구현될 TSX 파일경로: src/components/inquiries/index.tsx
+조건-파일경로) 구현될 CSS 파일경로: src/components/inquiries/styles.module.css
+조건-파일경로) 구현될 TYPES 파일경로: src/components/inquiries/types.ts
+
+==============================================
+
+핵심요구사항) 기존 답변 UI 디자인을 재사용하여, 중첩 답변(답변에 대한 답변) 기능을 추가로 구현할 것.
+                - 스토리북은 생성하지 말 것.
+                - 기존의 컴포넌트 스타일 일관성을 유지할 것.
+
+핵심요구사항) 다음 조건을 모두 만족하는 트리 구조 중첩 답변 시스템을 구현할 것.
+                1) 답변 아이템에 "답변 하기" 버튼 추가
+                    - 위치: 각 답변(reply) 아이템의 오른쪽 상단
+                    - 아이콘: renderReplyIcon() 재사용
+                    - 스타일: 기존 replyButton 스타일 재사용
+
+                2) 재귀적 컴포넌트 구조로 다단계 답변 지원
+                    - renderReplyItem 함수를 재귀 호출 가능하도록 수정
+                    - parent_id를 기반으로 답변의 자식 답변 렌더링
+                    - 중첩 레벨 제한 없음 (무한 깊이 지원)
+
+                3) 중첩 답변 인덴트 처리
+                    - 1단계 답변: 왼쪽 24px 여백 (현재와 동일)
+                    - 2단계 답변: 왼쪽 48px 여백 (24px 추가)
+                    - 3단계 이상: 각 단계마다 24px씩 추가
+                    - replyWrapper의 paddingLeft를 동적으로 계산하여 적용
+
+                4) 중첩 답변 입력창 표시
+                    - 답변 아이템의 "답변 하기" 버튼 클릭 시 입력창 표시
+                    - 기존 replyInputSection 스타일 재사용
+                    - 입력창 위치: 해당 답변 아이템 바로 아래
+                    - 취소/답변 하기 버튼 동일하게 적용
+
+핵심요구사항) Props 인터페이스를 다음과 같이 확장할 것.
+                1) InqueriesProps에 추가할 props
+                    - onSubmitNestedReply?: (parentId: string, content: string) => void | Promise<boolean>
+
+                2) 컴포넌트 내부 상태 관리
+                    - expandedNestedReplies: { [replyId: string]: boolean } - 중첩 답변 입력창 표시 여부
+                    - nestedReplyTexts: { [replyId: string]: string } - 중첩 답변 입력 텍스트
+
+핵심요구사항) 다음의 이벤트 핸들러를 step-by-step 으로 구현하고, 적용 결과를 체크리스트로 반환할 것.
+                1) handleNestedReplyClick(replyId: string)
+                    - 중첩 답변 입력창 토글
+                    - expandedNestedReplies 상태 업데이트
+
+                2) handleSubmitNestedReply(parentId: string)
+                    - nestedReplyTexts[parentId] 값 가져오기
+                    - onSubmitNestedReply 호출
+                    - 성공 시 입력창 초기화 및 닫기
+
+                3) handleCancelNestedReply(replyId: string)
+                    - 입력창 닫기
+                    - 입력 텍스트 초기화
+
+핵심요구사항) renderReplyItem 함수를 다음과 같이 수정할 것.
+                1) depth 파라미터 추가
+                    - 함수 시그니처: renderReplyItem(reply: InquiryItem, parentIndex: number, replyIndex: number, depth: number = 1)
+                    - depth를 기반으로 paddingLeft 계산: 24 * depth + 'px'
+
+                2) 답변 헤더에 "답변 하기" 버튼 추가
+                    - 위치: replyActions 옆 또는 독립적인 버튼 영역
+                    - 클릭 시 handleNestedReplyClick(reply.id) 호출
+
+                3) 중첩 답변 입력창 렌더링
+                    - expandedNestedReplies[reply.id]가 true일 때 표시
+                    - 기존 replyInputSection과 동일한 구조
+                    - 제출 시 handleSubmitNestedReply(reply.id) 호출
+
+                4) 자식 답변 재귀 렌더링
+                    - inquiries.filter(item => item.parentId === reply.id)로 자식 찾기
+                    - 각 자식에 대해 renderReplyItem 재귀 호출
+                    - depth + 1을 전달하여 인덴트 증가
+
+핵심요구사항) data-testid를 다음과 같이 추가할 것.
+                - nested-reply-button-{replyId}: 중첩 답변 하기 버튼
+                - nested-reply-textarea-{replyId}: 중첩 답변 입력 textarea
+                - nested-reply-submit-{replyId}: 중첩 답변 제출 버튼
+                - nested-reply-cancel-{replyId}: 중첩 답변 취소 버튼
+                - nested-reply-item-{parentIndex}-{replyIndex}-{depth}: 중첩 답변 아이템
