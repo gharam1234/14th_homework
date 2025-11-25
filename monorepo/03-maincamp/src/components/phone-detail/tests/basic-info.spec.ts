@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 // README 참고: 실제 Supabase phones 테이블에서 확인한 UUID로 교체해야 테스트가 실행됩니다.
-const VALID_PHONE_ID = 'YOUR_ACTUAL_PHONE_UUID_HERE'; // 예: '550e8400-e29b-41d4-a716-446655440000'
+const VALID_PHONE_ID = 'ef5a624a-3a90-490b-b531-474ff45f6187';
 
 const ensureValidPhoneId = () => {
   if (!VALID_PHONE_ID || VALID_PHONE_ID === 'YOUR_ACTUAL_PHONE_UUID_HERE') {

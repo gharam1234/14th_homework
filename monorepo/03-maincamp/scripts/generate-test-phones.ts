@@ -52,7 +52,15 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 /**
  * 현재 로그인한 사용자 ID를 가져오거나, 첫 번째 사용자 ID 사용
  */
-async function getSellerId(): Promise<string | null> {
+async function getSellerId(argSellerId?: string | null): Promise<string | null> {
+  if (argSellerId) {
+    return argSellerId;
+  }
+
+  if (process.env.SELLER_ID) {
+    return process.env.SELLER_ID;
+  }
+
   // 1. 현재 로그인한 사용자 확인
   const { data: { user } } = await supabase.auth.getUser();
   if (user?.id) {
@@ -168,11 +176,11 @@ function generatePhoneData(index: number, sellerId: string) {
   };
 }
 
-async function generateTestPhones(count: number = 100) {
+async function generateTestPhones(count: number = 100, sellerOverride?: string | null) {
   console.log(`🚀 ${count}개의 테스트 데이터 생성 시작...\n`);
 
   // seller_id 가져오기
-  const sellerId = await getSellerId();
+  const sellerId = await getSellerId(sellerOverride ?? null);
   
   if (!sellerId) {
     console.error('❌ 사용 가능한 seller_id를 찾을 수 없습니다.');
@@ -230,14 +238,30 @@ async function generateTestPhones(count: number = 100) {
 }
 
 // 스크립트 실행
-const count = process.argv[2] ? parseInt(process.argv[2], 10) : 100;
+const rawArg1 = process.argv[2];
+const rawArg2 = process.argv[3];
+
+const isNumber = (value?: string) => !!value && /^\d+$/.test(value);
+
+let count = 100;
+let sellerIdArg: string | null = null;
+
+if (isNumber(rawArg1)) {
+  count = parseInt(rawArg1 as string, 10);
+  sellerIdArg = rawArg2 ?? null;
+} else {
+  sellerIdArg = rawArg1 ?? null;
+  if (isNumber(rawArg2)) {
+    count = parseInt(rawArg2 as string, 10);
+  }
+}
 
 if (isNaN(count) || count <= 0) {
   console.error('❌ 잘못된 개수입니다. 숫자를 입력해주세요.');
   process.exit(1);
 }
 
-generateTestPhones(count)
+generateTestPhones(count, sellerIdArg)
   .then(() => {
     console.log('\n🎉 스크립트 실행 완료!');
     process.exit(0);
@@ -246,4 +270,3 @@ generateTestPhones(count)
     console.error('\n❌ 스크립트 실행 중 오류 발생:', error);
     process.exit(1);
   });
-

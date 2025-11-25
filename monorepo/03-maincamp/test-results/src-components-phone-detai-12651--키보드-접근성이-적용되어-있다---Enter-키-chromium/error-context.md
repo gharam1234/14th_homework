@@ -1,0 +1,74 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e4]:
+    - list [ref=e6]:
+      - listitem [ref=e7]: 트립토크
+      - listitem [ref=e8]: 숙박권 구매
+      - listitem [ref=e9]: 마이 페이지
+    - button "로그인 right" [ref=e11] [cursor=pointer]:
+      - text: 로그인
+      - img "right" [ref=e12]:
+        - img [ref=e13]
+  - generic [ref=e16]:
+    - button "← Previous" [ref=e17] [cursor=pointer]
+    - generic [ref=e19]:
+      - img [ref=e23]
+      - img "배너1" [ref=e27]
+      - img [ref=e31]
+      - img [ref=e35]
+      - img [ref=e39]
+    - button "→ Next" [ref=e40] [cursor=pointer]
+    - list [ref=e41]:
+      - listitem [ref=e42] [cursor=pointer]:
+        - button "• 1" [ref=e43]
+      - listitem [ref=e44] [cursor=pointer]:
+        - button "• 2" [ref=e45]
+      - listitem [ref=e46] [cursor=pointer]:
+        - button "• 3" [ref=e47]
+  - generic [ref=e50]:
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - button "← 뒤로가기" [ref=e53] [cursor=pointer]
+        - button "중고폰 카테고리" [ref=e54] [cursor=pointer]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - heading "아이폰 14 Pro 256GB" [level=1] [ref=e58]
+            - generic [ref=e59]:
+              - button "판매글 제거 아이콘" [ref=e60] [cursor=pointer]:
+                - img [ref=e61]
+              - button "공유" [ref=e63] [cursor=pointer]:
+                - img [ref=e64]
+              - button "위치" [ref=e66] [cursor=pointer]:
+                - img [ref=e67]
+              - generic [ref=e69]:
+                - button "북마크" [ref=e70] [cursor=pointer]:
+                  - img [ref=e71]
+                - paragraph [ref=e73]: "0"
+          - paragraph [ref=e74]: A급 상태, 생활 스크래치 거의 없음
+          - paragraph [ref=e75]: apple a급 직거래
+        - img "메인 이미지" [ref=e78]
+    - generic [ref=e80]:
+      - heading "상세 설명" [level=2] [ref=e81]
+      - paragraph [ref=e83]: 테스트용 중고폰 데이터입니다. Playwright 전용 더미 설명입니다.
+    - generic [ref=e85]:
+      - heading "거래 희망 지역" [level=2] [ref=e86]
+      - generic [ref=e87]:
+        - generic [ref=e88]:
+          - generic:
+            - img [ref=e90]
+            - generic:
+              - generic:
+                - generic:
+                  - link:
+                    - /url: javascript:void(0)
+        - generic [ref=e91]:
+          - generic [ref=e94]: 250m
+          - link "Kakao 맵으로 이동(새창열림)" [ref=e96] [cursor=pointer]:
+            - /url: http://map.kakao.com/
+            - img "Kakao 맵으로 이동(새창열림)" [ref=e97]
+      - paragraph [ref=e99]: 서울시 마포구 합정동 123번길 45
+```

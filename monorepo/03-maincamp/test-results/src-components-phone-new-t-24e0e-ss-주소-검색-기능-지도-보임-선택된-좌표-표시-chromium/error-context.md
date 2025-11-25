@@ -1,0 +1,164 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e4]:
+    - list [ref=e6]:
+      - listitem [ref=e7]: 트립토크
+      - listitem [ref=e8]: 숙박권 구매
+      - listitem [ref=e9]: 마이 페이지
+    - button "로그인 right" [ref=e11] [cursor=pointer]:
+      - text: 로그인
+      - img "right" [ref=e12]:
+        - img [ref=e13]
+  - generic [ref=e16]:
+    - button "← Previous" [ref=e17] [cursor=pointer]
+    - generic [ref=e19]:
+      - img [ref=e23]
+      - img "배너1" [ref=e27]
+      - img [ref=e31]
+      - img [ref=e35]
+      - img [ref=e39]
+    - button "→ Next" [ref=e40] [cursor=pointer]
+    - list [ref=e41]:
+      - listitem [ref=e42] [cursor=pointer]:
+        - button "• 1" [ref=e43]
+      - listitem [ref=e44] [cursor=pointer]:
+        - button "• 2" [ref=e45]
+      - listitem [ref=e46] [cursor=pointer]:
+        - button "• 3" [ref=e47]
+  - main [ref=e49]:
+    - generic [ref=e51]:
+      - heading "중고폰 판매하기" [level=1] [ref=e52]
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - text: 기기명
+            - generic [ref=e56]: "*"
+          - textbox "기기명 *" [ref=e57]:
+            - /placeholder: 모델명을 입력해 주세요.
+        - separator [ref=e58]
+        - generic [ref=e59]:
+          - generic [ref=e60]:
+            - text: 한줄 요약
+            - generic [ref=e61]: "*"
+          - textbox "한줄 요약 *" [ref=e62]:
+            - /placeholder: 기기를 한줄로 요약해 주세요.
+        - separator [ref=e63]
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - text: 상품 설명
+            - generic [ref=e66]: "*"
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - generic [ref=e69]:
+                - button "B" [ref=e70] [cursor=pointer]:
+                  - strong [ref=e71]: B
+                - button "I" [ref=e72] [cursor=pointer]:
+                  - emphasis [ref=e73]: I
+                - button "U" [ref=e74] [cursor=pointer]:
+                  - generic [ref=e75]: U
+                - button "S" [ref=e76] [cursor=pointer]:
+                  - generic [ref=e77]: S
+              - generic [ref=e78]:
+                - button "⬅️" [ref=e79] [cursor=pointer]
+                - button "⬅️➡️" [ref=e80] [cursor=pointer]
+                - button "➡️" [ref=e81] [cursor=pointer]
+                - button "⬅️⬅️" [ref=e82] [cursor=pointer]
+              - generic [ref=e83]:
+                - button "•" [ref=e84] [cursor=pointer]
+                - button "1." [ref=e85] [cursor=pointer]
+              - generic [ref=e86]:
+                - button "🔗" [ref=e87] [cursor=pointer]
+                - button "🖼️" [ref=e88] [cursor=pointer]
+                - button "📹" [ref=e89] [cursor=pointer]
+              - button "⋯" [disabled] [ref=e91]
+            - textbox "내용을 입력해 주세요." [ref=e92]
+        - separator [ref=e93]
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - text: 판매 가격
+            - generic [ref=e96]: "*"
+          - spinbutton "판매 가격 *" [ref=e97]: "0"
+        - separator [ref=e98]
+        - generic [ref=e99]:
+          - generic [ref=e100]: 태그 입력
+          - textbox "태그 입력" [ref=e101]:
+            - /placeholder: 태그를 입력해 주세요.
+        - separator [ref=e102]
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - generic [ref=e105]:
+              - generic [ref=e106]:
+                - text: 주소
+                - generic [ref=e107]: "*"
+              - generic [ref=e108]:
+                - textbox "01234" [ref=e109]
+                - button "우편번호 검색" [ref=e110] [cursor=pointer]:
+                  - button "우편번호 검색" [active] [ref=e111]
+              - paragraph
+            - textbox "상세주소를 입력해 주세요." [ref=e113]
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: 위도(LAT)
+                - textbox "위도(LAT)" [ref=e117]:
+                  - /placeholder: 주소를 먼저 입력해 주세요.
+                  - text: "0"
+                - text: "0"
+              - generic [ref=e118]:
+                - generic [ref=e119]: 경도(LNG)
+                - textbox "경도(LNG)" [ref=e120]:
+                  - /placeholder: 주소를 먼저 입력해 주세요.
+                  - text: "0"
+                - text: "0"
+            - generic [ref=e121]:
+              - button "좌표로 주소 찾기" [disabled] [ref=e122] [cursor=pointer]
+              - button "주소 초기화" [ref=e123] [cursor=pointer]
+          - generic [ref=e124]:
+            - heading "거래 위치" [level=3] [ref=e125]
+            - generic [ref=e127]: 주소를 먼저 선택해 주세요.
+        - separator [ref=e128]
+        - generic [ref=e129]:
+          - generic [ref=e130]: 사진 첨부*
+          - button "Choose File" [ref=e131]
+          - button "+ 클릭해서 사진 업로드" [ref=e132] [cursor=pointer]:
+            - generic [ref=e133]:
+              - generic [ref=e134]: +
+              - paragraph [ref=e135]: 클릭해서 사진 업로드
+        - generic [ref=e136]:
+          - button "취소" [ref=e137] [cursor=pointer]
+          - button "등록하기" [disabled] [ref=e138]
+  - generic [ref=e140]:
+    - iframe [ref=e143]:
+      - iframe [ref=f1e2]:
+        - generic [active] [ref=f2e1]:
+          - generic [ref=f2e3]:
+            - generic [ref=f2e4]:
+              - heading "우편번호 검색" [level=1]
+              - group "우편번호 검색 입력폼" [ref=f2e6]:
+                - generic: 우편번호 검색 입력폼
+                - generic [ref=f2e7]:
+                  - generic: 검색할 도로명/지번주소를 입력, 예시) 판교역로 166, 분당 주공, 백현동 532
+                  - textbox "검색할 도로명/지번주소를 입력, 예시) 판교역로 166, 분당 주공, 백현동 532" [ref=f2e9]
+                  - button "검색" [ref=f2e10] [cursor=pointer]:
+                    - generic [ref=f2e11]: 검색
+                  - generic [ref=f2e12]: 예) 판교역로 166, 분당 주공, 백현동 532
+            - generic [ref=f2e14]:
+              - heading "tip" [level=2] [ref=f2e15]
+              - paragraph [ref=f2e16]: 아래와 같은 조합으로 검색을 하시면 더욱 정확한 결과가 검색됩니다.
+              - paragraph [ref=f2e17]: 도로명 + 건물번호
+              - generic [ref=f2e18]: 예) 판교역로 166, 제주 첨단로 242
+              - paragraph [ref=f2e19]: 지역명(동/리) + 번지
+              - generic [ref=f2e20]: 예) 백현동 532, 제주 영평동 2181
+              - paragraph [ref=f2e21]: 지역명(동/리) + 건물명(아파트명)
+              - generic [ref=f2e22]: 예) 분당 주공, 연수동 주공3차
+              - paragraph [ref=f2e23]: 사서함명 + 번호
+              - generic [ref=f2e24]: 예) 분당우체국사서함 1~100
+          - generic [ref=f2e26]:
+            - generic [ref=f2e27]: Powered by
+            - strong [ref=f2e28]: kakao
+            - link "우편번호 서비스 안내" [ref=f2e30] [cursor=pointer]:
+              - /url: //postcode.map.daum.net/guide
+    - button "닫기" [ref=e144] [cursor=pointer]
+```

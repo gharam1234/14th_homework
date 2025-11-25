@@ -26,6 +26,13 @@ interface PhoneInquiryRecord {
   status: string;
   created_at: string;
   updated_at: string;
+  link_title?: string | null;
+  link_url?: string | null;
+  author?: {
+    id?: string | null;
+    username?: string | null;
+    avatar_url?: string | null;
+  } | null;
 }
 
 /**
@@ -64,12 +71,21 @@ const mapRecordToInquiryItem = (
   record: PhoneInquiryRecord,
   currentUserId?: string
 ): InquiryItem => {
+  const authorProfile = record.author;
+  const authorName =
+    record.link_title?.trim() ||
+    authorProfile?.username?.trim() ||
+    DEFAULT_USERNAME;
+  const authorId = authorProfile?.id || record.author_id;
+  const authorAvatar = authorProfile?.avatar_url || undefined;
+  const derivedId = record.link_url?.trim() || record.id;
+
   return {
-    id: record.id,
+    id: derivedId,
     author: {
-      id: record.author_id,
-      name: DEFAULT_USERNAME,
-      avatar: undefined,
+      id: authorId,
+      name: authorName,
+      avatar: authorAvatar,
       role: record.is_answer ? 'seller' : 'user',
     },
     content: record.content,

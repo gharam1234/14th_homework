@@ -1,11 +1,77 @@
 # Page snapshot
 
 ```yaml
-- generic [active] [ref=e1]:
+- generic [ref=e1]:
   - alert [ref=e2]
-  - dialog [ref=e5]:
-    - generic [ref=e6]:
-      - heading "로그인해주세요" [level=2] [ref=e7]
-      - generic [ref=e8]: 이 페이지에 접근하려면 로그인이 필요합니다.
-    - button "확인" [ref=e11] [cursor=pointer]
+  - generic [ref=e4]:
+    - list [ref=e6]:
+      - listitem [ref=e7]: 트립토크
+      - listitem [ref=e8]: 숙박권 구매
+      - listitem [ref=e9]: 마이 페이지
+    - button "로그인 right" [ref=e11] [cursor=pointer]:
+      - text: 로그인
+      - img "right" [ref=e12]:
+        - img [ref=e13]
+  - generic [ref=e16]:
+    - button "← Previous" [ref=e17] [cursor=pointer]
+    - generic [ref=e19]:
+      - img [ref=e23]
+      - img "배너1" [ref=e27]
+      - img [ref=e31]
+      - img [ref=e35]
+      - img [ref=e39]
+    - button "→ Next" [ref=e40] [cursor=pointer]
+    - list [ref=e41]:
+      - listitem [ref=e42] [cursor=pointer]:
+        - button "• 1" [ref=e43]
+      - listitem [ref=e44] [cursor=pointer]:
+        - button "• 2" [ref=e45]
+      - listitem [ref=e46] [cursor=pointer]:
+        - button "• 3" [ref=e47]
+  - main [ref=e49]:
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - button "← 뒤로가기" [ref=e54] [cursor=pointer]
+          - button "중고폰 카테고리" [ref=e55] [cursor=pointer]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - heading [level=1]
+              - generic [ref=e59]:
+                - button "판매글 제거 아이콘" [ref=e60] [cursor=pointer]:
+                  - img [ref=e61]
+                - button "공유" [ref=e63] [cursor=pointer]:
+                  - img [ref=e64]
+                - button "위치" [ref=e66] [cursor=pointer]:
+                  - img [ref=e67]
+                - generic [ref=e69]:
+                  - button "북마크" [ref=e70] [cursor=pointer]:
+                    - img [ref=e71]
+                  - paragraph [ref=e73]: "0"
+            - paragraph [ref=e74]: 판매자의 믿을 수 있는 중고폰 거래
+            - paragraph
+          - img "메인 이미지" [ref=e77]
+      - generic [ref=e79]:
+        - heading "상세 설명" [level=2] [ref=e80]
+        - generic:
+          - paragraph
+      - generic [ref=e82]:
+        - heading "거래 희망 지역" [level=2] [ref=e83]
+        - paragraph [ref=e85]: 등록된 위치 정보가 없습니다
+    - generic [ref=e87]:
+      - generic [ref=e89]:
+        - img [ref=e91]
+        - heading "문의하기" [level=2] [ref=e93]
+      - generic [ref=e95]:
+        - generic [ref=e96]:
+          - textbox "문의사항을 입력해 주세요." [ref=e97]: 로그인 필요 테스트
+          - generic [ref=e98]: 10/100
+        - button "문의 하기" [active] [ref=e99] [cursor=pointer]
+      - separator [ref=e100]
+      - generic [ref=e102]: 문의가 없습니다.
+  - generic [ref=e104]:
+    - img "exclamation-circle" [ref=e105]:
+      - img [ref=e106]
+    - generic [ref=e108]: 로그인이 필요합니다.
 ```

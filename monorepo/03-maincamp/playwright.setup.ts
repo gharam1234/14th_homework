@@ -19,11 +19,15 @@ export const test = base.extend({
       process.env.NEXT_PUBLIC_TEST_ENV = 'test';
     });
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+    const projectRef = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] ?? 'fkkztiavgrmmazvdwtdw';
+    const supabaseStorageKey = `sb-${projectRef}-auth-token`;
+
     // 3. 기본 인증 정보 설정
-    await context.addInitScript(() => {
+    await context.addInitScript((payload) => {
       const testUser = {
-        id: '8d159ce6-5a84-46f4-95d7-dd0d7a37b6a9',
-        email: 'tester@example.com',
+        id: '85f42831-5761-4cc9-8186-987653ef915c',
+        email: 'gharanm1234@gmail.com',
         aud: 'authenticated',
         role: 'authenticated',
         app_metadata: {},
@@ -34,10 +38,25 @@ export const test = base.extend({
       try {
         localStorage.setItem('accessToken', 'test-access-token');
         localStorage.setItem('user', JSON.stringify(testUser));
+
+        const sessionPayload = {
+          currentSession: {
+            access_token: 'test-access-token',
+            token_type: 'bearer',
+            expires_in: 3600,
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
+            refresh_token: 'test-refresh-token',
+            user: testUser,
+          },
+          user: testUser,
+        };
+
+        localStorage.setItem(payload.supabaseStorageKey, JSON.stringify(sessionPayload));
+        (window as any).__TEST_SUPABASE_USER__ = testUser;
       } catch (e) {
         console.warn('localStorage setItem failed during setup:', e);
       }
-    });
+    }, { supabaseStorageKey });
 
     await use(context);
   },

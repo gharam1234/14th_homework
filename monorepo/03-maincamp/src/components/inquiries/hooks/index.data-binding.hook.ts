@@ -25,6 +25,13 @@ interface PhoneInquiryRecord {
   created_at: string;
   parent_id: string | null;
   status: string;
+  link_title?: string | null;
+  link_url?: string | null;
+  author?: {
+    id?: string | null;
+    username?: string | null;
+    avatar_url?: string | null;
+  } | null;
 }
 
 /**
@@ -97,12 +104,21 @@ const formatDateToYYYYMMDD = (dateString: string): string => {
  * @description profiles 테이블이 없어 기본값만 사용
  */
 const mapRecordToInquiryItem = (record: PhoneInquiryRecord): InquiryItem => {
+  const authorProfile = record.author;
+  const authorName =
+    record.link_title?.trim() ||
+    authorProfile?.username?.trim() ||
+    DEFAULT_USERNAME;
+  const authorId = authorProfile?.id || record.author_id;
+  const authorAvatar = authorProfile?.avatar_url || undefined;
+  const derivedId = record.link_url?.trim() || record.id;
+
   return {
-    id: record.id,
+    id: derivedId,
     author: {
-      id: record.author_id,
-      name: DEFAULT_USERNAME, // profiles 테이블 없음
-      avatar: undefined,       // profiles 테이블 없음
+      id: authorId,
+      name: authorName,
+      avatar: authorAvatar,
     },
     content: record.content,
     createdAt: formatDateToYYYYMMDD(record.created_at),

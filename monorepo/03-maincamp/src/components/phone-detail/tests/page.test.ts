@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Phone Detail Page - Task1 데이터 바인딩', () => {
   // 테스트용 폰 ID (실제 Supabase 데이터 사용)
   // Supabase 대시보드에서 phones 테이블의 첫 번째 레코드 UUID를 아래에 입력하세요
-  const VALID_PHONE_ID = 'YOUR_ACTUAL_PHONE_UUID_HERE'; // 예: '550e8400-e29b-41d4-a716-446655440000'
+  const VALID_PHONE_ID = 'ef5a624a-3a90-490b-b531-474ff45f6187';
   const INVALID_PHONE_ID = '00000000-0000-0000-0000-000000000000'; // 존재하지 않는 UUID
 
   test.beforeEach(async ({ page }) => {

@@ -1,0 +1,69 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e4]:
+    - list [ref=e6]:
+      - listitem [ref=e7]: 트립토크
+      - listitem [ref=e8]: 숙박권 구매
+      - listitem [ref=e9]: 마이 페이지
+    - button "로그인 right" [ref=e11] [cursor=pointer]:
+      - text: 로그인
+      - img "right" [ref=e12]:
+        - img [ref=e13]
+  - generic [ref=e16]:
+    - button "← Previous" [ref=e17] [cursor=pointer]
+    - generic [ref=e19]:
+      - img [ref=e23]
+      - img "배너1" [ref=e27]
+      - img [ref=e31]
+      - img [ref=e35]
+      - img [ref=e39]
+    - button "→ Next" [ref=e40] [cursor=pointer]
+    - list [ref=e41]:
+      - listitem [ref=e42] [cursor=pointer]:
+        - button "• 1" [ref=e43]
+      - listitem [ref=e44] [cursor=pointer]:
+        - button "• 2" [ref=e45]
+      - listitem [ref=e46] [cursor=pointer]:
+        - button "• 3" [ref=e47]
+  - generic [ref=e49]:
+    - heading "여기에서만 만날 수 있는 중고폰" [level=1] [ref=e50]
+    - generic [ref=e51]:
+      - button "판매중인 기기" [ref=e52] [cursor=pointer]
+      - button "거래완료 기기" [ref=e53] [cursor=pointer]
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - text: 📅
+          - generic [ref=e57]:
+            - textbox [ref=e58]
+            - generic [ref=e59]: ~
+            - textbox [ref=e60]
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - text: 🔍
+            - textbox "모델명이나 기기명을 검색해 주세요." [ref=e63]
+          - button "검색" [disabled] [ref=e64] [cursor=pointer]
+          - button "초기화" [ref=e65] [cursor=pointer]
+      - button "📝 중고폰 판매 등록" [ref=e66] [cursor=pointer]:
+        - generic [ref=e67]: 📝
+        - generic [ref=e68]: 중고폰 판매 등록
+    - generic [ref=e69]: 로딩 중...
+    - generic [ref=e70]:
+      - generic [ref=e71]:
+        - button "Apple Apple" [ref=e72] [cursor=pointer]:
+          - img "Apple" [ref=e73]
+          - generic [ref=e74]: Apple
+        - button "Samsung Samsung" [ref=e75] [cursor=pointer]:
+          - img "Samsung" [ref=e76]
+          - generic [ref=e77]: Samsung
+        - button "LG LG" [ref=e78] [cursor=pointer]:
+          - img "LG" [ref=e79]
+          - generic [ref=e80]: LG
+        - button "기타 브랜드 기타" [ref=e81] [cursor=pointer]:
+          - img "기타 브랜드" [ref=e82]
+          - generic [ref=e83]: 기타
+      - generic [ref=e85]: 필터링 중...
+```

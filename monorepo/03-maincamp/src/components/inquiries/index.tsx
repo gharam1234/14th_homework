@@ -328,7 +328,8 @@ export default function Inquiries({
         {/* 답변 아이템 */}
         <div
           className={`${styles.replyWrapper} ${depthClass}`}
-          data-testid={`nested-reply-item-${parentIndex}-${replyIndex}-${depth}`}
+          data-testid={`reply-item-${reply.id}`}
+          data-nested-testid={`nested-reply-item-${parentIndex}-${replyIndex}-${depth}`}
         >
           {/* 들여쓰기 표시 */}
           <div className={styles.replyBorder}>

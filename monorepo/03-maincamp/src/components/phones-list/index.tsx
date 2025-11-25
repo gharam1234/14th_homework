@@ -1,6 +1,6 @@
      "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./styles.module.css";
 import { usePhonesListRouting } from "./hooks/index.routing.hook";
 import { usePhoneFilters } from "./hooks/index.filter.hook";
@@ -95,6 +95,11 @@ function PhoneCard({
   isFavoriteLoading = false,
 }: PhoneCardProps) {
   const DEFAULT_IMAGE_PATH = '/images/phone_sample.png';
+  const [localFavorite, setLocalFavorite] = useState<boolean>(Boolean(isFavorite));
+
+  useEffect(() => {
+    setLocalFavorite(Boolean(isFavorite));
+  }, [isFavorite]);
   
   const handleClick = () => {
     if (phoneId && onCardClick) {
@@ -104,6 +109,10 @@ function PhoneCard({
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+    if (isFavoriteLoading) {
+      return;
+    }
+    setLocalFavorite((prev) => !prev);
     if (onFavoriteClick) {
       onFavoriteClick(e);
     }
@@ -190,10 +199,10 @@ function PhoneCard({
               onClick={handleFavoriteClick}
               disabled={isFavoriteLoading}
               data-testid={`favorite-button-${phoneId}`}
-              aria-label={isFavorite ? '관심상품 제거' : '관심상품 저장'}
-              aria-pressed={isFavorite}
+              aria-label={localFavorite ? '관심상품 제거' : '관심상품 저장'}
+              aria-pressed={localFavorite}
             >
-              <span>{isFavorite ? '❤️' : '🤍'}</span>
+              <span>{localFavorite ? '❤️' : '🤍'}</span>
               <span>{likeCount}</span>
             </button>
           </div>

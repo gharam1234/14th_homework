@@ -3,9 +3,71 @@
 ```yaml
 - generic [active] [ref=e1]:
   - alert [ref=e2]
-  - dialog [ref=e5]:
-    - generic [ref=e6]:
-      - heading "로그인해주세요" [level=2] [ref=e7]
-      - generic [ref=e8]: 이 페이지에 접근하려면 로그인이 필요합니다.
-    - button "확인" [ref=e11] [cursor=pointer]
+  - generic [ref=e4]:
+    - list [ref=e6]:
+      - listitem [ref=e7]: 트립토크
+      - listitem [ref=e8]: 숙박권 구매
+      - listitem [ref=e9]: 마이 페이지
+    - button "로그인 right" [ref=e11] [cursor=pointer]:
+      - text: 로그인
+      - img "right" [ref=e12]:
+        - img [ref=e13]
+  - generic [ref=e16]:
+    - button "← Previous" [ref=e17] [cursor=pointer]
+    - generic [ref=e19]:
+      - img [ref=e23]
+      - img "배너1" [ref=e27]
+      - img [ref=e31]
+      - img [ref=e35]
+      - img [ref=e39]
+    - button "→ Next" [ref=e40] [cursor=pointer]
+    - list [ref=e41]:
+      - listitem [ref=e42] [cursor=pointer]:
+        - button "• 1" [ref=e43]
+      - listitem [ref=e44] [cursor=pointer]:
+        - button "• 2" [ref=e45]
+      - listitem [ref=e46] [cursor=pointer]:
+        - button "• 3" [ref=e47]
+  - main [ref=e49]:
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - button "← 뒤로가기" [ref=e54] [cursor=pointer]
+          - button "중고폰 카테고리" [ref=e55] [cursor=pointer]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - heading "Playwright 테스트용 중고폰" [level=1] [ref=e59]
+              - generic [ref=e60]:
+                - button "판매글 제거 아이콘" [ref=e61] [cursor=pointer]:
+                  - img [ref=e62]
+                - button "공유" [ref=e64] [cursor=pointer]:
+                  - img [ref=e65]
+                - button "위치" [ref=e67] [cursor=pointer]:
+                  - img [ref=e68]
+                - generic [ref=e70]:
+                  - button "북마크" [ref=e71] [cursor=pointer]:
+                    - img [ref=e72]
+                  - paragraph [ref=e74]: "0"
+            - paragraph [ref=e75]: 테스트 전용 요약
+            - paragraph [ref=e76]: "#테스트"
+          - img "메인 이미지" [ref=e79]
+      - generic [ref=e81]:
+        - heading "상세 설명" [level=2] [ref=e82]
+        - paragraph [ref=e84]: 테스트 전용 상세 설명입니다.
+      - generic [ref=e86]:
+        - heading "거래 희망 지역" [level=2] [ref=e87]
+        - paragraph [ref=e90]: 지도를 불러오는 중...
+        - paragraph [ref=e92]: 서울특별시 중구 세종대로 110 테스트 타워 10층
+    - generic [ref=e94]:
+      - generic [ref=e96]:
+        - img [ref=e98]
+        - heading "문의하기" [level=2] [ref=e100]
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - textbox "문의사항을 입력해 주세요." [ref=e104]
+          - generic [ref=e105]: 0/100
+        - button "문의 하기" [ref=e106] [cursor=pointer]
+      - separator [ref=e107]
+      - generic [ref=e109]: 문의가 없습니다.
 ```

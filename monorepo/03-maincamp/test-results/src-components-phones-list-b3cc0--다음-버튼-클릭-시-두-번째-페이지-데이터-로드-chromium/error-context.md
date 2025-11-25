@@ -1,0 +1,1893 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e4]:
+    - list [ref=e6]:
+      - listitem [ref=e7]: 트립토크
+      - listitem [ref=e8]: 숙박권 구매
+      - listitem [ref=e9]: 마이 페이지
+    - button "로그인 right" [ref=e11] [cursor=pointer]:
+      - text: 로그인
+      - img "right" [ref=e12]:
+        - img [ref=e13]
+  - generic [ref=e16]:
+    - button "← Previous" [ref=e17] [cursor=pointer]
+    - generic [ref=e19]:
+      - img [ref=e23]
+      - img "배너1" [ref=e27]
+      - img [ref=e31]
+      - img [ref=e35]
+      - img [ref=e39]
+    - button "→ Next" [ref=e40] [cursor=pointer]
+    - list [ref=e41]:
+      - listitem [ref=e42] [cursor=pointer]:
+        - button "• 1" [ref=e43]
+      - listitem [ref=e44] [cursor=pointer]:
+        - button "• 2" [ref=e45]
+      - listitem [ref=e46] [cursor=pointer]:
+        - button "• 3" [ref=e47]
+  - generic [ref=e49]:
+    - heading "여기에서만 만날 수 있는 중고폰" [level=1] [ref=e50]
+    - generic [ref=e51]:
+      - button "판매중인 기기" [ref=e52] [cursor=pointer]
+      - button "거래완료 기기" [ref=e53] [cursor=pointer]
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - text: 📅
+          - generic [ref=e57]:
+            - textbox [ref=e58]
+            - generic [ref=e59]: ~
+            - textbox [ref=e60]
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - text: 🔍
+            - textbox "모델명이나 기기명을 검색해 주세요." [ref=e63]
+          - button "검색" [disabled] [ref=e64] [cursor=pointer]
+          - button "초기화" [ref=e65] [cursor=pointer]
+      - button "📝 중고폰 판매 등록" [ref=e66] [cursor=pointer]:
+        - generic [ref=e67]: 📝
+        - generic [ref=e68]: 중고폰 판매 등록
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - button "Apple Apple" [ref=e71] [cursor=pointer]:
+          - img "Apple" [ref=e72]
+          - generic [ref=e73]: Apple
+        - button "Samsung Samsung" [ref=e74] [cursor=pointer]:
+          - img "Samsung" [ref=e75]
+          - generic [ref=e76]: Samsung
+        - button "LG LG" [ref=e77] [cursor=pointer]:
+          - img "LG" [ref=e78]
+          - generic [ref=e79]: LG
+        - button "기타 브랜드 기타" [ref=e80] [cursor=pointer]:
+          - img "기타 브랜드" [ref=e81]
+          - generic [ref=e82]: 기타
+      - generic [ref=e83]:
+        - generic [ref=e84] [cursor=pointer]:
+          - img "Galaxy S23 128GB" [ref=e87]
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - heading "Galaxy S23 128GB" [level=3] [ref=e90]
+              - paragraph
+              - generic [ref=e91]:
+                - generic [ref=e92]: 판매완료
+                - button "관심상품 저장" [ref=e93]:
+                  - generic [ref=e94]: 🤍
+                  - generic [ref=e95]: "0"
+            - paragraph [ref=e97]: samsung phone
+            - generic [ref=e98]:
+              - generic [ref=e99]: 판매자 정보
+              - generic [ref=e100]:
+                - generic [ref=e101]: 968,235
+                - generic [ref=e102]: 원
+        - generic [ref=e103] [cursor=pointer]:
+          - img "Xperia 10 1TB" [ref=e106]
+          - generic [ref=e107]:
+            - generic [ref=e108]:
+              - heading "Xperia 10 1TB" [level=3] [ref=e109]
+              - paragraph
+              - generic [ref=e110]:
+                - generic [ref=e111]: 예약중
+                - button "관심상품 저장" [ref=e112]:
+                  - generic [ref=e113]: 🤍
+                  - generic [ref=e114]: "0"
+            - paragraph [ref=e116]: sony phone
+            - generic [ref=e117]:
+              - generic [ref=e118]: 판매자 정보
+              - generic [ref=e119]:
+                - generic [ref=e120]: 616,193
+                - generic [ref=e121]: 원
+        - generic [ref=e122] [cursor=pointer]:
+          - img "iPhone 16 Pro 512GB" [ref=e125]
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - heading "iPhone 16 Pro 512GB" [level=3] [ref=e128]
+              - paragraph
+              - generic [ref=e129]:
+                - generic [ref=e130]: 판매중
+                - button "관심상품 저장" [ref=e131]:
+                  - generic [ref=e132]: 🤍
+                  - generic [ref=e133]: "0"
+            - paragraph [ref=e135]: apple phone
+            - generic [ref=e136]:
+              - generic [ref=e137]: 판매자 정보
+              - generic [ref=e138]:
+                - generic [ref=e139]: 908,112
+                - generic [ref=e140]: 원
+        - generic [ref=e141] [cursor=pointer]:
+          - img "Pixel 7 Pro 1TB" [ref=e144]
+          - generic [ref=e145]:
+            - generic [ref=e146]:
+              - heading "Pixel 7 Pro 1TB" [level=3] [ref=e147]
+              - paragraph
+              - generic [ref=e148]:
+                - generic [ref=e149]: 판매완료
+                - button "관심상품 저장" [ref=e150]:
+                  - generic [ref=e151]: 🤍
+                  - generic [ref=e152]: "0"
+            - paragraph [ref=e154]: google phone
+            - generic [ref=e155]:
+              - generic [ref=e156]: 판매자 정보
+              - generic [ref=e157]:
+                - generic [ref=e158]: 1,152,319
+                - generic [ref=e159]: 원
+        - generic [ref=e160] [cursor=pointer]:
+          - img "iPhone 16 512GB" [ref=e163]
+          - generic [ref=e164]:
+            - generic [ref=e165]:
+              - heading "iPhone 16 512GB" [level=3] [ref=e166]
+              - paragraph
+              - generic [ref=e167]:
+                - generic [ref=e168]: 예약중
+                - button "관심상품 저장" [ref=e169]:
+                  - generic [ref=e170]: 🤍
+                  - generic [ref=e171]: "0"
+            - paragraph [ref=e173]: apple phone
+            - generic [ref=e174]:
+              - generic [ref=e175]: 판매자 정보
+              - generic [ref=e176]:
+                - generic [ref=e177]: 1,431,147
+                - generic [ref=e178]: 원
+        - generic [ref=e179] [cursor=pointer]:
+          - img "Xperia 1 256GB" [ref=e182]
+          - generic [ref=e183]:
+            - generic [ref=e184]:
+              - heading "Xperia 1 256GB" [level=3] [ref=e185]
+              - paragraph
+              - generic [ref=e186]:
+                - generic [ref=e187]: 판매완료
+                - button "관심상품 저장" [ref=e188]:
+                  - generic [ref=e189]: 🤍
+                  - generic [ref=e190]: "0"
+            - paragraph [ref=e192]: sony phone
+            - generic [ref=e193]:
+              - generic [ref=e194]: 판매자 정보
+              - generic [ref=e195]:
+                - generic [ref=e196]: 1,393,256
+                - generic [ref=e197]: 원
+        - generic [ref=e198] [cursor=pointer]:
+          - img "Pixel 7 1TB" [ref=e201]
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - heading "Pixel 7 1TB" [level=3] [ref=e204]
+              - paragraph
+              - generic [ref=e205]:
+                - generic [ref=e206]: 판매중
+                - button "관심상품 저장" [ref=e207]:
+                  - generic [ref=e208]: 🤍
+                  - generic [ref=e209]: "0"
+            - paragraph [ref=e211]: google phone
+            - generic [ref=e212]:
+              - generic [ref=e213]: 판매자 정보
+              - generic [ref=e214]:
+                - generic [ref=e215]: 961,252
+                - generic [ref=e216]: 원
+        - generic [ref=e217] [cursor=pointer]:
+          - img "iPhone 15 Pro 512GB" [ref=e220]
+          - generic [ref=e221]:
+            - generic [ref=e222]:
+              - heading "iPhone 15 Pro 512GB" [level=3] [ref=e223]
+              - paragraph
+              - generic [ref=e224]:
+                - generic [ref=e225]: 예약중
+                - button "관심상품 저장" [ref=e226]:
+                  - generic [ref=e227]: 🤍
+                  - generic [ref=e228]: "0"
+            - paragraph [ref=e230]: apple phone
+            - generic [ref=e231]:
+              - generic [ref=e232]: 판매자 정보
+              - generic [ref=e233]:
+                - generic [ref=e234]: 1,009,264
+                - generic [ref=e235]: 원
+        - generic [ref=e236] [cursor=pointer]:
+          - img "Xperia 10 512GB" [ref=e239]
+          - generic [ref=e240]:
+            - generic [ref=e241]:
+              - heading "Xperia 10 512GB" [level=3] [ref=e242]
+              - paragraph
+              - generic [ref=e243]:
+                - generic [ref=e244]: 판매완료
+                - button "관심상품 저장" [ref=e245]:
+                  - generic [ref=e246]: 🤍
+                  - generic [ref=e247]: "0"
+            - paragraph [ref=e249]: sony phone
+            - generic [ref=e250]:
+              - generic [ref=e251]: 판매자 정보
+              - generic [ref=e252]:
+                - generic [ref=e253]: 1,263,291
+                - generic [ref=e254]: 원
+        - generic [ref=e255] [cursor=pointer]:
+          - img "Nothing Phone 1 128GB" [ref=e258]
+          - generic [ref=e259]:
+            - generic [ref=e260]:
+              - heading "Nothing Phone 1 128GB" [level=3] [ref=e261]
+              - paragraph
+              - generic [ref=e262]:
+                - generic [ref=e263]: 예약중
+                - button "관심상품 저장" [ref=e264]:
+                  - generic [ref=e265]: 🤍
+                  - generic [ref=e266]: "0"
+            - paragraph [ref=e268]: nothing phone
+            - generic [ref=e269]:
+              - generic [ref=e270]: 판매자 정보
+              - generic [ref=e271]:
+                - generic [ref=e272]: 1,337,548
+                - generic [ref=e273]: 원
+        - generic [ref=e274] [cursor=pointer]:
+          - img "Playwright 테스트용 중고폰" [ref=e277]
+          - generic [ref=e278]:
+            - generic [ref=e279]:
+              - heading "Playwright 테스트용 중고폰" [level=3] [ref=e280]
+              - paragraph
+              - generic [ref=e281]:
+                - generic [ref=e282]: 판매중
+                - button "관심상품 저장" [ref=e283]:
+                  - generic [ref=e284]: 🤍
+                  - generic [ref=e285]: "0"
+            - paragraph [ref=e287]: phone test
+            - generic [ref=e288]:
+              - generic [ref=e289]: 판매자 정보
+              - generic [ref=e290]:
+                - generic [ref=e291]: 1,290,000
+                - generic [ref=e292]: 원
+        - generic [ref=e293] [cursor=pointer]:
+          - img "Pixel 8 Pro 256GB" [ref=e296]
+          - generic [ref=e297]:
+            - generic [ref=e298]:
+              - heading "Pixel 8 Pro 256GB" [level=3] [ref=e299]
+              - paragraph
+              - generic [ref=e300]:
+                - generic [ref=e301]: 판매중
+                - button "관심상품 저장" [ref=e302]:
+                  - generic [ref=e303]: 🤍
+                  - generic [ref=e304]: "0"
+            - paragraph [ref=e306]: google phone
+            - generic [ref=e307]:
+              - generic [ref=e308]: 판매자 정보
+              - generic [ref=e309]:
+                - generic [ref=e310]: 1,295,847
+                - generic [ref=e311]: 원
+        - generic [ref=e312] [cursor=pointer]:
+          - img "Pixel 7 1TB" [ref=e315]
+          - generic [ref=e316]:
+            - generic [ref=e317]:
+              - heading "Pixel 7 1TB" [level=3] [ref=e318]
+              - paragraph
+              - generic [ref=e319]:
+                - generic [ref=e320]: 판매완료
+                - button "관심상품 저장" [ref=e321]:
+                  - generic [ref=e322]: 🤍
+                  - generic [ref=e323]: "0"
+            - paragraph [ref=e325]: google phone
+            - generic [ref=e326]:
+              - generic [ref=e327]: 판매자 정보
+              - generic [ref=e328]:
+                - generic [ref=e329]: 1,721,897
+                - generic [ref=e330]: 원
+        - generic [ref=e331] [cursor=pointer]:
+          - img "iPhone 15 Pro Max 256GB" [ref=e334]
+          - generic [ref=e335]:
+            - generic [ref=e336]:
+              - heading "iPhone 15 Pro Max 256GB" [level=3] [ref=e337]
+              - paragraph
+              - generic [ref=e338]:
+                - generic [ref=e339]: 판매완료
+                - button "관심상품 저장" [ref=e340]:
+                  - generic [ref=e341]: 🤍
+                  - generic [ref=e342]: "0"
+            - paragraph [ref=e344]: apple phone
+            - generic [ref=e345]:
+              - generic [ref=e346]: 판매자 정보
+              - generic [ref=e347]:
+                - generic [ref=e348]: 1,097,330
+                - generic [ref=e349]: 원
+        - generic [ref=e350] [cursor=pointer]:
+          - img "Nothing Phone 2 1TB" [ref=e353]
+          - generic [ref=e354]:
+            - generic [ref=e355]:
+              - heading "Nothing Phone 2 1TB" [level=3] [ref=e356]
+              - paragraph
+              - generic [ref=e357]:
+                - generic [ref=e358]: 판매완료
+                - button "관심상품 저장" [ref=e359]:
+                  - generic [ref=e360]: 🤍
+                  - generic [ref=e361]: "0"
+            - paragraph [ref=e363]: nothing phone
+            - generic [ref=e364]:
+              - generic [ref=e365]: 판매자 정보
+              - generic [ref=e366]:
+                - generic [ref=e367]: 1,005,635
+                - generic [ref=e368]: 원
+        - generic [ref=e369] [cursor=pointer]:
+          - img "iPhone 15 Pro Max 512GB" [ref=e372]
+          - generic [ref=e373]:
+            - generic [ref=e374]:
+              - heading "iPhone 15 Pro Max 512GB" [level=3] [ref=e375]
+              - paragraph
+              - generic [ref=e376]:
+                - generic [ref=e377]: 판매중
+                - button "관심상품 저장" [ref=e378]:
+                  - generic [ref=e379]: 🤍
+                  - generic [ref=e380]: "0"
+            - paragraph [ref=e382]: apple phone
+            - generic [ref=e383]:
+              - generic [ref=e384]: 판매자 정보
+              - generic [ref=e385]:
+                - generic [ref=e386]: 709,224
+                - generic [ref=e387]: 원
+        - generic [ref=e388] [cursor=pointer]:
+          - img "Nothing Phone 1 256GB" [ref=e391]
+          - generic [ref=e392]:
+            - generic [ref=e393]:
+              - heading "Nothing Phone 1 256GB" [level=3] [ref=e394]
+              - paragraph
+              - generic [ref=e395]:
+                - generic [ref=e396]: 예약중
+                - button "관심상품 저장" [ref=e397]:
+                  - generic [ref=e398]: 🤍
+                  - generic [ref=e399]: "0"
+            - paragraph [ref=e401]: nothing phone
+            - generic [ref=e402]:
+              - generic [ref=e403]: 판매자 정보
+              - generic [ref=e404]:
+                - generic [ref=e405]: 806,562
+                - generic [ref=e406]: 원
+        - generic [ref=e407] [cursor=pointer]:
+          - img "Galaxy S24 Ultra 128GB" [ref=e410]
+          - generic [ref=e411]:
+            - generic [ref=e412]:
+              - heading "Galaxy S24 Ultra 128GB" [level=3] [ref=e413]
+              - paragraph
+              - generic [ref=e414]:
+                - generic [ref=e415]: 판매완료
+                - button "관심상품 저장" [ref=e416]:
+                  - generic [ref=e417]: 🤍
+                  - generic [ref=e418]: "0"
+            - paragraph [ref=e420]: samsung phone
+            - generic [ref=e421]:
+              - generic [ref=e422]: 판매자 정보
+              - generic [ref=e423]:
+                - generic [ref=e424]: 965,767
+                - generic [ref=e425]: 원
+        - generic [ref=e426] [cursor=pointer]:
+          - img "Pixel 8 Pro 256GB" [ref=e429]
+          - generic [ref=e430]:
+            - generic [ref=e431]:
+              - heading "Pixel 8 Pro 256GB" [level=3] [ref=e432]
+              - paragraph
+              - generic [ref=e433]:
+                - generic [ref=e434]: 판매완료
+                - button "관심상품 저장" [ref=e435]:
+                  - generic [ref=e436]: 🤍
+                  - generic [ref=e437]: "0"
+            - paragraph [ref=e439]: google phone
+            - generic [ref=e440]:
+              - generic [ref=e441]: 판매자 정보
+              - generic [ref=e442]:
+                - generic [ref=e443]: 924,321
+                - generic [ref=e444]: 원
+        - generic [ref=e445] [cursor=pointer]:
+          - img "Xperia 10 256GB" [ref=e448]
+          - generic [ref=e449]:
+            - generic [ref=e450]:
+              - heading "Xperia 10 256GB" [level=3] [ref=e451]
+              - paragraph
+              - generic [ref=e452]:
+                - generic [ref=e453]: 판매완료
+                - button "관심상품 저장" [ref=e454]:
+                  - generic [ref=e455]: 🤍
+                  - generic [ref=e456]: "0"
+            - paragraph [ref=e458]: sony phone
+            - generic [ref=e459]:
+              - generic [ref=e460]: 판매자 정보
+              - generic [ref=e461]:
+                - generic [ref=e462]: 1,355,214
+                - generic [ref=e463]: 원
+        - generic [ref=e464] [cursor=pointer]:
+          - img "Nothing Phone 2 1TB" [ref=e467]
+          - generic [ref=e468]:
+            - generic [ref=e469]:
+              - heading "Nothing Phone 2 1TB" [level=3] [ref=e470]
+              - paragraph
+              - generic [ref=e471]:
+                - generic [ref=e472]: 판매중
+                - button "관심상품 저장" [ref=e473]:
+                  - generic [ref=e474]: 🤍
+                  - generic [ref=e475]: "0"
+            - paragraph [ref=e477]: nothing phone
+            - generic [ref=e478]:
+              - generic [ref=e479]: 판매자 정보
+              - generic [ref=e480]:
+                - generic [ref=e481]: 1,304,727
+                - generic [ref=e482]: 원
+        - generic [ref=e483] [cursor=pointer]:
+          - img "Nothing Phone 1 512GB" [ref=e486]
+          - generic [ref=e487]:
+            - generic [ref=e488]:
+              - heading "Nothing Phone 1 512GB" [level=3] [ref=e489]
+              - paragraph
+              - generic [ref=e490]:
+                - generic [ref=e491]: 예약중
+                - button "관심상품 저장" [ref=e492]:
+                  - generic [ref=e493]: 🤍
+                  - generic [ref=e494]: "0"
+            - paragraph [ref=e496]: nothing phone
+            - generic [ref=e497]:
+              - generic [ref=e498]: 판매자 정보
+              - generic [ref=e499]:
+                - generic [ref=e500]: 1,765,862
+                - generic [ref=e501]: 원
+        - generic [ref=e502] [cursor=pointer]:
+          - img "Xperia 5 128GB" [ref=e505]
+          - generic [ref=e506]:
+            - generic [ref=e507]:
+              - heading "Xperia 5 128GB" [level=3] [ref=e508]
+              - paragraph
+              - generic [ref=e509]:
+                - generic [ref=e510]: 판매완료
+                - button "관심상품 저장" [ref=e511]:
+                  - generic [ref=e512]: 🤍
+                  - generic [ref=e513]: "0"
+            - paragraph [ref=e515]: sony phone
+            - generic [ref=e516]:
+              - generic [ref=e517]: 판매자 정보
+              - generic [ref=e518]:
+                - generic [ref=e519]: 1,520,432
+                - generic [ref=e520]: 원
+        - generic [ref=e521] [cursor=pointer]:
+          - img "Xperia 5 128GB" [ref=e524]
+          - generic [ref=e525]:
+            - generic [ref=e526]:
+              - heading "Xperia 5 128GB" [level=3] [ref=e527]
+              - paragraph
+              - generic [ref=e528]:
+                - generic [ref=e529]: 판매중
+                - button "관심상품 저장" [ref=e530]:
+                  - generic [ref=e531]: 🤍
+                  - generic [ref=e532]: "0"
+            - paragraph [ref=e534]: sony phone
+            - generic [ref=e535]:
+              - generic [ref=e536]: 판매자 정보
+              - generic [ref=e537]:
+                - generic [ref=e538]: 1,680,677
+                - generic [ref=e539]: 원
+        - generic [ref=e540] [cursor=pointer]:
+          - img "Xperia 5 256GB" [ref=e543]
+          - generic [ref=e544]:
+            - generic [ref=e545]:
+              - heading "Xperia 5 256GB" [level=3] [ref=e546]
+              - paragraph
+              - generic [ref=e547]:
+                - generic [ref=e548]: 판매중
+                - button "관심상품 저장" [ref=e549]:
+                  - generic [ref=e550]: 🤍
+                  - generic [ref=e551]: "0"
+            - paragraph [ref=e553]: sony phone
+            - generic [ref=e554]:
+              - generic [ref=e555]: 판매자 정보
+              - generic [ref=e556]:
+                - generic [ref=e557]: 1,054,848
+                - generic [ref=e558]: 원
+        - generic [ref=e559] [cursor=pointer]:
+          - img "Galaxy S24 256GB" [ref=e562]
+          - generic [ref=e563]:
+            - generic [ref=e564]:
+              - heading "Galaxy S24 256GB" [level=3] [ref=e565]
+              - paragraph
+              - generic [ref=e566]:
+                - generic [ref=e567]: 판매중
+                - button "관심상품 저장" [ref=e568]:
+                  - generic [ref=e569]: 🤍
+                  - generic [ref=e570]: "0"
+            - paragraph [ref=e572]: samsung phone
+            - generic [ref=e573]:
+              - generic [ref=e574]: 판매자 정보
+              - generic [ref=e575]:
+                - generic [ref=e576]: 1,479,922
+                - generic [ref=e577]: 원
+        - generic [ref=e578] [cursor=pointer]:
+          - img "Nothing Phone 2 128GB" [ref=e581]
+          - generic [ref=e582]:
+            - generic [ref=e583]:
+              - heading "Nothing Phone 2 128GB" [level=3] [ref=e584]
+              - paragraph
+              - generic [ref=e585]:
+                - generic [ref=e586]: 예약중
+                - button "관심상품 저장" [ref=e587]:
+                  - generic [ref=e588]: 🤍
+                  - generic [ref=e589]: "0"
+            - paragraph [ref=e591]: nothing phone
+            - generic [ref=e592]:
+              - generic [ref=e593]: 판매자 정보
+              - generic [ref=e594]:
+                - generic [ref=e595]: 971,513
+                - generic [ref=e596]: 원
+        - generic [ref=e597] [cursor=pointer]:
+          - img "iPhone 15 Pro 256GB" [ref=e600]
+          - generic [ref=e601]:
+            - generic [ref=e602]:
+              - heading "iPhone 15 Pro 256GB" [level=3] [ref=e603]
+              - paragraph
+              - generic [ref=e604]:
+                - generic [ref=e605]: 판매중
+                - button "관심상품 저장" [ref=e606]:
+                  - generic [ref=e607]: 🤍
+                  - generic [ref=e608]: "0"
+            - paragraph [ref=e610]: apple phone
+            - generic [ref=e611]:
+              - generic [ref=e612]: 판매자 정보
+              - generic [ref=e613]:
+                - generic [ref=e614]: 589,796
+                - generic [ref=e615]: 원
+        - generic [ref=e616] [cursor=pointer]:
+          - img "Xperia 5 256GB" [ref=e619]
+          - generic [ref=e620]:
+            - generic [ref=e621]:
+              - heading "Xperia 5 256GB" [level=3] [ref=e622]
+              - paragraph
+              - generic [ref=e623]:
+                - generic [ref=e624]: 판매중
+                - button "관심상품 저장" [ref=e625]:
+                  - generic [ref=e626]: 🤍
+                  - generic [ref=e627]: "0"
+            - paragraph [ref=e629]: sony phone
+            - generic [ref=e630]:
+              - generic [ref=e631]: 판매자 정보
+              - generic [ref=e632]:
+                - generic [ref=e633]: 1,721,408
+                - generic [ref=e634]: 원
+        - generic [ref=e635] [cursor=pointer]:
+          - img "Pixel 7 Pro 128GB" [ref=e638]
+          - generic [ref=e639]:
+            - generic [ref=e640]:
+              - heading "Pixel 7 Pro 128GB" [level=3] [ref=e641]
+              - paragraph
+              - generic [ref=e642]:
+                - generic [ref=e643]: 판매중
+                - button "관심상품 저장" [ref=e644]:
+                  - generic [ref=e645]: 🤍
+                  - generic [ref=e646]: "0"
+            - paragraph [ref=e648]: google phone
+            - generic [ref=e649]:
+              - generic [ref=e650]: 판매자 정보
+              - generic [ref=e651]:
+                - generic [ref=e652]: 1,249,786
+                - generic [ref=e653]: 원
+        - generic [ref=e654] [cursor=pointer]:
+          - img "iPhone 16 1TB" [ref=e657]
+          - generic [ref=e658]:
+            - generic [ref=e659]:
+              - heading "iPhone 16 1TB" [level=3] [ref=e660]
+              - paragraph
+              - generic [ref=e661]:
+                - generic [ref=e662]: 판매중
+                - button "관심상품 저장" [ref=e663]:
+                  - generic [ref=e664]: 🤍
+                  - generic [ref=e665]: "0"
+            - paragraph [ref=e667]: apple phone
+            - generic [ref=e668]:
+              - generic [ref=e669]: 판매자 정보
+              - generic [ref=e670]:
+                - generic [ref=e671]: 1,835,871
+                - generic [ref=e672]: 원
+        - generic [ref=e673] [cursor=pointer]:
+          - img "iPhone 14 Pro 256GB" [ref=e676]
+          - generic [ref=e677]:
+            - generic [ref=e678]:
+              - heading "iPhone 14 Pro 256GB" [level=3] [ref=e679]
+              - paragraph
+              - generic [ref=e680]:
+                - generic [ref=e681]: 판매중
+                - button "관심상품 저장" [ref=e682]:
+                  - generic [ref=e683]: 🤍
+                  - generic [ref=e684]: "0"
+            - paragraph [ref=e686]: apple phone
+            - generic [ref=e687]:
+              - generic [ref=e688]: 판매자 정보
+              - generic [ref=e689]:
+                - generic [ref=e690]: 1,190,967
+                - generic [ref=e691]: 원
+        - generic [ref=e692] [cursor=pointer]:
+          - img "Galaxy S24 128GB" [ref=e695]
+          - generic [ref=e696]:
+            - generic [ref=e697]:
+              - heading "Galaxy S24 128GB" [level=3] [ref=e698]
+              - paragraph
+              - generic [ref=e699]:
+                - generic [ref=e700]: 판매완료
+                - button "관심상품 저장" [ref=e701]:
+                  - generic [ref=e702]: 🤍
+                  - generic [ref=e703]: "0"
+            - paragraph [ref=e705]: samsung phone
+            - generic [ref=e706]:
+              - generic [ref=e707]: 판매자 정보
+              - generic [ref=e708]:
+                - generic [ref=e709]: 1,261,462
+                - generic [ref=e710]: 원
+        - generic [ref=e711] [cursor=pointer]:
+          - img "iPhone 14 Pro 1TB" [ref=e714]
+          - generic [ref=e715]:
+            - generic [ref=e716]:
+              - heading "iPhone 14 Pro 1TB" [level=3] [ref=e717]
+              - paragraph
+              - generic [ref=e718]:
+                - generic [ref=e719]: 판매완료
+                - button "관심상품 저장" [ref=e720]:
+                  - generic [ref=e721]: 🤍
+                  - generic [ref=e722]: "0"
+            - paragraph [ref=e724]: apple phone
+            - generic [ref=e725]:
+              - generic [ref=e726]: 판매자 정보
+              - generic [ref=e727]:
+                - generic [ref=e728]: 1,340,314
+                - generic [ref=e729]: 원
+        - generic [ref=e730] [cursor=pointer]:
+          - img "Xperia 10 1TB" [ref=e733]
+          - generic [ref=e734]:
+            - generic [ref=e735]:
+              - heading "Xperia 10 1TB" [level=3] [ref=e736]
+              - paragraph
+              - generic [ref=e737]:
+                - generic [ref=e738]: 판매완료
+                - button "관심상품 저장" [ref=e739]:
+                  - generic [ref=e740]: 🤍
+                  - generic [ref=e741]: "0"
+            - paragraph [ref=e743]: sony phone
+            - generic [ref=e744]:
+              - generic [ref=e745]: 판매자 정보
+              - generic [ref=e746]:
+                - generic [ref=e747]: 1,903,955
+                - generic [ref=e748]: 원
+        - generic [ref=e749] [cursor=pointer]:
+          - img "Nothing Phone 1 128GB" [ref=e752]
+          - generic [ref=e753]:
+            - generic [ref=e754]:
+              - heading "Nothing Phone 1 128GB" [level=3] [ref=e755]
+              - paragraph
+              - generic [ref=e756]:
+                - generic [ref=e757]: 예약중
+                - button "관심상품 저장" [ref=e758]:
+                  - generic [ref=e759]: 🤍
+                  - generic [ref=e760]: "0"
+            - paragraph [ref=e762]: nothing phone
+            - generic [ref=e763]:
+              - generic [ref=e764]: 판매자 정보
+              - generic [ref=e765]:
+                - generic [ref=e766]: 614,467
+                - generic [ref=e767]: 원
+        - generic [ref=e768] [cursor=pointer]:
+          - img "Galaxy Note20 256GB" [ref=e771]
+          - generic [ref=e772]:
+            - generic [ref=e773]:
+              - heading "Galaxy Note20 256GB" [level=3] [ref=e774]
+              - paragraph
+              - generic [ref=e775]:
+                - generic [ref=e776]: 예약중
+                - button "관심상품 저장" [ref=e777]:
+                  - generic [ref=e778]: 🤍
+                  - generic [ref=e779]: "0"
+            - paragraph [ref=e781]: samsung phone
+            - generic [ref=e782]:
+              - generic [ref=e783]: 판매자 정보
+              - generic [ref=e784]:
+                - generic [ref=e785]: 857,082
+                - generic [ref=e786]: 원
+        - generic [ref=e787] [cursor=pointer]:
+          - img "Pixel 8 Pro 128GB" [ref=e790]
+          - generic [ref=e791]:
+            - generic [ref=e792]:
+              - heading "Pixel 8 Pro 128GB" [level=3] [ref=e793]
+              - paragraph
+              - generic [ref=e794]:
+                - generic [ref=e795]: 예약중
+                - button "관심상품 저장" [ref=e796]:
+                  - generic [ref=e797]: 🤍
+                  - generic [ref=e798]: "0"
+            - paragraph [ref=e800]: google phone
+            - generic [ref=e801]:
+              - generic [ref=e802]: 판매자 정보
+              - generic [ref=e803]:
+                - generic [ref=e804]: 809,713
+                - generic [ref=e805]: 원
+        - generic [ref=e806] [cursor=pointer]:
+          - img "Xperia 1 1TB" [ref=e809]
+          - generic [ref=e810]:
+            - generic [ref=e811]:
+              - heading "Xperia 1 1TB" [level=3] [ref=e812]
+              - paragraph
+              - generic [ref=e813]:
+                - generic [ref=e814]: 판매중
+                - button "관심상품 저장" [ref=e815]:
+                  - generic [ref=e816]: 🤍
+                  - generic [ref=e817]: "0"
+            - paragraph [ref=e819]: sony phone
+            - generic [ref=e820]:
+              - generic [ref=e821]: 판매자 정보
+              - generic [ref=e822]:
+                - generic [ref=e823]: 772,889
+                - generic [ref=e824]: 원
+        - generic [ref=e825] [cursor=pointer]:
+          - img "Pixel 8 1TB" [ref=e828]
+          - generic [ref=e829]:
+            - generic [ref=e830]:
+              - heading "Pixel 8 1TB" [level=3] [ref=e831]
+              - paragraph
+              - generic [ref=e832]:
+                - generic [ref=e833]: 판매완료
+                - button "관심상품 저장" [ref=e834]:
+                  - generic [ref=e835]: 🤍
+                  - generic [ref=e836]: "0"
+            - paragraph [ref=e838]: google phone
+            - generic [ref=e839]:
+              - generic [ref=e840]: 판매자 정보
+              - generic [ref=e841]:
+                - generic [ref=e842]: 1,995,697
+                - generic [ref=e843]: 원
+        - generic [ref=e844] [cursor=pointer]:
+          - img "Galaxy S24 Ultra 1TB" [ref=e847]
+          - generic [ref=e848]:
+            - generic [ref=e849]:
+              - heading "Galaxy S24 Ultra 1TB" [level=3] [ref=e850]
+              - paragraph
+              - generic [ref=e851]:
+                - generic [ref=e852]: 판매완료
+                - button "관심상품 저장" [ref=e853]:
+                  - generic [ref=e854]: 🤍
+                  - generic [ref=e855]: "0"
+            - paragraph [ref=e857]: samsung phone
+            - generic [ref=e858]:
+              - generic [ref=e859]: 판매자 정보
+              - generic [ref=e860]:
+                - generic [ref=e861]: 1,642,576
+                - generic [ref=e862]: 원
+        - generic [ref=e863] [cursor=pointer]:
+          - img "Nothing Phone 1 128GB" [ref=e866]
+          - generic [ref=e867]:
+            - generic [ref=e868]:
+              - heading "Nothing Phone 1 128GB" [level=3] [ref=e869]
+              - paragraph
+              - generic [ref=e870]:
+                - generic [ref=e871]: 예약중
+                - button "관심상품 저장" [ref=e872]:
+                  - generic [ref=e873]: 🤍
+                  - generic [ref=e874]: "0"
+            - paragraph [ref=e876]: nothing phone
+            - generic [ref=e877]:
+              - generic [ref=e878]: 판매자 정보
+              - generic [ref=e879]:
+                - generic [ref=e880]: 1,952,078
+                - generic [ref=e881]: 원
+        - generic [ref=e882] [cursor=pointer]:
+          - img "Pixel 8 Pro 512GB" [ref=e885]
+          - generic [ref=e886]:
+            - generic [ref=e887]:
+              - heading "Pixel 8 Pro 512GB" [level=3] [ref=e888]
+              - paragraph
+              - generic [ref=e889]:
+                - generic [ref=e890]: 판매중
+                - button "관심상품 저장" [ref=e891]:
+                  - generic [ref=e892]: 🤍
+                  - generic [ref=e893]: "0"
+            - paragraph [ref=e895]: google phone
+            - generic [ref=e896]:
+              - generic [ref=e897]: 판매자 정보
+              - generic [ref=e898]:
+                - generic [ref=e899]: 515,183
+                - generic [ref=e900]: 원
+        - generic [ref=e901] [cursor=pointer]:
+          - img "Pixel 7 512GB" [ref=e904]
+          - generic [ref=e905]:
+            - generic [ref=e906]:
+              - heading "Pixel 7 512GB" [level=3] [ref=e907]
+              - paragraph
+              - generic [ref=e908]:
+                - generic [ref=e909]: 예약중
+                - button "관심상품 저장" [ref=e910]:
+                  - generic [ref=e911]: 🤍
+                  - generic [ref=e912]: "0"
+            - paragraph [ref=e914]: google phone
+            - generic [ref=e915]:
+              - generic [ref=e916]: 판매자 정보
+              - generic [ref=e917]:
+                - generic [ref=e918]: 1,427,432
+                - generic [ref=e919]: 원
+        - generic [ref=e920] [cursor=pointer]:
+          - img "Xperia 10 1TB" [ref=e923]
+          - generic [ref=e924]:
+            - generic [ref=e925]:
+              - heading "Xperia 10 1TB" [level=3] [ref=e926]
+              - paragraph
+              - generic [ref=e927]:
+                - generic [ref=e928]: 판매중
+                - button "관심상품 저장" [ref=e929]:
+                  - generic [ref=e930]: 🤍
+                  - generic [ref=e931]: "0"
+            - paragraph [ref=e933]: sony phone
+            - generic [ref=e934]:
+              - generic [ref=e935]: 판매자 정보
+              - generic [ref=e936]:
+                - generic [ref=e937]: 1,725,316
+                - generic [ref=e938]: 원
+        - generic [ref=e939] [cursor=pointer]:
+          - img "Xperia 1 256GB" [ref=e942]
+          - generic [ref=e943]:
+            - generic [ref=e944]:
+              - heading "Xperia 1 256GB" [level=3] [ref=e945]
+              - paragraph
+              - generic [ref=e946]:
+                - generic [ref=e947]: 예약중
+                - button "관심상품 저장" [ref=e948]:
+                  - generic [ref=e949]: 🤍
+                  - generic [ref=e950]: "0"
+            - paragraph [ref=e952]: sony phone
+            - generic [ref=e953]:
+              - generic [ref=e954]: 판매자 정보
+              - generic [ref=e955]:
+                - generic [ref=e956]: 1,435,074
+                - generic [ref=e957]: 원
+        - generic [ref=e958] [cursor=pointer]:
+          - img "iPhone 16 256GB" [ref=e961]
+          - generic [ref=e962]:
+            - generic [ref=e963]:
+              - heading "iPhone 16 256GB" [level=3] [ref=e964]
+              - paragraph
+              - generic [ref=e965]:
+                - generic [ref=e966]: 판매완료
+                - button "관심상품 저장" [ref=e967]:
+                  - generic [ref=e968]: 🤍
+                  - generic [ref=e969]: "0"
+            - paragraph [ref=e971]: apple phone
+            - generic [ref=e972]:
+              - generic [ref=e973]: 판매자 정보
+              - generic [ref=e974]:
+                - generic [ref=e975]: 1,993,468
+                - generic [ref=e976]: 원
+        - generic [ref=e977] [cursor=pointer]:
+          - img "Nothing Phone 1 256GB" [ref=e980]
+          - generic [ref=e981]:
+            - generic [ref=e982]:
+              - heading "Nothing Phone 1 256GB" [level=3] [ref=e983]
+              - paragraph
+              - generic [ref=e984]:
+                - generic [ref=e985]: 판매중
+                - button "관심상품 저장" [ref=e986]:
+                  - generic [ref=e987]: 🤍
+                  - generic [ref=e988]: "0"
+            - paragraph [ref=e990]: nothing phone
+            - generic [ref=e991]:
+              - generic [ref=e992]: 판매자 정보
+              - generic [ref=e993]:
+                - generic [ref=e994]: 1,989,327
+                - generic [ref=e995]: 원
+        - generic [ref=e996] [cursor=pointer]:
+          - img "11" [ref=e999]
+          - generic [ref=e1000]:
+            - generic [ref=e1001]:
+              - heading "11" [level=3] [ref=e1002]
+              - paragraph
+              - generic [ref=e1003]:
+                - generic [ref=e1004]: 판매중
+                - button "관심상품 저장" [ref=e1005]:
+                  - generic [ref=e1006]: 🤍
+                  - generic [ref=e1007]: "0"
+            - generic:
+              - paragraph
+            - generic [ref=e1008]:
+              - generic [ref=e1009]: 판매자 정보
+              - generic [ref=e1010]:
+                - generic [ref=e1011]: "111"
+                - generic [ref=e1012]: 원
+        - generic [ref=e1013] [cursor=pointer]:
+          - img "iPhone 14 Pro 512GB" [ref=e1016]
+          - generic [ref=e1017]:
+            - generic [ref=e1018]:
+              - heading "iPhone 14 Pro 512GB" [level=3] [ref=e1019]
+              - paragraph
+              - generic [ref=e1020]:
+                - generic [ref=e1021]: 판매중
+                - button "관심상품 저장" [ref=e1022]:
+                  - generic [ref=e1023]: 🤍
+                  - generic [ref=e1024]: "0"
+            - paragraph [ref=e1026]: apple phone
+            - generic [ref=e1027]:
+              - generic [ref=e1028]: 판매자 정보
+              - generic [ref=e1029]:
+                - generic [ref=e1030]: 1,098,934
+                - generic [ref=e1031]: 원
+        - generic [ref=e1032] [cursor=pointer]:
+          - img "Pixel 8 128GB" [ref=e1035]
+          - generic [ref=e1036]:
+            - generic [ref=e1037]:
+              - heading "Pixel 8 128GB" [level=3] [ref=e1038]
+              - paragraph
+              - generic [ref=e1039]:
+                - generic [ref=e1040]: 예약중
+                - button "관심상품 저장" [ref=e1041]:
+                  - generic [ref=e1042]: 🤍
+                  - generic [ref=e1043]: "0"
+            - paragraph [ref=e1045]: google phone
+            - generic [ref=e1046]:
+              - generic [ref=e1047]: 판매자 정보
+              - generic [ref=e1048]:
+                - generic [ref=e1049]: 1,636,506
+                - generic [ref=e1050]: 원
+        - generic [ref=e1051] [cursor=pointer]:
+          - img "Pixel 7 Pro 512GB" [ref=e1054]
+          - generic [ref=e1055]:
+            - generic [ref=e1056]:
+              - heading "Pixel 7 Pro 512GB" [level=3] [ref=e1057]
+              - paragraph
+              - generic [ref=e1058]:
+                - generic [ref=e1059]: 판매중
+                - button "관심상품 저장" [ref=e1060]:
+                  - generic [ref=e1061]: 🤍
+                  - generic [ref=e1062]: "0"
+            - paragraph [ref=e1064]: google phone
+            - generic [ref=e1065]:
+              - generic [ref=e1066]: 판매자 정보
+              - generic [ref=e1067]:
+                - generic [ref=e1068]: 1,885,649
+                - generic [ref=e1069]: 원
+        - generic [ref=e1070] [cursor=pointer]:
+          - img "Galaxy S23 1TB" [ref=e1073]
+          - generic [ref=e1074]:
+            - generic [ref=e1075]:
+              - heading "Galaxy S23 1TB" [level=3] [ref=e1076]
+              - paragraph
+              - generic [ref=e1077]:
+                - generic [ref=e1078]: 판매완료
+                - button "관심상품 저장" [ref=e1079]:
+                  - generic [ref=e1080]: 🤍
+                  - generic [ref=e1081]: "0"
+            - paragraph [ref=e1083]: samsung phone
+            - generic [ref=e1084]:
+              - generic [ref=e1085]: 판매자 정보
+              - generic [ref=e1086]:
+                - generic [ref=e1087]: 1,395,570
+                - generic [ref=e1088]: 원
+        - generic [ref=e1089] [cursor=pointer]:
+          - img "Galaxy S23 128GB" [ref=e1092]
+          - generic [ref=e1093]:
+            - generic [ref=e1094]:
+              - heading "Galaxy S23 128GB" [level=3] [ref=e1095]
+              - paragraph
+              - generic [ref=e1096]:
+                - generic [ref=e1097]: 판매중
+                - button "관심상품 저장" [ref=e1098]:
+                  - generic [ref=e1099]: 🤍
+                  - generic [ref=e1100]: "0"
+            - paragraph [ref=e1102]: samsung phone
+            - generic [ref=e1103]:
+              - generic [ref=e1104]: 판매자 정보
+              - generic [ref=e1105]:
+                - generic [ref=e1106]: 783,489
+                - generic [ref=e1107]: 원
+        - generic [ref=e1108] [cursor=pointer]:
+          - img "Pixel 8 Pro 1TB" [ref=e1111]
+          - generic [ref=e1112]:
+            - generic [ref=e1113]:
+              - heading "Pixel 8 Pro 1TB" [level=3] [ref=e1114]
+              - paragraph
+              - generic [ref=e1115]:
+                - generic [ref=e1116]: 판매중
+                - button "관심상품 저장" [ref=e1117]:
+                  - generic [ref=e1118]: 🤍
+                  - generic [ref=e1119]: "0"
+            - paragraph [ref=e1121]: google phone
+            - generic [ref=e1122]:
+              - generic [ref=e1123]: 판매자 정보
+              - generic [ref=e1124]:
+                - generic [ref=e1125]: 550,104
+                - generic [ref=e1126]: 원
+        - generic [ref=e1127] [cursor=pointer]:
+          - img "Pixel 7 Pro 128GB" [ref=e1130]
+          - generic [ref=e1131]:
+            - generic [ref=e1132]:
+              - heading "Pixel 7 Pro 128GB" [level=3] [ref=e1133]
+              - paragraph
+              - generic [ref=e1134]:
+                - generic [ref=e1135]: 예약중
+                - button "관심상품 저장" [ref=e1136]:
+                  - generic [ref=e1137]: 🤍
+                  - generic [ref=e1138]: "0"
+            - paragraph [ref=e1140]: google phone
+            - generic [ref=e1141]:
+              - generic [ref=e1142]: 판매자 정보
+              - generic [ref=e1143]:
+                - generic [ref=e1144]: 1,703,089
+                - generic [ref=e1145]: 원
+        - generic [ref=e1146] [cursor=pointer]:
+          - img "Nothing Phone 1 1TB" [ref=e1149]
+          - generic [ref=e1150]:
+            - generic [ref=e1151]:
+              - heading "Nothing Phone 1 1TB" [level=3] [ref=e1152]
+              - paragraph
+              - generic [ref=e1153]:
+                - generic [ref=e1154]: 예약중
+                - button "관심상품 저장" [ref=e1155]:
+                  - generic [ref=e1156]: 🤍
+                  - generic [ref=e1157]: "0"
+            - paragraph [ref=e1159]: nothing phone
+            - generic [ref=e1160]:
+              - generic [ref=e1161]: 판매자 정보
+              - generic [ref=e1162]:
+                - generic [ref=e1163]: 1,270,021
+                - generic [ref=e1164]: 원
+        - generic [ref=e1165] [cursor=pointer]:
+          - img "Galaxy S24 Ultra 256GB" [ref=e1168]
+          - generic [ref=e1169]:
+            - generic [ref=e1170]:
+              - heading "Galaxy S24 Ultra 256GB" [level=3] [ref=e1171]
+              - paragraph
+              - generic [ref=e1172]:
+                - generic [ref=e1173]: 판매완료
+                - button "관심상품 저장" [ref=e1174]:
+                  - generic [ref=e1175]: 🤍
+                  - generic [ref=e1176]: "0"
+            - paragraph [ref=e1178]: samsung phone
+            - generic [ref=e1179]:
+              - generic [ref=e1180]: 판매자 정보
+              - generic [ref=e1181]:
+                - generic [ref=e1182]: 1,237,182
+                - generic [ref=e1183]: 원
+        - generic [ref=e1184] [cursor=pointer]:
+          - img "Xperia 5 128GB" [ref=e1187]
+          - generic [ref=e1188]:
+            - generic [ref=e1189]:
+              - heading "Xperia 5 128GB" [level=3] [ref=e1190]
+              - paragraph
+              - generic [ref=e1191]:
+                - generic [ref=e1192]: 판매완료
+                - button "관심상품 저장" [ref=e1193]:
+                  - generic [ref=e1194]: 🤍
+                  - generic [ref=e1195]: "0"
+            - paragraph [ref=e1197]: sony phone
+            - generic [ref=e1198]:
+              - generic [ref=e1199]: 판매자 정보
+              - generic [ref=e1200]:
+                - generic [ref=e1201]: 1,501,670
+                - generic [ref=e1202]: 원
+        - generic [ref=e1203] [cursor=pointer]:
+          - img "Pixel 7 Pro 256GB" [ref=e1206]
+          - generic [ref=e1207]:
+            - generic [ref=e1208]:
+              - heading "Pixel 7 Pro 256GB" [level=3] [ref=e1209]
+              - paragraph
+              - generic [ref=e1210]:
+                - generic [ref=e1211]: 판매완료
+                - button "관심상품 저장" [ref=e1212]:
+                  - generic [ref=e1213]: 🤍
+                  - generic [ref=e1214]: "0"
+            - paragraph [ref=e1216]: google phone
+            - generic [ref=e1217]:
+              - generic [ref=e1218]: 판매자 정보
+              - generic [ref=e1219]:
+                - generic [ref=e1220]: 1,799,949
+                - generic [ref=e1221]: 원
+        - generic [ref=e1222] [cursor=pointer]:
+          - img "Galaxy S23 512GB" [ref=e1225]
+          - generic [ref=e1226]:
+            - generic [ref=e1227]:
+              - heading "Galaxy S23 512GB" [level=3] [ref=e1228]
+              - paragraph
+              - generic [ref=e1229]:
+                - generic [ref=e1230]: 예약중
+                - button "관심상품 저장" [ref=e1231]:
+                  - generic [ref=e1232]: 🤍
+                  - generic [ref=e1233]: "0"
+            - paragraph [ref=e1235]: samsung phone
+            - generic [ref=e1236]:
+              - generic [ref=e1237]: 판매자 정보
+              - generic [ref=e1238]:
+                - generic [ref=e1239]: 1,537,188
+                - generic [ref=e1240]: 원
+        - generic [ref=e1241] [cursor=pointer]:
+          - img "Xperia 1 256GB" [ref=e1244]
+          - generic [ref=e1245]:
+            - generic [ref=e1246]:
+              - heading "Xperia 1 256GB" [level=3] [ref=e1247]
+              - paragraph
+              - generic [ref=e1248]:
+                - generic [ref=e1249]: 판매완료
+                - button "관심상품 저장" [ref=e1250]:
+                  - generic [ref=e1251]: 🤍
+                  - generic [ref=e1252]: "0"
+            - paragraph [ref=e1254]: sony phone
+            - generic [ref=e1255]:
+              - generic [ref=e1256]: 판매자 정보
+              - generic [ref=e1257]:
+                - generic [ref=e1258]: 846,239
+                - generic [ref=e1259]: 원
+        - generic [ref=e1260] [cursor=pointer]:
+          - img "Nothing Phone 1 1TB" [ref=e1263]
+          - generic [ref=e1264]:
+            - generic [ref=e1265]:
+              - heading "Nothing Phone 1 1TB" [level=3] [ref=e1266]
+              - paragraph
+              - generic [ref=e1267]:
+                - generic [ref=e1268]: 예약중
+                - button "관심상품 저장" [ref=e1269]:
+                  - generic [ref=e1270]: 🤍
+                  - generic [ref=e1271]: "0"
+            - paragraph [ref=e1273]: nothing phone
+            - generic [ref=e1274]:
+              - generic [ref=e1275]: 판매자 정보
+              - generic [ref=e1276]:
+                - generic [ref=e1277]: 737,641
+                - generic [ref=e1278]: 원
+        - generic [ref=e1279] [cursor=pointer]:
+          - img "iPhone 16 Pro 512GB" [ref=e1282]
+          - generic [ref=e1283]:
+            - generic [ref=e1284]:
+              - heading "iPhone 16 Pro 512GB" [level=3] [ref=e1285]
+              - paragraph
+              - generic [ref=e1286]:
+                - generic [ref=e1287]: 판매중
+                - button "관심상품 저장" [ref=e1288]:
+                  - generic [ref=e1289]: 🤍
+                  - generic [ref=e1290]: "0"
+            - paragraph [ref=e1292]: apple phone
+            - generic [ref=e1293]:
+              - generic [ref=e1294]: 판매자 정보
+              - generic [ref=e1295]:
+                - generic [ref=e1296]: 1,742,301
+                - generic [ref=e1297]: 원
+        - generic [ref=e1298] [cursor=pointer]:
+          - img "Galaxy S23 Ultra 1TB" [ref=e1301]
+          - generic [ref=e1302]:
+            - generic [ref=e1303]:
+              - heading "Galaxy S23 Ultra 1TB" [level=3] [ref=e1304]
+              - paragraph
+              - generic [ref=e1305]:
+                - generic [ref=e1306]: 판매완료
+                - button "관심상품 저장" [ref=e1307]:
+                  - generic [ref=e1308]: 🤍
+                  - generic [ref=e1309]: "0"
+            - paragraph [ref=e1311]: samsung phone
+            - generic [ref=e1312]:
+              - generic [ref=e1313]: 판매자 정보
+              - generic [ref=e1314]:
+                - generic [ref=e1315]: 1,080,173
+                - generic [ref=e1316]: 원
+        - generic [ref=e1317] [cursor=pointer]:
+          - img "iPhone 16 Pro 512GB" [ref=e1320]
+          - generic [ref=e1321]:
+            - generic [ref=e1322]:
+              - heading "iPhone 16 Pro 512GB" [level=3] [ref=e1323]
+              - paragraph
+              - generic [ref=e1324]:
+                - generic [ref=e1325]: 판매완료
+                - button "관심상품 저장" [ref=e1326]:
+                  - generic [ref=e1327]: 🤍
+                  - generic [ref=e1328]: "0"
+            - paragraph [ref=e1330]: apple phone
+            - generic [ref=e1331]:
+              - generic [ref=e1332]: 판매자 정보
+              - generic [ref=e1333]:
+                - generic [ref=e1334]: 889,183
+                - generic [ref=e1335]: 원
+        - generic [ref=e1336] [cursor=pointer]:
+          - img "Galaxy S24 128GB" [ref=e1339]
+          - generic [ref=e1340]:
+            - generic [ref=e1341]:
+              - heading "Galaxy S24 128GB" [level=3] [ref=e1342]
+              - paragraph
+              - generic [ref=e1343]:
+                - generic [ref=e1344]: 예약중
+                - button "관심상품 저장" [ref=e1345]:
+                  - generic [ref=e1346]: 🤍
+                  - generic [ref=e1347]: "0"
+            - paragraph [ref=e1349]: samsung phone
+            - generic [ref=e1350]:
+              - generic [ref=e1351]: 판매자 정보
+              - generic [ref=e1352]:
+                - generic [ref=e1353]: 1,534,149
+                - generic [ref=e1354]: 원
+        - generic [ref=e1355] [cursor=pointer]:
+          - img "iPhone 15 Pro 512GB" [ref=e1358]
+          - generic [ref=e1359]:
+            - generic [ref=e1360]:
+              - heading "iPhone 15 Pro 512GB" [level=3] [ref=e1361]
+              - paragraph
+              - generic [ref=e1362]:
+                - generic [ref=e1363]: 판매완료
+                - button "관심상품 저장" [ref=e1364]:
+                  - generic [ref=e1365]: 🤍
+                  - generic [ref=e1366]: "0"
+            - paragraph [ref=e1368]: apple phone
+            - generic [ref=e1369]:
+              - generic [ref=e1370]: 판매자 정보
+              - generic [ref=e1371]:
+                - generic [ref=e1372]: 1,843,046
+                - generic [ref=e1373]: 원
+        - generic [ref=e1374] [cursor=pointer]:
+          - img "iPhone 16 256GB" [ref=e1377]
+          - generic [ref=e1378]:
+            - generic [ref=e1379]:
+              - heading "iPhone 16 256GB" [level=3] [ref=e1380]
+              - paragraph
+              - generic [ref=e1381]:
+                - generic [ref=e1382]: 예약중
+                - button "관심상품 저장" [ref=e1383]:
+                  - generic [ref=e1384]: 🤍
+                  - generic [ref=e1385]: "0"
+            - paragraph [ref=e1387]: apple phone
+            - generic [ref=e1388]:
+              - generic [ref=e1389]: 판매자 정보
+              - generic [ref=e1390]:
+                - generic [ref=e1391]: 1,897,988
+                - generic [ref=e1392]: 원
+        - generic [ref=e1393] [cursor=pointer]:
+          - img "ㅇㅇ" [ref=e1396]
+          - generic [ref=e1397]:
+            - generic [ref=e1398]:
+              - heading "ㅇㅇ" [level=3] [ref=e1399]
+              - paragraph
+              - generic [ref=e1400]:
+                - generic [ref=e1401]: 판매중
+                - button "관심상품 저장" [ref=e1402]:
+                  - generic [ref=e1403]: 🤍
+                  - generic [ref=e1404]: "0"
+            - generic:
+              - paragraph
+            - generic [ref=e1405]:
+              - generic [ref=e1406]: 판매자 정보
+              - generic [ref=e1407]:
+                - generic [ref=e1408]: "22"
+                - generic [ref=e1409]: 원
+        - generic [ref=e1410] [cursor=pointer]:
+          - img "iPhone 15 Pro 512GB" [ref=e1413]
+          - generic [ref=e1414]:
+            - generic [ref=e1415]:
+              - heading "iPhone 15 Pro 512GB" [level=3] [ref=e1416]
+              - paragraph
+              - generic [ref=e1417]:
+                - generic [ref=e1418]: 예약중
+                - button "관심상품 저장" [ref=e1419]:
+                  - generic [ref=e1420]: 🤍
+                  - generic [ref=e1421]: "0"
+            - paragraph [ref=e1423]: apple phone
+            - generic [ref=e1424]:
+              - generic [ref=e1425]: 판매자 정보
+              - generic [ref=e1426]:
+                - generic [ref=e1427]: 1,265,332
+                - generic [ref=e1428]: 원
+        - generic [ref=e1429] [cursor=pointer]:
+          - img "Xperia 1 1TB" [ref=e1432]
+          - generic [ref=e1433]:
+            - generic [ref=e1434]:
+              - heading "Xperia 1 1TB" [level=3] [ref=e1435]
+              - paragraph
+              - generic [ref=e1436]:
+                - generic [ref=e1437]: 예약중
+                - button "관심상품 저장" [ref=e1438]:
+                  - generic [ref=e1439]: 🤍
+                  - generic [ref=e1440]: "0"
+            - paragraph [ref=e1442]: sony phone
+            - generic [ref=e1443]:
+              - generic [ref=e1444]: 판매자 정보
+              - generic [ref=e1445]:
+                - generic [ref=e1446]: 734,272
+                - generic [ref=e1447]: 원
+        - generic [ref=e1448] [cursor=pointer]:
+          - img "iPhone 14 Pro 256GB" [ref=e1451]
+          - generic [ref=e1452]:
+            - generic [ref=e1453]:
+              - heading "iPhone 14 Pro 256GB" [level=3] [ref=e1454]
+              - paragraph
+              - generic [ref=e1455]:
+                - generic [ref=e1456]: 판매완료
+                - button "관심상품 저장" [ref=e1457]:
+                  - generic [ref=e1458]: 🤍
+                  - generic [ref=e1459]: "0"
+            - paragraph [ref=e1461]: apple phone
+            - generic [ref=e1462]:
+              - generic [ref=e1463]: 판매자 정보
+              - generic [ref=e1464]:
+                - generic [ref=e1465]: 807,679
+                - generic [ref=e1466]: 원
+        - generic [ref=e1467] [cursor=pointer]:
+          - img "Nothing Phone 2 256GB" [ref=e1470]
+          - generic [ref=e1471]:
+            - generic [ref=e1472]:
+              - heading "Nothing Phone 2 256GB" [level=3] [ref=e1473]
+              - paragraph
+              - generic [ref=e1474]:
+                - generic [ref=e1475]: 판매중
+                - button "관심상품 저장" [ref=e1476]:
+                  - generic [ref=e1477]: 🤍
+                  - generic [ref=e1478]: "0"
+            - paragraph [ref=e1480]: nothing phone
+            - generic [ref=e1481]:
+              - generic [ref=e1482]: 판매자 정보
+              - generic [ref=e1483]:
+                - generic [ref=e1484]: 556,855
+                - generic [ref=e1485]: 원
+        - generic [ref=e1486] [cursor=pointer]:
+          - img "Nothing Phone 1 128GB" [ref=e1489]
+          - generic [ref=e1490]:
+            - generic [ref=e1491]:
+              - heading "Nothing Phone 1 128GB" [level=3] [ref=e1492]
+              - paragraph
+              - generic [ref=e1493]:
+                - generic [ref=e1494]: 판매완료
+                - button "관심상품 저장" [ref=e1495]:
+                  - generic [ref=e1496]: 🤍
+                  - generic [ref=e1497]: "0"
+            - paragraph [ref=e1499]: nothing phone
+            - generic [ref=e1500]:
+              - generic [ref=e1501]: 판매자 정보
+              - generic [ref=e1502]:
+                - generic [ref=e1503]: 1,089,185
+                - generic [ref=e1504]: 원
+        - generic [ref=e1505] [cursor=pointer]:
+          - img "Xperia 1 512GB" [ref=e1508]
+          - generic [ref=e1509]:
+            - generic [ref=e1510]:
+              - heading "Xperia 1 512GB" [level=3] [ref=e1511]
+              - paragraph
+              - generic [ref=e1512]:
+                - generic [ref=e1513]: 판매중
+                - button "관심상품 저장" [ref=e1514]:
+                  - generic [ref=e1515]: 🤍
+                  - generic [ref=e1516]: "0"
+            - paragraph [ref=e1518]: sony phone
+            - generic [ref=e1519]:
+              - generic [ref=e1520]: 판매자 정보
+              - generic [ref=e1521]:
+                - generic [ref=e1522]: 842,079
+                - generic [ref=e1523]: 원
+        - generic [ref=e1524] [cursor=pointer]:
+          - img "Xperia 10 1TB" [ref=e1527]
+          - generic [ref=e1528]:
+            - generic [ref=e1529]:
+              - heading "Xperia 10 1TB" [level=3] [ref=e1530]
+              - paragraph
+              - generic [ref=e1531]:
+                - generic [ref=e1532]: 판매중
+                - button "관심상품 저장" [ref=e1533]:
+                  - generic [ref=e1534]: 🤍
+                  - generic [ref=e1535]: "0"
+            - paragraph [ref=e1537]: sony phone
+            - generic [ref=e1538]:
+              - generic [ref=e1539]: 판매자 정보
+              - generic [ref=e1540]:
+                - generic [ref=e1541]: 1,852,184
+                - generic [ref=e1542]: 원
+        - generic [ref=e1543] [cursor=pointer]:
+          - img "11" [ref=e1546]
+          - generic [ref=e1547]:
+            - generic [ref=e1548]:
+              - heading "11" [level=3] [ref=e1549]
+              - paragraph
+              - generic [ref=e1550]:
+                - generic [ref=e1551]: 판매중
+                - button "관심상품 저장" [ref=e1552]:
+                  - generic [ref=e1553]: 🤍
+                  - generic [ref=e1554]: "0"
+            - generic:
+              - paragraph
+            - generic [ref=e1555]:
+              - generic [ref=e1556]: 판매자 정보
+              - generic [ref=e1557]:
+                - generic [ref=e1558]: "111"
+                - generic [ref=e1559]: 원
+        - generic [ref=e1560] [cursor=pointer]:
+          - img "iPhone 16 Pro 128GB" [ref=e1563]
+          - generic [ref=e1564]:
+            - generic [ref=e1565]:
+              - heading "iPhone 16 Pro 128GB" [level=3] [ref=e1566]
+              - paragraph
+              - generic [ref=e1567]:
+                - generic [ref=e1568]: 판매완료
+                - button "관심상품 저장" [ref=e1569]:
+                  - generic [ref=e1570]: 🤍
+                  - generic [ref=e1571]: "0"
+            - paragraph [ref=e1573]: apple phone
+            - generic [ref=e1574]:
+              - generic [ref=e1575]: 판매자 정보
+              - generic [ref=e1576]:
+                - generic [ref=e1577]: 1,056,243
+                - generic [ref=e1578]: 원
+        - generic [ref=e1579] [cursor=pointer]:
+          - img "iPhone 14 Pro 512GB" [ref=e1582]
+          - generic [ref=e1583]:
+            - generic [ref=e1584]:
+              - heading "iPhone 14 Pro 512GB" [level=3] [ref=e1585]
+              - paragraph
+              - generic [ref=e1586]:
+                - generic [ref=e1587]: 판매중
+                - button "관심상품 저장" [ref=e1588]:
+                  - generic [ref=e1589]: 🤍
+                  - generic [ref=e1590]: "0"
+            - paragraph [ref=e1592]: apple phone
+            - generic [ref=e1593]:
+              - generic [ref=e1594]: 판매자 정보
+              - generic [ref=e1595]:
+                - generic [ref=e1596]: 1,514,519
+                - generic [ref=e1597]: 원
+        - generic [ref=e1598] [cursor=pointer]:
+          - img "Nothing Phone 2 256GB" [ref=e1601]
+          - generic [ref=e1602]:
+            - generic [ref=e1603]:
+              - heading "Nothing Phone 2 256GB" [level=3] [ref=e1604]
+              - paragraph
+              - generic [ref=e1605]:
+                - generic [ref=e1606]: 판매중
+                - button "관심상품 저장" [ref=e1607]:
+                  - generic [ref=e1608]: 🤍
+                  - generic [ref=e1609]: "0"
+            - paragraph [ref=e1611]: nothing phone
+            - generic [ref=e1612]:
+              - generic [ref=e1613]: 판매자 정보
+              - generic [ref=e1614]:
+                - generic [ref=e1615]: 1,042,799
+                - generic [ref=e1616]: 원
+        - generic [ref=e1617] [cursor=pointer]:
+          - img "11" [ref=e1620]
+          - generic [ref=e1621]:
+            - generic [ref=e1622]:
+              - heading "11" [level=3] [ref=e1623]
+              - paragraph
+              - generic [ref=e1624]:
+                - generic [ref=e1625]: 판매중
+                - button "관심상품 저장" [ref=e1626]:
+                  - generic [ref=e1627]: 🤍
+                  - generic [ref=e1628]: "0"
+            - generic:
+              - paragraph
+            - generic [ref=e1629]:
+              - generic [ref=e1630]: 판매자 정보
+              - generic [ref=e1631]:
+                - generic [ref=e1632]: "111"
+                - generic [ref=e1633]: 원
+        - generic [ref=e1634] [cursor=pointer]:
+          - img "ㅁㄴㅇㅁㄴㅇㅁㄴ" [ref=e1637]
+          - generic [ref=e1638]:
+            - generic [ref=e1639]:
+              - heading "ㅁㄴㅇㅁㄴㅇㅁㄴ" [level=3] [ref=e1640]
+              - paragraph
+              - generic [ref=e1641]:
+                - generic [ref=e1642]: 판매중
+                - button "관심상품 저장" [ref=e1643]:
+                  - generic [ref=e1644]: 🤍
+                  - generic [ref=e1645]: "0"
+            - generic:
+              - paragraph
+            - generic [ref=e1646]:
+              - generic [ref=e1647]: 판매자 정보
+              - generic [ref=e1648]:
+                - generic [ref=e1649]: "11"
+                - generic [ref=e1650]: 원
+        - generic [ref=e1651] [cursor=pointer]:
+          - img "Galaxy Note20 1TB" [ref=e1654]
+          - generic [ref=e1655]:
+            - generic [ref=e1656]:
+              - heading "Galaxy Note20 1TB" [level=3] [ref=e1657]
+              - paragraph
+              - generic [ref=e1658]:
+                - generic [ref=e1659]: 예약중
+                - button "관심상품 저장" [ref=e1660]:
+                  - generic [ref=e1661]: 🤍
+                  - generic [ref=e1662]: "0"
+            - paragraph [ref=e1664]: samsung phone
+            - generic [ref=e1665]:
+              - generic [ref=e1666]: 판매자 정보
+              - generic [ref=e1667]:
+                - generic [ref=e1668]: 1,998,001
+                - generic [ref=e1669]: 원
+        - generic [ref=e1670] [cursor=pointer]:
+          - img "Xperia 5 1TB" [ref=e1673]
+          - generic [ref=e1674]:
+            - generic [ref=e1675]:
+              - heading "Xperia 5 1TB" [level=3] [ref=e1676]
+              - paragraph
+              - generic [ref=e1677]:
+                - generic [ref=e1678]: 판매중
+                - button "관심상품 저장" [ref=e1679]:
+                  - generic [ref=e1680]: 🤍
+                  - generic [ref=e1681]: "0"
+            - paragraph [ref=e1683]: sony phone
+            - generic [ref=e1684]:
+              - generic [ref=e1685]: 판매자 정보
+              - generic [ref=e1686]:
+                - generic [ref=e1687]: 1,560,211
+                - generic [ref=e1688]: 원
+        - generic [ref=e1689] [cursor=pointer]:
+          - img "Pixel 8 Pro 128GB" [ref=e1692]
+          - generic [ref=e1693]:
+            - generic [ref=e1694]:
+              - heading "Pixel 8 Pro 128GB" [level=3] [ref=e1695]
+              - paragraph
+              - generic [ref=e1696]:
+                - generic [ref=e1697]: 예약중
+                - button "관심상품 저장" [ref=e1698]:
+                  - generic [ref=e1699]: 🤍
+                  - generic [ref=e1700]: "0"
+            - paragraph [ref=e1702]: google phone
+            - generic [ref=e1703]:
+              - generic [ref=e1704]: 판매자 정보
+              - generic [ref=e1705]:
+                - generic [ref=e1706]: 1,667,737
+                - generic [ref=e1707]: 원
+        - generic [ref=e1708] [cursor=pointer]:
+          - img "Nothing Phone 2 1TB" [ref=e1711]
+          - generic [ref=e1712]:
+            - generic [ref=e1713]:
+              - heading "Nothing Phone 2 1TB" [level=3] [ref=e1714]
+              - paragraph
+              - generic [ref=e1715]:
+                - generic [ref=e1716]: 예약중
+                - button "관심상품 저장" [ref=e1717]:
+                  - generic [ref=e1718]: 🤍
+                  - generic [ref=e1719]: "0"
+            - paragraph [ref=e1721]: nothing phone
+            - generic [ref=e1722]:
+              - generic [ref=e1723]: 판매자 정보
+              - generic [ref=e1724]:
+                - generic [ref=e1725]: 891,135
+                - generic [ref=e1726]: 원
+        - generic [ref=e1727] [cursor=pointer]:
+          - img "Xperia 1 1TB" [ref=e1730]
+          - generic [ref=e1731]:
+            - generic [ref=e1732]:
+              - heading "Xperia 1 1TB" [level=3] [ref=e1733]
+              - paragraph
+              - generic [ref=e1734]:
+                - generic [ref=e1735]: 판매완료
+                - button "관심상품 저장" [ref=e1736]:
+                  - generic [ref=e1737]: 🤍
+                  - generic [ref=e1738]: "0"
+            - paragraph [ref=e1740]: sony phone
+            - generic [ref=e1741]:
+              - generic [ref=e1742]: 판매자 정보
+              - generic [ref=e1743]:
+                - generic [ref=e1744]: 1,437,835
+                - generic [ref=e1745]: 원
+        - generic [ref=e1746] [cursor=pointer]:
+          - img "iPhone 15 Pro 512GB" [ref=e1749]
+          - generic [ref=e1750]:
+            - generic [ref=e1751]:
+              - heading "iPhone 15 Pro 512GB" [level=3] [ref=e1752]
+              - paragraph
+              - generic [ref=e1753]:
+                - generic [ref=e1754]: 판매완료
+                - button "관심상품 저장" [ref=e1755]:
+                  - generic [ref=e1756]: 🤍
+                  - generic [ref=e1757]: "0"
+            - paragraph [ref=e1759]: apple phone
+            - generic [ref=e1760]:
+              - generic [ref=e1761]: 판매자 정보
+              - generic [ref=e1762]:
+                - generic [ref=e1763]: 715,472
+                - generic [ref=e1764]: 원
+        - generic [ref=e1765] [cursor=pointer]:
+          - img "Galaxy S24 1TB" [ref=e1768]
+          - generic [ref=e1769]:
+            - generic [ref=e1770]:
+              - heading "Galaxy S24 1TB" [level=3] [ref=e1771]
+              - paragraph
+              - generic [ref=e1772]:
+                - generic [ref=e1773]: 판매중
+                - button "관심상품 저장" [ref=e1774]:
+                  - generic [ref=e1775]: 🤍
+                  - generic [ref=e1776]: "0"
+            - paragraph [ref=e1778]: samsung phone
+            - generic [ref=e1779]:
+              - generic [ref=e1780]: 판매자 정보
+              - generic [ref=e1781]:
+                - generic [ref=e1782]: 1,662,586
+                - generic [ref=e1783]: 원
+        - generic [ref=e1784] [cursor=pointer]:
+          - img "Nothing Phone 2 1TB" [ref=e1787]
+          - generic [ref=e1788]:
+            - generic [ref=e1789]:
+              - heading "Nothing Phone 2 1TB" [level=3] [ref=e1790]
+              - paragraph
+              - generic [ref=e1791]:
+                - generic [ref=e1792]: 예약중
+                - button "관심상품 저장" [ref=e1793]:
+                  - generic [ref=e1794]: 🤍
+                  - generic [ref=e1795]: "0"
+            - paragraph [ref=e1797]: nothing phone
+            - generic [ref=e1798]:
+              - generic [ref=e1799]: 판매자 정보
+              - generic [ref=e1800]:
+                - generic [ref=e1801]: 557,760
+                - generic [ref=e1802]: 원
+        - generic [ref=e1803] [cursor=pointer]:
+          - img "Pixel 7 128GB" [ref=e1806]
+          - generic [ref=e1807]:
+            - generic [ref=e1808]:
+              - heading "Pixel 7 128GB" [level=3] [ref=e1809]
+              - paragraph
+              - generic [ref=e1810]:
+                - generic [ref=e1811]: 예약중
+                - button "관심상품 저장" [ref=e1812]:
+                  - generic [ref=e1813]: 🤍
+                  - generic [ref=e1814]: "0"
+            - paragraph [ref=e1816]: google phone
+            - generic [ref=e1817]:
+              - generic [ref=e1818]: 판매자 정보
+              - generic [ref=e1819]:
+                - generic [ref=e1820]: 1,972,073
+                - generic [ref=e1821]: 원
+        - generic [ref=e1822] [cursor=pointer]:
+          - img "iPhone 14 Pro 128GB" [ref=e1825]
+          - generic [ref=e1826]:
+            - generic [ref=e1827]:
+              - heading "iPhone 14 Pro 128GB" [level=3] [ref=e1828]
+              - paragraph
+              - generic [ref=e1829]:
+                - generic [ref=e1830]: 판매완료
+                - button "관심상품 저장" [ref=e1831]:
+                  - generic [ref=e1832]: 🤍
+                  - generic [ref=e1833]: "0"
+            - paragraph [ref=e1835]: apple phone
+            - generic [ref=e1836]:
+              - generic [ref=e1837]: 판매자 정보
+              - generic [ref=e1838]:
+                - generic [ref=e1839]: 1,000,366
+                - generic [ref=e1840]: 원
+        - generic [ref=e1841] [cursor=pointer]:
+          - img "Galaxy S23 512GB" [ref=e1844]
+          - generic [ref=e1845]:
+            - generic [ref=e1846]:
+              - heading "Galaxy S23 512GB" [level=3] [ref=e1847]
+              - paragraph
+              - generic [ref=e1848]:
+                - generic [ref=e1849]: 예약중
+                - button "관심상품 저장" [ref=e1850]:
+                  - generic [ref=e1851]: 🤍
+                  - generic [ref=e1852]: "0"
+            - paragraph [ref=e1854]: samsung phone
+            - generic [ref=e1855]:
+              - generic [ref=e1856]: 판매자 정보
+              - generic [ref=e1857]:
+                - generic [ref=e1858]: 1,256,018
+                - generic [ref=e1859]: 원
+        - generic [ref=e1860] [cursor=pointer]:
+          - img "iPhone 15 Pro 256GB" [ref=e1863]
+          - generic [ref=e1864]:
+            - generic [ref=e1865]:
+              - heading "iPhone 15 Pro 256GB" [level=3] [ref=e1866]
+              - paragraph
+              - generic [ref=e1867]:
+                - generic [ref=e1868]: 판매완료
+                - button "관심상품 저장" [ref=e1869]:
+                  - generic [ref=e1870]: 🤍
+                  - generic [ref=e1871]: "0"
+            - paragraph [ref=e1873]: apple phone
+            - generic [ref=e1874]:
+              - generic [ref=e1875]: 판매자 정보
+              - generic [ref=e1876]:
+                - generic [ref=e1877]: 1,214,352
+                - generic [ref=e1878]: 원
+        - generic [ref=e1879] [cursor=pointer]:
+          - img "iPhone 14 Pro 512GB" [ref=e1882]
+          - generic [ref=e1883]:
+            - generic [ref=e1884]:
+              - heading "iPhone 14 Pro 512GB" [level=3] [ref=e1885]
+              - paragraph
+              - generic [ref=e1886]:
+                - generic [ref=e1887]: 판매완료
+                - button "관심상품 저장" [ref=e1888]:
+                  - generic [ref=e1889]: 🤍
+                  - generic [ref=e1890]: "0"
+            - paragraph [ref=e1892]: apple phone
+            - generic [ref=e1893]:
+              - generic [ref=e1894]: 판매자 정보
+              - generic [ref=e1895]:
+                - generic [ref=e1896]: 1,310,138
+                - generic [ref=e1897]: 원
+        - generic [ref=e1898] [cursor=pointer]:
+          - img "11" [ref=e1901]
+          - generic [ref=e1902]:
+            - generic [ref=e1903]:
+              - heading "11" [level=3] [ref=e1904]
+              - paragraph
+              - generic [ref=e1905]:
+                - generic [ref=e1906]: 판매중
+                - button "관심상품 저장" [ref=e1907]:
+                  - generic [ref=e1908]: 🤍
+                  - generic [ref=e1909]: "0"
+            - generic:
+              - paragraph
+            - generic [ref=e1910]:
+              - generic [ref=e1911]: 판매자 정보
+              - generic [ref=e1912]:
+                - generic [ref=e1913]: 1,111
+                - generic [ref=e1914]: 원
+        - generic [ref=e1915] [cursor=pointer]:
+          - img "Nothing Phone 1 128GB" [ref=e1918]
+          - generic [ref=e1919]:
+            - generic [ref=e1920]:
+              - heading "Nothing Phone 1 128GB" [level=3] [ref=e1921]
+              - paragraph
+              - generic [ref=e1922]:
+                - generic [ref=e1923]: 예약중
+                - button "관심상품 저장" [ref=e1924]:
+                  - generic [ref=e1925]: 🤍
+                  - generic [ref=e1926]: "0"
+            - paragraph [ref=e1928]: nothing phone
+            - generic [ref=e1929]:
+              - generic [ref=e1930]: 판매자 정보
+              - generic [ref=e1931]:
+                - generic [ref=e1932]: 1,331,253
+                - generic [ref=e1933]: 원
+        - generic [ref=e1934] [cursor=pointer]:
+          - img "Xperia 5 256GB" [ref=e1937]
+          - generic [ref=e1938]:
+            - generic [ref=e1939]:
+              - heading "Xperia 5 256GB" [level=3] [ref=e1940]
+              - paragraph
+              - generic [ref=e1941]:
+                - generic [ref=e1942]: 판매중
+                - button "관심상품 저장" [ref=e1943]:
+                  - generic [ref=e1944]: 🤍
+                  - generic [ref=e1945]: "0"
+            - paragraph [ref=e1947]: sony phone
+            - generic [ref=e1948]:
+              - generic [ref=e1949]: 판매자 정보
+              - generic [ref=e1950]:
+                - generic [ref=e1951]: 1,104,967
+                - generic [ref=e1952]: 원
+        - generic [ref=e1953] [cursor=pointer]:
+          - img "Galaxy S23 256GB" [ref=e1956]
+          - generic [ref=e1957]:
+            - generic [ref=e1958]:
+              - heading "Galaxy S23 256GB" [level=3] [ref=e1959]
+              - paragraph
+              - generic [ref=e1960]:
+                - generic [ref=e1961]: 판매완료
+                - button "관심상품 저장" [ref=e1962]:
+                  - generic [ref=e1963]: 🤍
+                  - generic [ref=e1964]: "0"
+            - paragraph [ref=e1966]: samsung phone
+            - generic [ref=e1967]:
+              - generic [ref=e1968]: 판매자 정보
+              - generic [ref=e1969]:
+                - generic [ref=e1970]: 1,326,560
+                - generic [ref=e1971]: 원
+        - generic [ref=e1972] [cursor=pointer]:
+          - img "Galaxy S23 Ultra 512GB" [ref=e1975]
+          - generic [ref=e1976]:
+            - generic [ref=e1977]:
+              - heading "Galaxy S23 Ultra 512GB" [level=3] [ref=e1978]
+              - paragraph
+              - generic [ref=e1979]:
+                - generic [ref=e1980]: 예약중
+                - button "관심상품 저장" [ref=e1981]:
+                  - generic [ref=e1982]: 🤍
+                  - generic [ref=e1983]: "0"
+            - paragraph [ref=e1985]: samsung phone
+            - generic [ref=e1986]:
+              - generic [ref=e1987]: 판매자 정보
+              - generic [ref=e1988]:
+                - generic [ref=e1989]: 999,904
+                - generic [ref=e1990]: 원
+        - generic [ref=e1991] [cursor=pointer]:
+          - img "Pixel 8 Pro 512GB" [ref=e1994]
+          - generic [ref=e1995]:
+            - generic [ref=e1996]:
+              - heading "Pixel 8 Pro 512GB" [level=3] [ref=e1997]
+              - paragraph
+              - generic [ref=e1998]:
+                - generic [ref=e1999]: 판매완료
+                - button "관심상품 저장" [ref=e2000]:
+                  - generic [ref=e2001]: 🤍
+                  - generic [ref=e2002]: "0"
+            - paragraph [ref=e2004]: google phone
+            - generic [ref=e2005]:
+              - generic [ref=e2006]: 판매자 정보
+              - generic [ref=e2007]:
+                - generic [ref=e2008]: 1,573,062
+                - generic [ref=e2009]: 원
+        - generic [ref=e2010] [cursor=pointer]:
+          - img "iPhone 15 Pro 128GB" [ref=e2013]
+          - generic [ref=e2014]:
+            - generic [ref=e2015]:
+              - heading "iPhone 15 Pro 128GB" [level=3] [ref=e2016]
+              - paragraph
+              - generic [ref=e2017]:
+                - generic [ref=e2018]: 판매완료
+                - button "관심상품 저장" [ref=e2019]:
+                  - generic [ref=e2020]: 🤍
+                  - generic [ref=e2021]: "0"
+            - paragraph [ref=e2023]: apple phone
+            - generic [ref=e2024]:
+              - generic [ref=e2025]: 판매자 정보
+              - generic [ref=e2026]:
+                - generic [ref=e2027]: 613,668
+                - generic [ref=e2028]: 원
+        - generic [ref=e2029] [cursor=pointer]:
+          - img "Xperia 5 128GB" [ref=e2032]
+          - generic [ref=e2033]:
+            - generic [ref=e2034]:
+              - heading "Xperia 5 128GB" [level=3] [ref=e2035]
+              - paragraph
+              - generic [ref=e2036]:
+                - generic [ref=e2037]: 판매중
+                - button "관심상품 저장" [ref=e2038]:
+                  - generic [ref=e2039]: 🤍
+                  - generic [ref=e2040]: "0"
+            - paragraph [ref=e2042]: sony phone
+            - generic [ref=e2043]:
+              - generic [ref=e2044]: 판매자 정보
+              - generic [ref=e2045]:
+                - generic [ref=e2046]: 1,822,889
+                - generic [ref=e2047]: 원
+        - generic [ref=e2048] [cursor=pointer]:
+          - img "Pixel 7 Pro 512GB" [ref=e2051]
+          - generic [ref=e2052]:
+            - generic [ref=e2053]:
+              - heading "Pixel 7 Pro 512GB" [level=3] [ref=e2054]
+              - paragraph
+              - generic [ref=e2055]:
+                - generic [ref=e2056]: 판매완료
+                - button "관심상품 저장" [ref=e2057]:
+                  - generic [ref=e2058]: 🤍
+                  - generic [ref=e2059]: "0"
+            - paragraph [ref=e2061]: google phone
+            - generic [ref=e2062]:
+              - generic [ref=e2063]: 판매자 정보
+              - generic [ref=e2064]:
+                - generic [ref=e2065]: 1,879,316
+                - generic [ref=e2066]: 원
+        - generic [ref=e2067] [cursor=pointer]:
+          - img "iPhone 15 Pro 512GB" [ref=e2070]
+          - generic [ref=e2071]:
+            - generic [ref=e2072]:
+              - heading "iPhone 15 Pro 512GB" [level=3] [ref=e2073]
+              - paragraph
+              - generic [ref=e2074]:
+                - generic [ref=e2075]: 예약중
+                - button "관심상품 저장" [ref=e2076]:
+                  - generic [ref=e2077]: 🤍
+                  - generic [ref=e2078]: "0"
+            - paragraph [ref=e2080]: apple phone
+            - generic [ref=e2081]:
+              - generic [ref=e2082]: 판매자 정보
+              - generic [ref=e2083]:
+                - generic [ref=e2084]: 755,497
+                - generic [ref=e2085]: 원
+        - generic [ref=e2086] [cursor=pointer]:
+          - img "Galaxy S24 512GB" [ref=e2089]
+          - generic [ref=e2090]:
+            - generic [ref=e2091]:
+              - heading "Galaxy S24 512GB" [level=3] [ref=e2092]
+              - paragraph
+              - generic [ref=e2093]:
+                - generic [ref=e2094]: 판매중
+                - button "관심상품 저장" [ref=e2095]:
+                  - generic [ref=e2096]: 🤍
+                  - generic [ref=e2097]: "0"
+            - paragraph [ref=e2099]: samsung phone
+            - generic [ref=e2100]:
+              - generic [ref=e2101]: 판매자 정보
+              - generic [ref=e2102]:
+                - generic [ref=e2103]: 1,578,650
+                - generic [ref=e2104]: 원
+```

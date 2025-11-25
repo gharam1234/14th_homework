@@ -13,6 +13,7 @@
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
     "generate:test-phones": "tsx scripts/generate-test-phones.ts",
+    "generate:test-inquiries": "tsx scripts/generate-test-inquiries.ts",
     "cleanup:test-phones": "tsx scripts/cleanup-test-phones.ts",
     "generate:local-test-data": "tsx scripts/generate-local-test-data.ts"
   },

@@ -86,11 +86,41 @@ export default function LayoutNavigation(){
       setSelectedAmount('')
     }
 
-    const handleConfirmCharge = () => {
-      // TODO: 실제 충전 로직 구현
-      console.log('충전 금액:', selectedAmount)
-      alert(`${selectedAmount}원 충전이 완료되었습니다.`)
-      handleCloseChargeModal()
+    const handleConfirmCharge = async () => {
+      if (!selectedAmount) {
+        alert('충전 금액을 선택해주세요.')
+        return
+      }
+
+      try {
+        // 결제 API 호출
+        const response = await fetch('/api/payments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            billingKey: 'test_billing_key_' + Date.now(), // TODO: 실제 빌링키 사용
+            orderName: '포인트 충전',
+            amount: parseInt(selectedAmount),
+            customer: {
+              id: userEmail || 'guest', // 로그인된 사용자 이메일 사용
+            },
+          }),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          alert(`${parseInt(selectedAmount).toLocaleString()}원 충전이 완료되었습니다.`)
+          handleCloseChargeModal()
+        } else {
+          alert(`충전에 실패했습니다: ${result.error || '알 수 없는 오류'}`)
+        }
+      } catch (error) {
+        console.error('결제 오류:', error)
+        alert('충전 중 오류가 발생했습니다.')
+      }
     }
 
     // 충전 금액 옵션
