@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
  * PortOne v2 빌링키 결제 API
  * 
  * 요청 데이터:
- * - billingKey: string (PortOne 빌링키)
+ * - billingKey: string ( 빌링키)
  * - orderName: string (주문명)
  * - amount: number (결제 금액)
  * - customer: { id: string } (고객 정보)
